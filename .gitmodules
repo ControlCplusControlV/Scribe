@@ -1,0 +1,3 @@
+[submodule "miden-yul/miden"]
+	path = miden-yul/miden
+	url = git@github.com:maticnetwork/miden.git
