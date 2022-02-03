@@ -1,0 +1,19 @@
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+underscore = { "_" }
+newline = _{ "\n" | "\r" }
+WHITESPACE = _{ " " }
+inner = { ASCII_ALPHANUMERIC* }
+
+//all yul_parsing rules
+yul_syntax = {variable_declaration | less_than | greater_than | add | mstore | _if}
+
+//individual parsing rules
+variable_declaration = { "let" ~ inner ~ ":=" }
+less_than = {"lt("}
+greater_than = {"gt("}
+add = {"add("}
+mstore = {"mstore("}
+//_if because if is a keyword in rust
+_if = {"if" ~ WHITESPACE}
+
