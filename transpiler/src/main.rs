@@ -2,7 +2,7 @@ mod lib;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
-use std::fs;
+// use std::fs;
 use pest::Parser;
 use pest::iterators::Pair;
 
@@ -13,15 +13,38 @@ struct IdentParser;
 
 
 
+
+
 fn main() {
-    parse_yul_syntax(Rule::greater_than, "gt(200)")   
+    let yul_code:&str = "gt(add(x,y), add(x,y))";
+
+    let op_codes: String = transpile(yul_code); 
 }
 
 
+fn transpile(syntax: &str) -> String {
+    let mut opcodes: String = "".to_string();
 
-fn parse_yul_syntax(rule: Rule, syntax: &str ) {
+
+    loop {
+        let new_opcode = parse_yul_syntax(syntax);
+        opcodes.push_str(new_opcode);
+
+        if syntax.len()==0{
+            break;
+        }
+    }
+
+
+    return opcodes;
+
+
+}
+
+
+fn parse_yul_syntax(syntax: &str) -> &str{
     // Parse a string input
-    let pair = IdentParser::parse(rule, syntax)
+    let pair = IdentParser::parse(Rule::yul_syntax, syntax)
         .expect("unsuccessful parse")
         .next().unwrap();
 
@@ -29,15 +52,26 @@ fn parse_yul_syntax(rule: Rule, syntax: &str ) {
     // Iterate over the "inner" Pairs
     for inner_pair in pair.into_inner() {
         match inner_pair.as_rule() {
-            Rule::variable_declaration => println!("variable declaration:  {}", inner_pair.as_str()),
-            Rule::less_than => println!("lt:  {}", inner_pair.as_str()),
-            Rule::greater_than => println!("gt:  {}", inner_pair.as_str()),
-            Rule::add => println!("add:  {}", inner_pair.as_str()),
-            Rule::mstore => println!("mstore:  {}", inner_pair.as_str()),
-            Rule::_if => println!("_if:  {}", inner_pair.as_str()),
-           
+            // Rule::variable_declaration => println!("variable declaration:  {}", inner_pair.as_str()),
+            // Rule::less_than => println!("lt:  {}", inner_pair.as_str()),
+            Rule::greater_than => parse_greater_than(inner_pair.as_span().start(), inner_pair.as_span().end(),  syntax),
+            // Rule::add => println!("add:  {}", inner_pair.as_str()),
+            // Rule::mstore => println!("mstore:  {}", inner_pair.as_str()),
+            // Rule::_if => println!("_if:  {}", inner_pair.as_str()),
+            // Rule::inner => println!("inner: {}", inner_pair.as_str()),
             _ => unreachable!()
         };    }
+
+        return "";
+}
+
+
+fn parse_greater_than(start: usize, end: usize, syntax: &str) -> String{
+    //return gt opcode and shorten yul syntax by the "stop" position of the rule
+ 
+
+    return "".to_string();
+
 }
 
 

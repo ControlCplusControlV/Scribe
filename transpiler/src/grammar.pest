@@ -16,4 +16,3 @@ add = {"add("}
 mstore = {"mstore("}
 //_if because if is a keyword in rust
 _if = {"if" ~ WHITESPACE}
-
