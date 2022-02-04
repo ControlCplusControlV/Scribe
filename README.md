@@ -1,2 +1,12 @@
-# Scribe
-Minimal Yul Transpilation to the Miden VM
+
+<br />
+<p align="center">
+    <img src="Scribe.png" alt="Logo" width="1080" height="608">
+  <p align="center">
+
+ 
+<br />
+
+
+# Overview
+ A compact transpiler to convert Yul code to the Polygon Miden VM.
