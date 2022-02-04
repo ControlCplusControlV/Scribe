@@ -190,7 +190,7 @@ fn gt(program: &mut String, op: &OpGt, context: &mut Context) {
 }
 
 fn insert_literal(program: &mut String, value: u128, context: &mut Context) {
-    add_line(program, &format!("{}", value));
+    add_line(program, &format!("push.{}", value));
 }
 
 fn load_variable(program: &mut String, op: &OpVariable, context: &mut Context) {
@@ -250,6 +250,32 @@ fn test_parse() {
         }),
     ];
     assert_eq!(transpile(yul), expected_ops);
+}
+
+#[test]
+fn test_gt_compilation() {
+    let mut context = Context {
+        variables: HashMap::new(),
+        next_open_memory_address: 0,
+    };
+    let mut program = "begin".to_string();
+    let ops = vec![Expr::Gt(OpGt {
+        first_expr: Box::new(Expr::Literal(1)),
+        second_expr: Box::new(Expr::Literal(2)),
+    })];
+    for op in ops {
+        transpile_op(&op, &mut program, &mut context);
+    }
+    add_line(&mut program, "end");
+    println!("{}", program);
+    assert_eq!(
+        program,
+        "begin
+push.1
+push.2
+gt
+end"
+    );
 }
 
 #[test]
