@@ -53,13 +53,21 @@ fn parse_yul_syntax(syntax: &mut String) -> OpCode {
             // Rule::variable_declaration => println!("variable declaration:  {}", inner_pair.as_str()),
             // Rule::less_than => println!("lt:  {}", inner_pair.as_str()),
             Rule::greater_than => parse_greater_than(
-                inner_pair.as_span().start(),
                 inner_pair.as_span().end(),
                 syntax,
             ),
-            // Rule::add => println!("add:  {}", inner_pair.as_str()),
-            // Rule::mstore => println!("mstore:  {}", inner_pair.as_str()),
-            // Rule::_if => println!("_if:  {}", inner_pair.as_str()),
+            Rule::add =>parse_add(
+            inner_pair.as_span().end(),
+            syntax,
+            ),
+            Rule::mstore =>parse_mstore(
+            inner_pair.as_span().end(),
+            syntax,
+            ),
+            Rule::_if =>parse_if(
+            inner_pair.as_span().end(),
+            syntax,
+            ),
             // Rule::inner => println!("inner: {}", inner_pair.as_str()),
             _ => unreachable!(),
         };
@@ -68,9 +76,27 @@ fn parse_yul_syntax(syntax: &mut String) -> OpCode {
 }
 
 //Function to parse greater than syntax from yul into a miden opcode
-fn parse_greater_than(start: usize, end: usize, syntax: &mut String) -> OpCode {
+fn parse_greater_than(end: usize, syntax: &mut String) -> OpCode {
     *syntax = syntax[end..].to_string();
     return "GT".to_string();
+}
+
+//Function to parse greater than syntax from yul into a miden opcode
+fn parse_add(end: usize, syntax: &mut String) -> OpCode {
+    *syntax = syntax[end..].to_string();
+    return "ADD".to_string();
+}
+
+//Function to parse greater than syntax from yul into a miden opcode
+fn parse_mstore(end: usize, syntax: &mut String) -> OpCode {
+    *syntax = syntax[end..].to_string();
+    return "".to_string();
+}
+
+//Function to parse greater than syntax from yul into a miden opcode
+fn parse_if(end: usize, syntax: &mut String) -> OpCode {
+    *syntax = syntax[end..].to_string();
+    return "".to_string();
 }
 
 //for debugging
