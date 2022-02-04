@@ -12,7 +12,8 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     dbg!(&address);
     context.next_open_memory_address += 1;
     context.variables.insert(op.identifier.clone(), address);
-    add_line(program, &format!("push.{}", op.value));
+    // TODO: recursee, transpile expr
+    // add_line(program, &format!("push.{}", op.rhs));
     add_line(program, &format!("mem.store.{}", address));
 }
 
@@ -91,11 +92,11 @@ fn test_add_compilation() {
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "foo".to_string(),
-            value: 12,
+            rhs: Box::new(Expr::Literal(12)),
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "bar".to_string(),
-            value: 15,
+            rhs: Box::new(Expr::Literal(15)),
         }),
         Expr::Add(ExprAdd {
             first_expr: Box::new(Expr::Variable(ExprVariableReference {

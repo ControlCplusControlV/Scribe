@@ -1,4 +1,4 @@
-mod executor;
-mod miden_generator;
-mod parser;
-mod types;
+pub mod executor;
+pub mod miden_generator;
+pub mod parser;
+pub mod types;

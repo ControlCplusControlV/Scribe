@@ -9,80 +9,62 @@ use crate::types::*;
 #[grammar = "./grammar.pest"]
 struct IdentParser;
 
-fn parse(mut syntax: String) -> Vec<Expr> {
-    let mut opcodes: Vec<Expr> = vec![];
-
-    //while the syntax string is greater than 0, parse the string for yul syntax and return the miden opcodes.
-    loop {
-        let new_expr = parse_yul_syntax(&mut syntax);
-        opcodes.push(new_expr);
-
-        if syntax.len() == 0 {
-            break;
-        }
-    }
-
-    //return the transpiled miden opcodes
-    return opcodes;
-}
-
-// Just a type alias for now, but eventually will be an enum like in src/lib.rs
-type OpCode = String;
-
 //function to parse yul syntax into miden opcodes
-fn parse_yul_syntax(syntax: &mut String) -> Expr {
+pub fn parse_yul_syntax(syntax: &mut String) -> Vec<Expr> {
     // Parse a string input
-    let pair = IdentParser::parse(Rule::yul_syntax, syntax)
+    let file = IdentParser::parse(Rule::file, syntax)
         .expect("unsuccessful parse")
         .next()
         .unwrap();
-
-    //for debugging
-    print_pair(&pair, true);
-
-    // Iterate over the "inner" Pairs
-    for inner_pair in pair.into_inner() {
-        return match inner_pair.as_rule() {
-            // Rule::variable_declaration => println!("variable declaration:  {}", inner_pair.as_str()),
-            // Rule::less_than => println!("lt:  {}", inner_pair.as_str()),
-            // Rule::greater_than => parse_greater_than(
-            //     inner_pair.as_span().end(),
-            //     syntax,
-            // ),
-            // Rule::add =>parse_add(
-            // inner_pair.as_span().end(),
-            // syntax,
-            // ),
-            // Rule::mstore =>parse_mstore(
-            // inner_pair.as_span().end(),
-            // syntax,
-            // ),
-            // Rule::_if =>parse_if(
-            // inner_pair.as_span().end(),
-            // syntax,
-            // ),
-            Rule::greater_than => {
-                parse_greater_than(inner_pair.as_span().end(), syntax);
-                // TODO: expect two more expressions, so parse for two more expressions, then
-                // return something like:
-                // Pretending like we've parsed everything
-                *syntax = "".to_string();
-                // TODO: we'll also have to "finish" parsing this by consuming the last
-                // parentheses, after parsing the two arguments as expressions
-                Expr::Gt(ExprGt {
-                    first_expr: Box::new(Expr::Literal(1)),
-                    second_expr: Box::new(Expr::Literal(2)),
-                })
+    let mut expressions: Vec<Expr> = vec![];
+    for statement in file.into_inner() {
+        match statement.as_rule() {
+            Rule::statement => {
+                expressions.push(parse_statement(statement));
             }
-            // Rule::add => println!("add:  {}", inner_pair.as_str()),
-            // Rule::mstore => println!("mstore:  {}", inner_pair.as_str()),
-            // Rule::_if => println!("_if:  {}", inner_pair.as_str()),
-            // Rule::inner => println!("inner: {}", inner_pair.as_str()),
-            _ => unreachable!(),
-        };
+            Rule::EOI => (),
+            r => {
+                panic!("Unreachable rule: {:?}", r);
+            }
+        }
     }
-    todo!("is this even possible to hit, maybe we should return None");
+    return expressions;
 }
+
+fn parse_statement(expression: Pair<Rule>) -> Expr {
+    let inner = expression.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::variable_declaration => {
+            let mut parts = inner.into_inner();
+            let identifier = parts.next().unwrap().as_str();
+            let rhs = parse_expression(parts.next().unwrap());
+            return Expr::DeclareVariable(ExprDeclareVariable {
+                identifier: identifier.to_string(),
+                rhs: Box::new(rhs),
+            });
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn parse_expression(expression: Pair<Rule>) -> Expr {
+    let inner = expression.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::literal => return Expr::Literal(inner.as_str().parse::<u128>().unwrap()),
+        Rule::add_op => {
+            let mut inners = inner.into_inner();
+            let first_arg = inners.next().unwrap();
+            let second_arg = inners.next().unwrap();
+            return Expr::Add(ExprAdd {
+                first_expr: Box::new(parse_expression(first_arg)),
+                second_expr: Box::new(parse_expression(second_arg)),
+            });
+        }
+        _ => unreachable!(),
+    }
+}
+
+type OpCode = String;
 
 //Function to parse greater than syntax from yul into a miden opcode
 fn parse_greater_than(end: usize, syntax: &mut String) -> OpCode {
@@ -126,43 +108,27 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_gt() {
-        let yul = "gt(1,2)".to_string();
+    fn parse_var_declaration() {
+        let mut yul = "let x := 1".to_string();
 
-        let expected_ops = vec![Expr::Gt(ExprGt {
-            first_expr: Box::new(Expr::Literal(1)),
-            second_expr: Box::new(Expr::Literal(2)),
+        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
+            identifier: "x".to_string(),
+            rhs: Box::new(Expr::Literal(1)),
         })];
-        assert_eq!(parse(yul), expected_ops);
+        assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
     }
 
-    #[ignore]
     #[test]
-    fn parse_gt_add() {
-        let yul = "gt(1,2); let x := 12; let y := 15; add(x, y)".to_string();
+    fn parse_var_and_add() {
+        let mut yul = "let x := add(1,2)".to_string();
 
-        let expected_ops = vec![
-            Expr::Gt(ExprGt {
+        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
+            identifier: "x".to_string(),
+            rhs: Box::new(Expr::Add(ExprAdd {
                 first_expr: Box::new(Expr::Literal(1)),
                 second_expr: Box::new(Expr::Literal(2)),
-            }),
-            Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: "x".to_string(),
-                value: 12,
-            }),
-            Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: "y".to_string(),
-                value: 15,
-            }),
-            Expr::Add(ExprAdd {
-                first_expr: Box::new(Expr::Variable(ExprVariableReference {
-                    identifier: "x".to_string(),
-                })),
-                second_expr: Box::new(Expr::Variable(ExprVariableReference {
-                    identifier: "y".to_string(),
-                })),
-            }),
-        ];
-        assert_eq!(parse(yul), expected_ops);
+            })),
+        })];
+        assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
     }
 }
