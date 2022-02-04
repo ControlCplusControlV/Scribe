@@ -17,7 +17,7 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     add_line(program, &format!("mem.store.{}", address));
 }
 
-fn add(program: &mut String, op: &ExprAdd, context: &mut Context) {
+fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
     }
@@ -47,7 +47,13 @@ fn add_line(program: &mut String, line: &str) {
 fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
     match expr {
         Expr::Literal(value) => insert_literal(program, *value, context),
-        Expr::Add(op) => add(program, op, context),
+        Expr::FunctionCall(op) => {
+            if (op.function_name == "add") {
+                add(program, op, context)
+            } else {
+                todo!("Need to implement {} function in miden", op.function_name)
+            }
+        }
         Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
@@ -92,13 +98,14 @@ fn test_add_compilation() {
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "foo".to_string(),
-            rhs: Box::new(Expr::Literal(12)),
+            rhs: Some(Box::new(Expr::Literal(12))),
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "bar".to_string(),
-            rhs: Box::new(Expr::Literal(15)),
+            rhs: Some(Box::new(Expr::Literal(15))),
         }),
-        Expr::Add(ExprAdd {
+        Expr::FunctionCall(ExprFunctionCall {
+            function_name: "add".to_string(),
             first_expr: Box::new(Expr::Variable(ExprVariableReference {
                 identifier: "foo".to_string(),
             })),

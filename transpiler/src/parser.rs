@@ -37,13 +37,19 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let identifier = parts.next().unwrap().as_str();
-            let rhs = parse_expression(parts.next().unwrap());
+            let rhs = parts.next();
+            let mut rhs_expr = None;
+            if let Some(rhs) = rhs {
+                rhs_expr = Some(parse_expression(rhs));
+            }
             return Expr::DeclareVariable(ExprDeclareVariable {
                 identifier: identifier.to_string(),
-                rhs: Box::new(rhs),
+                rhs: rhs_expr.map(Box::new),
             });
         }
-        _ => unreachable!(),
+        r => {
+            panic!("Unreachable rule: {:?}", r);
+        }
     }
 }
 
@@ -51,43 +57,34 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
         Rule::literal => return Expr::Literal(inner.as_str().parse::<u128>().unwrap()),
-        Rule::add_op => {
+        Rule::function_call => {
             let mut inners = inner.into_inner();
+            let function_name = get_identifier(inners.next().unwrap());
             let first_arg = inners.next().unwrap();
             let second_arg = inners.next().unwrap();
-            return Expr::Add(ExprAdd {
+            dbg!(&function_name);
+            return Expr::FunctionCall(ExprFunctionCall {
+                function_name: function_name.to_string(),
                 first_expr: Box::new(parse_expression(first_arg)),
                 second_expr: Box::new(parse_expression(second_arg)),
             });
         }
-        _ => unreachable!(),
+        r => {
+            panic!("Unreachable rule: {:?}", r);
+        }
     }
 }
 
-type OpCode = String;
-
-//Function to parse greater than syntax from yul into a miden opcode
-fn parse_greater_than(end: usize, syntax: &mut String) -> OpCode {
-    *syntax = syntax[end..].to_string();
-    return "GT".to_string();
-}
-
-//Function to parse greater than syntax from yul into a miden opcode
-fn parse_add(end: usize, syntax: &mut String) -> OpCode {
-    *syntax = syntax[end..].to_string();
-    return "ADD".to_string();
-}
-
-//Function to parse greater than syntax from yul into a miden opcode
-fn parse_mstore(end: usize, syntax: &mut String) -> OpCode {
-    *syntax = syntax[end..].to_string();
-    return "".to_string();
-}
-
-//Function to parse greater than syntax from yul into a miden opcode
-fn parse_if(end: usize, syntax: &mut String) -> OpCode {
-    *syntax = syntax[end..].to_string();
-    return "".to_string();
+fn get_identifier(pair: Pair<Rule>) -> String {
+    match pair.as_rule() {
+        Rule::identifier => {
+            return pair.as_str().to_string();
+            // return pair.into_inner().next().unwrap().to_string();
+        }
+        r => {
+            panic!("This was supposed to be an identifier! {:?}", r);
+        }
+    }
 }
 
 //for debugging
@@ -109,12 +106,20 @@ mod tests {
 
     #[test]
     fn parse_var_declaration() {
-        let mut yul = "let x := 1".to_string();
+        let mut yul = "let x := 1
+            let y := 2"
+            .to_string();
 
-        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
-            identifier: "x".to_string(),
-            rhs: Box::new(Expr::Literal(1)),
-        })];
+        let expected_ops = vec![
+            Expr::DeclareVariable(ExprDeclareVariable {
+                identifier: "x".to_string(),
+                rhs: Some(Box::new(Expr::Literal(1))),
+            }),
+            Expr::DeclareVariable(ExprDeclareVariable {
+                identifier: "y".to_string(),
+                rhs: Some(Box::new(Expr::Literal(2))),
+            }),
+        ];
         assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
     }
 
@@ -124,11 +129,35 @@ mod tests {
 
         let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "x".to_string(),
-            rhs: Box::new(Expr::Add(ExprAdd {
+            rhs: Some(Box::new(Expr::FunctionCall(ExprFunctionCall {
+                function_name: "add".to_string(),
                 first_expr: Box::new(Expr::Literal(1)),
                 second_expr: Box::new(Expr::Literal(2)),
-            })),
+            }))),
         })];
         assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
+    }
+
+    #[test]
+    fn parse_fibonnaci() {
+        let mut yul = "let f := 1
+    let s := 1
+    let next
+    for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+    {
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+      if gt(i, 1) {
+        next := add(s, f)
+        f := s
+        s := next
+        mstore(i, s)
+      }
+    }"
+        .to_string();
+        let res = parse_yul_syntax(&mut yul);
+        dbg!(&res);
+        todo!();
     }
 }

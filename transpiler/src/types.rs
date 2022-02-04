@@ -3,7 +3,7 @@
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
     Literal(u128),
-    Add(ExprAdd),
+    FunctionCall(ExprFunctionCall),
     Gt(ExprGt),
     DeclareVariable(ExprDeclareVariable),
     Variable(ExprVariableReference),
@@ -17,11 +17,12 @@ pub struct ExprVariableReference {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDeclareVariable {
     pub identifier: String,
-    pub rhs: Box<Expr>,
+    pub rhs: Option<Box<Expr>>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprAdd {
+pub struct ExprFunctionCall {
+    pub function_name: String,
     pub first_expr: Box<Expr>,
     pub second_expr: Box<Expr>,
 }
