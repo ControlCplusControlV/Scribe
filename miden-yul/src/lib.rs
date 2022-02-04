@@ -14,10 +14,6 @@ pub fn transpile_yul(yul: &str) -> String {
         push.7
         mem.store.1
 
-        push.0
-        push.0
-        push.0
-        push.0
         mem.load.0
         mem.load.1
 
