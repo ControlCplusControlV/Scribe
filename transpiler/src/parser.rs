@@ -37,10 +37,14 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let identifier = parts.next().unwrap().as_str();
-            let rhs = parse_expression(parts.next().unwrap());
+            let rhs = parts.next();
+            let mut rhs_expr = None;
+            if let Some(rhs) = rhs {
+                rhs_expr = Some(parse_expression(rhs));
+            }
             return Expr::DeclareVariable(ExprDeclareVariable {
                 identifier: identifier.to_string(),
-                rhs: Box::new(rhs),
+                rhs: rhs_expr.map(Box::new),
             });
         }
         r => {
@@ -102,12 +106,20 @@ mod tests {
 
     #[test]
     fn parse_var_declaration() {
-        let mut yul = "let x := 1".to_string();
+        let mut yul = "let x := 1
+            let y := 2"
+            .to_string();
 
-        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
-            identifier: "x".to_string(),
-            rhs: Box::new(Expr::Literal(1)),
-        })];
+        let expected_ops = vec![
+            Expr::DeclareVariable(ExprDeclareVariable {
+                identifier: "x".to_string(),
+                rhs: Some(Box::new(Expr::Literal(1))),
+            }),
+            Expr::DeclareVariable(ExprDeclareVariable {
+                identifier: "y".to_string(),
+                rhs: Some(Box::new(Expr::Literal(2))),
+            }),
+        ];
         assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
     }
 
@@ -117,12 +129,35 @@ mod tests {
 
         let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "x".to_string(),
-            rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
+            rhs: Some(Box::new(Expr::FunctionCall(ExprFunctionCall {
                 function_name: "add".to_string(),
                 first_expr: Box::new(Expr::Literal(1)),
                 second_expr: Box::new(Expr::Literal(2)),
-            })),
+            }))),
         })];
         assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
+    }
+
+    #[test]
+    fn parse_fibonnaci() {
+        let mut yul = "let f := 1
+    let s := 1
+    let next
+    for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+    {
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+      if gt(i, 1) {
+        next := add(s, f)
+        f := s
+        s := next
+        mstore(i, s)
+      }
+    }"
+        .to_string();
+        let res = parse_yul_syntax(&mut yul);
+        dbg!(&res);
+        todo!();
     }
 }

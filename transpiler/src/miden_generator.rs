@@ -98,11 +98,11 @@ fn test_add_compilation() {
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "foo".to_string(),
-            rhs: Box::new(Expr::Literal(12)),
+            rhs: Some(Box::new(Expr::Literal(12))),
         }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "bar".to_string(),
-            rhs: Box::new(Expr::Literal(15)),
+            rhs: Some(Box::new(Expr::Literal(15))),
         }),
         Expr::FunctionCall(ExprFunctionCall {
             function_name: "add".to_string(),

@@ -17,7 +17,7 @@ pub struct ExprVariableReference {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDeclareVariable {
     pub identifier: String,
-    pub rhs: Box<Expr>,
+    pub rhs: Option<Box<Expr>>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
