@@ -25,7 +25,7 @@ fn main() {
 fn transpile(syntax: &str) -> String {
     let mut opcodes: String = "".to_string();
 
-
+    //while the syntax string is greater than 0, parse the string for yul syntax and return the miden opcodes.
     loop {
         let new_opcode = parse_yul_syntax(syntax);
         opcodes.push_str(new_opcode);
@@ -35,20 +35,22 @@ fn transpile(syntax: &str) -> String {
         }
     }
 
-
+    //return the transpiled miden opcodes
     return opcodes;
 
 
 }
 
-
+//function to parse yul syntax into miden opcodes
 fn parse_yul_syntax(syntax: &str) -> &str{
     // Parse a string input
     let pair = IdentParser::parse(Rule::yul_syntax, syntax)
         .expect("unsuccessful parse")
         .next().unwrap();
 
+    //for debugging
     print_pair(&pair, true);
+    
     // Iterate over the "inner" Pairs
     for inner_pair in pair.into_inner() {
         match inner_pair.as_rule() {
@@ -66,6 +68,7 @@ fn parse_yul_syntax(syntax: &str) -> &str{
 }
 
 
+//Function to parse greater than syntax from yul into a miden opcode
 fn parse_greater_than(start: usize, end: usize, syntax: &str) -> String{
     //return gt opcode and shorten yul syntax by the "stop" position of the rule
  
@@ -75,7 +78,7 @@ fn parse_greater_than(start: usize, end: usize, syntax: &str) -> String{
 }
 
 
-
+//for debugging
 fn print_pair(pair: &Pair<Rule>, hard_divider: bool) {
     println!("Rule: {:?}", pair.as_rule());
     println!("Span: {:?}", pair.as_span());
