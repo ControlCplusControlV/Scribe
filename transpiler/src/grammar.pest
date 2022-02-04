@@ -3,27 +3,31 @@ digit = { '0'..'9' }
 underscore = { "_" }
 newline = _{ "\n" | "\r" }
 WHITESPACE = _{ " " }
-inner = { ASCII_ALPHANUMERIC* }
-
-literal = { digit+ }
-assignment = { "TODO" } 
-//all yul_parsing rules
-yul_syntax = {variable_declaration | less_than | greater_than | add | mstore | _if}
-
-//individual parsing rules
-less_than = {"lt("}
-greater_than = {"gt("}
-add = {"add("}
-mstore = {"mstore("}
-//_if because if is a keyword in rust
-_if = {"if" ~ WHITESPACE}
 
 // Messing w/ pest
 file = { SOI ~ statement* ~ EOI }
-statement = { variable_declaration | assignment | expr | if_statement | block } 
-block = { "TODO" }
+block = { "{" ~ statement+ ~ "}" }
+statement = { variable_declaration | assignment | expr | if_statement | block | function_definition | switch | for_loop | break_continue | leave } 
+expr = { literal | function_call | identifier }
+function_definition = { "TODO" }
+switch = { "TODO" }
+leave = { "TODO" }
+for_loop = { "for" ~ block ~ expr ~ block }
+break_continue = { "break" | "continue" }
 if_statement = { "TODO" }
-identifier = { ASCII_ALPHANUMERIC* }
-expr = { literal | add_op }
+identifier = @{ ASCII_ALPHANUMERIC+ }
+identifier_list = { "(" ~ identifier ~ ("," ~ identifier)* ~ ")" }
+type_name = { identifier } 
+typed_identifier_list = { "TODO" }
+literal = { number_literal | string_literal | true_literal | false_literal | hex_number}
+number_literal = { digit+ }
+string_literal = { "TODO" }
+true_literal = { "true" }
+false_literal = { "false" }
+hex_number = { "TODO" }
 variable_declaration = { "let" ~ identifier ~ ":=" ~ expr }
-add_op = { "add(" ~ expr ~ "," ~ expr ~ ")" }
+assignment = { identifier ~ ":=" ~ expr }
+function_call = { identifier ~ "(" ~ (expr ~ ( "," ~ expr)* )? ~ ")" }
+
+
+
