@@ -48,6 +48,15 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 rhs: rhs_expr.map(Box::new),
             });
         }
+        Rule::if_statement => {
+            let mut inners = inner.into_inner();
+            let first_arg = inners.next().unwrap();
+            let second_arg = inners.next().unwrap();
+            return Expr::IfStatement(ExprIfStatement {
+                first_expr: Box::new(parse_expression(first_arg)),
+                second_expr: Box::new(parse_block(second_arg)),
+            });
+        }
         // Rule::for_loop => {
         //     let mut parts = inner.into_inner();
         //     let init_block = parts.next().unwrap();
@@ -80,14 +89,6 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
                 second_expr: Box::new(parse_expression(second_arg)),
             });
         }
-        Rule::if_statement =>{
-            let mut inners = inner.into_inner();
-            let first_arg = inners.next().unwrap();
-            let second_arg = inners.next().unwrap();
-            return Expr::IfStatement(ExprIfStatement {
-                first_expr: Box::new(parse_expression(first_arg)),
-                second_expr: Box::new(parse_block(second_arg)),
-            });        }
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
@@ -96,12 +97,11 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
 
 fn parse_block(expression: Pair<Rule>) -> ExprBlock {
     let mut exprs: Vec<Expr> = Vec::new();
-    for statement in expression.into_inner(){
+    for statement in expression.into_inner() {
         exprs.push(parse_statement(statement));
-        
     }
 
-    return ExprBlock{exprs: exprs}
+    return ExprBlock { exprs: exprs };
 }
 
 fn get_identifier(pair: Pair<Rule>) -> String {
@@ -185,6 +185,18 @@ mod tests {
         mstore(i, s)
       }
     }"
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+    #[test]
+    fn parse_if() {
+        let mut yul = "
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+    "
         .to_string();
         let res = parse_yul_syntax(yul);
         dbg!(&res);
