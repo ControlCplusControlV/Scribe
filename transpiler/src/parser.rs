@@ -86,7 +86,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let second_arg = inners.next().unwrap();
             return Expr::IfStatement(ExprIfStatement {
                 first_expr: Box::new(parse_expression(first_arg)),
-                second_expr: Box::new(parse_expression(second_arg)),
+                second_expr: Box::new(parse_block(second_arg)),
             });        }
         r => {
             panic!("Unreachable rule: {:?}", r);
@@ -94,10 +94,14 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     }
 }
 
-fn parse_block(expression: Pair<Rule>) -> Expr {
+fn parse_block(expression: Pair<Rule>) -> ExprBlock {
+    let mut exprs: Vec<Expr> = Vec::new();
+    for statement in expression.into_inner(){
+        exprs.push(parse_statement(statement));
+        
+    }
 
-
-    
+    return ExprBlock{exprs: exprs}
 }
 
 fn get_identifier(pair: Pair<Rule>) -> String {

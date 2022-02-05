@@ -20,7 +20,7 @@ pub struct ExprVariableReference {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprBlock {
-    pub exprs: Vec<String>,
+    pub exprs: Vec<Expr>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
