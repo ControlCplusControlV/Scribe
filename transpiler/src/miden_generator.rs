@@ -34,6 +34,13 @@ fn gt(program: &mut String, op: &ExprGt, context: &mut Context) {
     add_line(program, &format!("gt"));
 }
 
+fn lt(program: &mut String, op: &ExprLt, context: &mut Context) {
+    for expr in [&op.first_expr, &op.second_expr] {
+        transpile_op(expr, program, context);
+    }
+    add_line(program, &format!("lt"));
+}
+
 fn insert_literal(program: &mut String, value: u128, context: &mut Context) {
     add_line(program, &format!("push.{}", value));
 }
@@ -56,11 +63,11 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
             } else {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
-        }
+        },
+        Expr::Lt(op) => lt(program, op, context),
         Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
-        _ => todo!(),
     }
 }
 
@@ -88,6 +95,32 @@ fn test_gt_compilation() {
 push.1
 push.2
 gt
+end"
+    );
+}
+
+#[test]
+fn test_lt_compilation() {
+    let mut context = Context {
+        variables: HashMap::new(),
+        next_open_memory_address: 0,
+    };
+    let mut program = "begin".to_string();
+    let ops = vec![Expr::Lt(ExprLt {
+        first_expr: Box::new(Expr::Literal(1)),
+        second_expr: Box::new(Expr::Literal(2)),
+    })];
+    for op in ops {
+        transpile_op(&op, &mut program, &mut context);
+    }
+    add_line(&mut program, "end");
+    println!("{}", program);
+    assert_eq!(
+        program,
+        "begin
+push.1
+push.2
+lt
 end"
     );
 }

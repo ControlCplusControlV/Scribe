@@ -5,27 +5,14 @@ pub enum Expr {
     Literal(u128),
     FunctionCall(ExprFunctionCall),
     Gt(ExprGt),
+    Lt(ExprLt),
     DeclareVariable(ExprDeclareVariable),
-    ForLoop(ExprForLoop),
-    Block(ExprBlock),
     Variable(ExprVariableReference),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprVariableReference {
     pub identifier: String,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprBlock {
-    pub exprs: Vec<String>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprForLoop {
-    pub init_block: Box<Expr>,
-    pub conditional: Box<Expr>,
-    pub after_block: Box<Expr>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -43,6 +30,12 @@ pub struct ExprFunctionCall {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprGt {
+    pub first_expr: Box<Expr>,
+    pub second_expr: Box<Expr>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprLt {
     pub first_expr: Box<Expr>,
     pub second_expr: Box<Expr>,
 }
