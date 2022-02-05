@@ -1,3 +1,5 @@
+use core::num::dec2flt::parse;
+
 // use std::fs;
 use pest::iterators::Pair;
 use pest::Parser;
@@ -57,12 +59,18 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 second_expr: Box::new(parse_block(second_arg)),
             });
         }
-        // Rule::for_loop => {
-        //     let mut parts = inner.into_inner();
-        //     let init_block = parts.next().unwrap();
-        //     let conditional = parts.next().unwrap();
-        //     let after_block = parts.next().unwrap();
-        // }
+        Rule::for_loop => {
+            let mut parts = inner.into_inner();
+            let init_block = parts.next().unwrap();
+            let conditional = parts.next().unwrap();
+            let after_block = parts.next().unwrap();
+
+            return Expr::ForLoop(ExprForLoop{
+                 init_block: Box::new(parse_block(init_block)),
+                 conditional:  Box::new(parse_expression(conditional)),
+                 after_block: Box::new(parse_block(after_block)),
+            });
+        }
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
@@ -116,17 +124,6 @@ fn get_identifier(pair: Pair<Rule>) -> String {
     }
 }
 
-//for debugging
-fn print_pair(pair: &Pair<Rule>, hard_divider: bool) {
-    println!("Rule: {:?}", pair.as_rule());
-    println!("Span: {:?}", pair.as_span());
-    println!("Text: {:?}", pair.as_str());
-    if hard_divider {
-        println!("{:=>60}", "");
-    } else {
-        println!("{:->60}", "");
-    }
-}
 
 // TESTS
 #[cfg(test)]
@@ -197,6 +194,17 @@ mod tests {
         mstore(i, 1)
       }
     "
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+
+
+    #[test]
+    fn parse_for_loop() {
+        let mut yul = "
+        for { let i := 0 } lt(i, 10) { i := add(i, 1)}"
         .to_string();
         let res = parse_yul_syntax(yul);
         dbg!(&res);

@@ -25,9 +25,9 @@ pub struct ExprBlock {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprForLoop {
-    pub init_block: Box<Expr>,
+    pub init_block: Box<ExprBlock>,
     pub conditional: Box<Expr>,
-    pub after_block: Box<Expr>,
+    pub after_block: Box<ExprBlock>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
