@@ -33,8 +33,19 @@ pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
 
 fn parse_statement(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
+    // dbg!(&inner);
     match inner.as_rule() {
         Rule::expr => parse_expression(inner),
+        Rule::assignment => {
+            let mut parts = inner.into_inner();
+            let identifier = parts.next().unwrap().as_str();
+            let rhs = parts.next().unwrap();
+            let mut rhs_expr = parse_expression(rhs);
+            return Expr::Assignment(ExprAssignment {
+                identifier: identifier.to_string(),
+                rhs: Box::new(rhs_expr),
+            });
+        }
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let identifier = parts.next().unwrap().as_str();

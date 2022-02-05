@@ -5,6 +5,7 @@ pub enum Expr {
     Literal(u128),
     FunctionCall(ExprFunctionCall),
     IfStatement(ExprIfStatement),
+    Assignment(ExprAssignment),
     Gt(ExprGt),
     Lt(ExprLt),
     DeclareVariable(ExprDeclareVariable),
@@ -21,6 +22,12 @@ pub struct ExprVariableReference {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprBlock {
     pub exprs: Vec<Expr>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprAssignment {
+    pub identifier: String,
+    pub rhs: Box<Expr>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
