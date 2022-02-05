@@ -62,11 +62,12 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
             } else {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
-        },
+        }
         Expr::Lt(op) => lt(program, op, context),
         Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
+        _ => todo!(),
     }
 }
 
