@@ -17,7 +17,6 @@ fn read_yul_files() -> Vec<YulFile> {
         let mut unwrapped_file = file.unwrap().path().display().to_string();
         let mut contents = fs::read_to_string(unwrapped_file)
         .expect("Something went wrong readingfrom the contracts directory");
-        contents = contents.replace('\n', "");
         
         yul_files.push(YulFile{file_name:"", file_contents: contents});
     }
