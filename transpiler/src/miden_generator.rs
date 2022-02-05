@@ -9,7 +9,6 @@ struct Context {
 
 fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Context) {
     let address = context.next_open_memory_address;
-    dbg!(&address);
     context.next_open_memory_address += 1;
     context.variables.insert(op.identifier.clone(), address);
     // TODO: recursee, transpile expr
@@ -71,6 +70,19 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
     }
 }
 
+pub fn transpile_program(expressions: Vec<Expr>) -> String {
+    let mut context = Context {
+        variables: HashMap::new(),
+        next_open_memory_address: 0,
+    };
+    let mut program = "begin\npush.0\npush.0\npush.0".to_string();
+    for expr in expressions {
+        transpile_op(&expr, &mut program, &mut context);
+    }
+    add_line(&mut program, "end");
+    return program;
+}
+
 // TESTS
 
 #[test]
@@ -84,9 +96,6 @@ fn test_gt_compilation() {
         first_expr: Box::new(Expr::Literal(1)),
         second_expr: Box::new(Expr::Literal(2)),
     })];
-    for op in ops {
-        transpile_op(&op, &mut program, &mut context);
-    }
     add_line(&mut program, "end");
     println!("{}", program);
     assert_eq!(

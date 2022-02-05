@@ -10,9 +10,9 @@ use crate::types::*;
 struct IdentParser;
 
 //function to parse yul syntax into miden opcodes
-pub fn parse_yul_syntax(syntax: &mut String) -> Vec<Expr> {
+pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
     // Parse a string input
-    let file = IdentParser::parse(Rule::file, syntax)
+    let file = IdentParser::parse(Rule::file, &syntax)
         .expect("unsuccessful parse")
         .next()
         .unwrap();
@@ -34,6 +34,7 @@ pub fn parse_yul_syntax(syntax: &mut String) -> Vec<Expr> {
 fn parse_statement(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
+        Rule::expr => parse_expression(inner),
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let identifier = parts.next().unwrap().as_str();
@@ -63,6 +64,11 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
         Rule::literal => return Expr::Literal(inner.as_str().parse::<u128>().unwrap()),
+        Rule::identifier => {
+            return Expr::Variable(ExprVariableReference {
+                identifier: inner.as_str().to_string(),
+            })
+        }
         Rule::function_call => {
             let mut inners = inner.into_inner();
             let function_name = get_identifier(inners.next().unwrap());
@@ -125,7 +131,7 @@ mod tests {
                 rhs: Some(Box::new(Expr::Literal(2))),
             }),
         ];
-        assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
+        assert_eq!(parse_yul_syntax(yul), expected_ops);
     }
 
     #[test]
@@ -140,7 +146,7 @@ mod tests {
                 second_expr: Box::new(Expr::Literal(2)),
             }))),
         })];
-        assert_eq!(parse_yul_syntax(&mut yul), expected_ops);
+        assert_eq!(parse_yul_syntax(yul), expected_ops);
     }
 
     #[test]
@@ -162,7 +168,7 @@ mod tests {
       }
     }"
         .to_string();
-        let res = parse_yul_syntax(&mut yul);
+        let res = parse_yul_syntax(yul);
         dbg!(&res);
         todo!();
     }
