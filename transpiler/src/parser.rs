@@ -47,6 +47,12 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 rhs: rhs_expr.map(Box::new),
             });
         }
+        // Rule::for_loop => {
+        //     let mut parts = inner.into_inner();
+        //     let init_block = parts.next().unwrap();
+        //     let conditional = parts.next().unwrap();
+        //     let after_block = parts.next().unwrap();
+        // }
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
@@ -62,7 +68,6 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let function_name = get_identifier(inners.next().unwrap());
             let first_arg = inners.next().unwrap();
             let second_arg = inners.next().unwrap();
-            dbg!(&function_name);
             return Expr::FunctionCall(ExprFunctionCall {
                 function_name: function_name.to_string(),
                 first_expr: Box::new(parse_expression(first_arg)),
@@ -140,7 +145,8 @@ mod tests {
 
     #[test]
     fn parse_fibonnaci() {
-        let mut yul = "let f := 1
+        let mut yul = "
+    let f := 1
     let s := 1
     let next
     for { let i := 0 } lt(i, 10) { i := add(i, 1)}

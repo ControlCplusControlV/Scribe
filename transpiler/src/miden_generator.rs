@@ -57,6 +57,7 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
         Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
+        _ => todo!(),
     }
 }
 
