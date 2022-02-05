@@ -8,13 +8,13 @@ file = { SOI ~ newline* ~ statement ~ (newline* ~ statement)* ~ EOI }
 block = { "{" ~ statement* ~ "}" }
 statement = { newline* ~ (variable_declaration | assignment | if_statement | block | function_definition | switch | for_loop | break_continue | leave | expr) ~ newline*  } 
 expr = { literal | function_call | identifier }
-for_loop = { "for" ~ block ~ expr ~ block }
+for_loop = { "for" ~ block ~ expr ~ block ~ block}
 break_continue = { "break" | "continue" }
 identifier = @{ ASCII_ALPHANUMERIC+ }
 identifier_list = { "(" ~ identifier ~ ("," ~ identifier)* ~ ")" }
 type_name = { identifier } 
 literal = { number_literal | string_literal | true_literal | false_literal | hex_number}
-number_literal = { digit+ }
+number_literal = @{ digit+ }
 true_literal = { "true" }
 false_literal = { "false" }
 variable_declaration = { "let" ~ identifier ~ (":=" ~ expr)? }

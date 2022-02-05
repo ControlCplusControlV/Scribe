@@ -62,13 +62,13 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let init_block = parts.next().unwrap();
             let conditional = parts.next().unwrap();
             let after_block = parts.next().unwrap();
-            let interior_block= parts.next().unwrap();
+            let interior_block = parts.next().unwrap();
 
-            return Expr::ForLoop(ExprForLoop{
-                 init_block: Box::new(parse_block(init_block)),
-                 conditional:  Box::new(parse_expression(conditional)),
-                 after_block: Box::new(parse_block(after_block)),
-                 interior_block: Box::new(parse_block(interior_block)),
+            return Expr::ForLoop(ExprForLoop {
+                init_block: Box::new(parse_block(init_block)),
+                conditional: Box::new(parse_expression(conditional)),
+                after_block: Box::new(parse_block(after_block)),
+                interior_block: Box::new(parse_block(interior_block)),
             });
         }
         r => {
@@ -80,7 +80,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
-        Rule::literal => return Expr::Literal(inner.as_str().parse::<u128>().unwrap()),
+        Rule::literal => {
+            let i = inner.as_str();
+            dbg!(i);
+            return Expr::Literal(i.parse::<u128>().unwrap());
+        }
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
                 identifier: inner.as_str().to_string(),
@@ -123,7 +127,6 @@ fn get_identifier(pair: Pair<Rule>) -> String {
         }
     }
 }
-
 
 // TESTS
 #[cfg(test)]
@@ -200,12 +203,10 @@ mod tests {
         todo!();
     }
 
-
     #[test]
     fn parse_for_loop() {
         let mut yul = "
-        for { let i := 0 } lt(i, 10) { i := add(i, 1)}
-        {
+        for { let i := 0 } lt(i, 10) { i := add(i, 1)} {
           if lt(i, 2) {
             mstore(i, 1)
           }
@@ -214,7 +215,9 @@ mod tests {
             f := s
             s := next
             mstore(i, s)
-          }"        .to_string();
+          }
+        }"
+        .to_string();
         let res = parse_yul_syntax(yul);
         dbg!(&res);
         todo!();
