@@ -4,6 +4,7 @@
 pub enum Expr {
     Literal(u128),
     FunctionCall(ExprFunctionCall),
+    IfStatement(ExprIfStatement),
     Gt(ExprGt),
     Lt(ExprLt),
     DeclareVariable(ExprDeclareVariable),
@@ -33,6 +34,12 @@ pub struct ExprForLoop {
 pub struct ExprDeclareVariable {
     pub identifier: String,
     pub rhs: Option<Box<Expr>>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprIfStatement {
+    pub first_expr: Box<Expr>,
+    pub second_expr: Box<ExprBlock>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]

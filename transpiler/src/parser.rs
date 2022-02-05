@@ -80,10 +80,24 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
                 second_expr: Box::new(parse_expression(second_arg)),
             });
         }
+        Rule::if_statement =>{
+            let mut inners = inner.into_inner();
+            let first_arg = inners.next().unwrap();
+            let second_arg = inners.next().unwrap();
+            return Expr::IfStatement(ExprIfStatement {
+                first_expr: Box::new(parse_expression(first_arg)),
+                second_expr: Box::new(parse_expression(second_arg)),
+            });        }
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
     }
+}
+
+fn parse_block(expression: Pair<Rule>) -> Expr {
+
+
+    
 }
 
 fn get_identifier(pair: Pair<Rule>) -> String {
