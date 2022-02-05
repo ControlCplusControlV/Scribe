@@ -31,6 +31,13 @@ fn gt(program: &mut String, op: &ExprGt, context: &mut Context) {
     add_line(program, &format!("gt"));
 }
 
+fn g=lt(program: &mut String, op: &ExprGt, context: &mut Context) {
+    for expr in [&op.first_expr, &op.second_expr] {
+        transpile_op(expr, program, context);
+    }
+    add_line(program, &format!("lt"));
+}
+
 fn insert_literal(program: &mut String, value: u128, context: &mut Context) {
     add_line(program, &format!("push.{}", value));
 }
@@ -57,7 +64,6 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
         Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
-        _ => todo!(),
     }
 }
 
