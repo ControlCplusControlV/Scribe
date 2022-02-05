@@ -14,6 +14,9 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     context.variables.insert(op.identifier.clone(), address);
     // TODO: recursee, transpile expr
     // add_line(program, &format!("push.{}", op.rhs));
+    if let Some(rhs) = &op.rhs {
+        transpile_op(&rhs, program, context);
+    }
     add_line(program, &format!("mem.store.{}", address));
 }
 
@@ -93,10 +96,6 @@ end"
 fn test_add_compilation() {
     let mut program = "begin\npush.0\npush.0\npush.0".to_string();
     let ops = vec![
-        Expr::Gt(ExprGt {
-            first_expr: Box::new(Expr::Literal(1)),
-            second_expr: Box::new(Expr::Literal(2)),
-        }),
         Expr::DeclareVariable(ExprDeclareVariable {
             identifier: "foo".to_string(),
             rhs: Some(Box::new(Expr::Literal(12))),
@@ -132,9 +131,6 @@ fn test_add_compilation() {
 push.0
 push.0
 push.0
-push.1
-push.2
-gt
 push.12
 mem.store.0
 push.15
