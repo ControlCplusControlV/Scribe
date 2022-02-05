@@ -1,5 +1,3 @@
-use core::num::dec2flt::parse;
-
 // use std::fs;
 use pest::iterators::Pair;
 use pest::Parser;
@@ -206,8 +204,17 @@ mod tests {
     #[test]
     fn parse_for_loop() {
         let mut yul = "
-        for { let i := 0 } lt(i, 10) { i := add(i, 1)}"
-        .to_string();
+        for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+        {
+          if lt(i, 2) {
+            mstore(i, 1)
+          }
+          if gt(i, 1) {
+            next := add(s, f)
+            f := s
+            s := next
+            mstore(i, s)
+          }"        .to_string();
         let res = parse_yul_syntax(yul);
         dbg!(&res);
         todo!();

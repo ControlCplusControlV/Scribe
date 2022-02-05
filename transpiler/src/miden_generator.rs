@@ -36,7 +36,7 @@ fn gt(program: &mut String, op: &ExprGt, context: &mut Context) {
 fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Context) {
     transpile_op(&op.first_expr, program, context);
     add_line(program, &format!("if.true"));
-    transpile_op(&op.second_expr, program, context);
+    // transpile_op(&op.second_expr, program, context);
     add_line(program, &format!("else")); 
     add_line(program, &format!("noop"));
     add_line(program, &format!("end"));   
