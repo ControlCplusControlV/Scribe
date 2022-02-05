@@ -1,12 +1,13 @@
 #[cfg(test)]
 mod tests {
     use colored::*;
+    use miden_processor::StarkField;
     use transpiler::executor;
     use transpiler::miden_generator;
     use transpiler::parser;
     use transpiler::types;
 
-    fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u128>) {
+    fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u64>) {
         fn print_title(s: &str) {
             let s1 = format!("=== {} ===", s).blue().bold();
             println!("{}", s1);
@@ -34,11 +35,12 @@ mod tests {
 
         print_title("Miden Output");
         println!("{}", last_stack_value);
+        assert_eq!(*expected_output.first().unwrap(), last_stack_value.as_int());
     }
 
     #[test]
     fn integration_literal() {
-        run_example("add(1,2)".to_string(), vec![], vec![4]);
+        run_example("add(1,2)".to_string(), vec![], vec![3]);
     }
 
     #[test]
@@ -51,7 +53,7 @@ add(x,y)
             "
             .to_string(),
             vec![],
-            vec![4],
+            vec![5],
         );
     }
 }
