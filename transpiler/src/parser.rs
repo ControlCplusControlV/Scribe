@@ -1,3 +1,5 @@
+use core::num::dec2flt::parse;
+
 // use std::fs;
 use pest::iterators::Pair;
 use pest::Parser;
@@ -62,11 +64,13 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let init_block = parts.next().unwrap();
             let conditional = parts.next().unwrap();
             let after_block = parts.next().unwrap();
+            let interior_block= parts.next().unwrap();
 
             return Expr::ForLoop(ExprForLoop{
                  init_block: Box::new(parse_block(init_block)),
                  conditional:  Box::new(parse_expression(conditional)),
                  after_block: Box::new(parse_block(after_block)),
+                 interior_block: Box::new(parse_block(interior_block)),
             });
         }
         r => {
