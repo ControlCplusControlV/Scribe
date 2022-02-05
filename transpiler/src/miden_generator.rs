@@ -37,10 +37,9 @@ fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Contex
     transpile_op(&op.first_expr, program, context);
     add_line(program, &format!("if.true"));
     transpile_op(&op.second_expr, program, context);
-    add_line("else");
-    add_line("noop");
-    add_line("end");
-    
+    add_line(program, &format!("else")); 
+    add_line(program, &format!("noop"));
+    add_line(program, &format!("end"));   
 }
 
 fn lt(program: &mut String, op: &ExprLt, context: &mut Context) {
