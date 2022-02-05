@@ -39,7 +39,7 @@ mod tests {
     }
 
     #[test]
-    fn integration_literal() {
+    fn integration_add() {
         run_example("add(1,2)".to_string(), vec![], vec![3]);
     }
 
@@ -50,6 +50,22 @@ mod tests {
 let x := 2
 let y := 3
 add(x,y)
+            "
+            .to_string(),
+            vec![],
+            vec![5],
+        );
+    }
+
+    #[test]
+    fn integration_if() {
+        run_example(
+            "
+let x := 2
+let y := 3
+if lt(x, y) {
+    5
+}
             "
             .to_string(),
             vec![],

@@ -19,6 +19,12 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     add_line(program, &format!("mem.store.{}", address));
 }
 
+fn block(program: &mut String, op: &ExprBlock, context: &mut Context) {
+    for op in &op.exprs {
+        transpile_op(&op, program, context);
+    }
+}
+
 fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
@@ -26,7 +32,7 @@ fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     add_line(program, &format!("add"));
 }
 
-fn gt(program: &mut String, op: &ExprGt, context: &mut Context) {
+fn gt(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
     }
@@ -36,13 +42,13 @@ fn gt(program: &mut String, op: &ExprGt, context: &mut Context) {
 fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Context) {
     transpile_op(&op.first_expr, program, context);
     add_line(program, &format!("if.true"));
-    // transpile_op(&op.second_expr, program, context);
-    add_line(program, &format!("else")); 
-    add_line(program, &format!("noop"));
-    add_line(program, &format!("end"));   
+    block(program, &op.second_expr, context);
+    // add_line(program, &format!("else"));
+    // add_line(program, &format!("noop"));
+    add_line(program, &format!("end"));
 }
 
-fn lt(program: &mut String, op: &ExprLt, context: &mut Context) {
+fn lt(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
     }
@@ -68,15 +74,19 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
         Expr::FunctionCall(op) => {
             if (op.function_name == "add") {
                 add(program, op, context)
+            } else if (op.function_name == "gt") {
+                gt(program, op, context)
+            } else if (op.function_name == "lt") {
+                lt(program, op, context)
             } else {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
         }
-        Expr::Lt(op) => lt(program, op, context),
-        Expr::Gt(op) => gt(program, op, context),
         Expr::DeclareVariable(op) => declare_var(program, op, context),
         Expr::Variable(op) => load_variable(program, op, context),
-        _ => todo!(),
+        Expr::Block(op) => block(program, op, context),
+        Expr::IfStatement(op) => if_statement(program, op, context),
+        x => todo!("{:?} unimplemented", x),
     }
 }
 
