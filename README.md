@@ -106,7 +106,7 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
 }
 ```
       
-Finally, the generated Miden code is ready to run! Scribe can test your code on the Miden VM by starting the VM, passing in the Miden code and calling the executor. Here is what our code looks like from start to finish!
+Finally, the generated Miden code is ready to run! Scribe can test your code on the Miden VM by starting the VM, passing in the Miden code and calling the executor. Here is what the process looks like from start to finish!
       
 ```rust
 //Parse the Yul code
@@ -127,14 +127,17 @@ print_title("Miden Output");
 println!("{}", last_stack_value);
 ```
       
-And here is our output!
+And here is the output!
       
 ```
       
       
 ```
       
-## How Can I Test It?
+## How to transpile your own contract.
+      
+Explain here, if they want to compile from solidity or vyper, maybe link it? Then we can explain how to drop their own contracts and maybe just quickly do something like `scribe` or `scribe build`, then maybe if they want to see the output `scribe test`.      
+
 
 Scribe was meant to focus on real world applicability, and because of this uses Miden v0.2. Due to Miden v0.2 not being done yet certain crates of it like the zk prover are broken atm as the developers build away on the new release. So certain functionality like zk proof generation can't be done at the moment, but execution can still be tested in the zk VM environment.
 
