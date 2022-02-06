@@ -316,6 +316,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "scribe"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "debug_tree",
+ "miden-assembly",
+ "miden-processor",
+ "pest",
+ "pest_derive",
+]
+
+[[package]]
 name = "sha-1"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -352,18 +364,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
-]
-
-[[package]]
-name = "transpiler"
-version = "0.1.0"
-dependencies = [
- "colored",
- "debug_tree",
- "miden-assembly",
- "miden-processor",
- "pest",
- "pest_derive",
 ]
 
 [[package]]
