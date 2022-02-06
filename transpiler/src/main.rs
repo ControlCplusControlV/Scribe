@@ -27,6 +27,9 @@ fn main() {
     let yul_contracts = read_yul_contracts();
 
     for yul_code in yul_contracts {
+        print_title("Input File");
+        println!("{}", yul_code.file_contents);
+        pause();
         let inputs = vec![];
         let parsed = parser::parse_yul_syntax(yul_code.file_contents);
 
