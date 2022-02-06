@@ -6,7 +6,7 @@ pub struct YulFile{
     pub file_contents: String,
 }
 
-fn read_yul_files() -> Vec<YulFile> {
+fn read_yul_contracts() -> Vec<YulFile> {
     let mut yul_files: Vec<YulFile> = Vec::new();
 
     let file_path = fs::read_dir("../contracts/").unwrap();
