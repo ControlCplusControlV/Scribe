@@ -94,7 +94,6 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     match inner.as_rule() {
         Rule::literal => {
             let i = inner.as_str();
-            dbg!(i);
             return Expr::Literal(i.parse::<u128>().unwrap());
         }
         Rule::identifier => {

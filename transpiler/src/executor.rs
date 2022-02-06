@@ -33,24 +33,20 @@ pub fn test_execute() {
 pub fn test_lt() {
     let assembly = "
 begin
-push.2
-push.0
-push.0
-push.0
-mem.pop.0
-push.3
-push.0
-push.0
-push.0
-mem.pop.1
-mem.push.1
-drop
-drop
-drop
-mem.push.0
-drop
-drop
-drop
+    push.2
+    push.0
+    push.0
+    push.0
+    mem.pop.0
+    push.3
+    push.0
+    push.0
+    push.0
+    mem.pop.1
+    mem.push.0
+    movup.3
+    movup.3
+    mem.push.0
 end
         ";
     let stack = execute(assembly.to_string(), vec![])

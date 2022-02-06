@@ -4,7 +4,7 @@ underscore = { "_" }
 newline = _{ "\n" | "\r" }
 WHITESPACE = _{ " " }
 
-file = { SOI ~ intro ~ statement* ~ outro ~ EOI }
+file = { SOI ~ intro? ~ statement* ~ outro? ~ EOI }
 block = { "{" ~ statement* ~ "}" }
 statement = { newline* ~ (variable_declaration | assignment | if_statement | block | function_definition | switch | for_loop | break_continue | leave | expr) ~ newline*  } 
 expr = { literal | function_call | identifier }

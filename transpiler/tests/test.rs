@@ -6,11 +6,13 @@ mod tests {
     use transpiler::miden_generator;
     use transpiler::parser;
     use transpiler::types;
+    use transpiler::types::expressions_to_tree;
 
     fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u64>) {
         fn print_title(s: &str) {
             let s1 = format!("=== {} ===", s).blue().bold();
             println!("{}", s1);
+            println!(" ");
         }
         println!("");
         println!("");
@@ -21,7 +23,7 @@ mod tests {
         let parsed = parser::parse_yul_syntax(yul_code);
 
         print_title("Parsed Expressions");
-        println!("{:?}", parsed);
+        println!("{}", expressions_to_tree(&parsed));
         println!("");
 
         let miden_code = miden_generator::transpile_program(parsed);
