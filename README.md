@@ -106,7 +106,21 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
 }
 ```
       
-Finally, the generated Miden code is ready to run! Scribe can test your code on the Miden VM by starting the VM, passing in the Miden code and calling the executor. Here is what the process looks like from start to finish!
+The transpiled code from the fibonacci example looks something like this.
+      
+```nasm
+      
+begin
+push.10
+push.0
+push.0
+push.0
+mem.pop.0
+ect...
+   
+```
+      
+Now the generated Miden code is ready to run! Scribe can test your code on the Miden VM by starting the VM, passing in the Miden code and calling the executor. Here is what the process looks like from start to finish!
       
 ```rust
 //Parse the Yul code
