@@ -49,7 +49,7 @@ fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Contex
 }
 
 fn lt(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
-    for expr in [&op.first_expr, &op.second_expr] {
+    for expr in [&op.second_expr, &op.first_expr] {
         transpile_op(expr, program, context);
     }
     add_line(program, &format!("lt"));
@@ -93,9 +93,10 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
 pub fn transpile_program(expressions: Vec<Expr>) -> String {
     let mut context = Context {
         variables: HashMap::new(),
-        next_open_memory_address: 0,
+        next_open_memory_address: 2,
     };
-    let mut program = "begin\npush.0\npush.0\npush.0".to_string();
+    let mut program =
+        "begin\npush.0\npush.0\npush.0\npush.0\nmem.store.0\npush.1\nmem.store.1".to_string();
     for expr in expressions {
         transpile_op(&expr, &mut program, &mut context);
     }
@@ -109,7 +110,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
 fn test_gt_compilation() {
     let mut context = Context {
         variables: HashMap::new(),
-        next_open_memory_address: 0,
+        next_open_memory_address: 1,
     };
     let mut program = "begin".to_string();
     let ops = vec![Expr::Gt(ExprGt {
@@ -124,32 +125,6 @@ fn test_gt_compilation() {
 push.1
 push.2
 gt
-end"
-    );
-}
-
-#[test]
-fn test_lt_compilation() {
-    let mut context = Context {
-        variables: HashMap::new(),
-        next_open_memory_address: 0,
-    };
-    let mut program = "begin".to_string();
-    let ops = vec![Expr::Lt(ExprLt {
-        first_expr: Box::new(Expr::Literal(1)),
-        second_expr: Box::new(Expr::Literal(2)),
-    })];
-    for op in ops {
-        transpile_op(&op, &mut program, &mut context);
-    }
-    add_line(&mut program, "end");
-    println!("{}", program);
-    assert_eq!(
-        program,
-        "begin
-push.1
-push.2
-lt
 end"
     );
 }
@@ -178,7 +153,7 @@ fn test_add_compilation() {
     ];
     let mut context = Context {
         variables: HashMap::new(),
-        next_open_memory_address: 0,
+        next_open_memory_address: 1,
     };
 
     for op in ops {

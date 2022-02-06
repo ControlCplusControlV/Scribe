@@ -35,7 +35,11 @@ mod tests {
 
         print_title("Miden Output");
         println!("{}", last_stack_value);
-        assert_eq!(*expected_output.first().unwrap(), last_stack_value.as_int());
+        if (*expected_output.first().unwrap() != last_stack_value.as_int()) {
+            print_title("Miden Stack");
+            println!("{:?}", stack);
+            panic!("Failed, stack result not right");
+        }
     }
 
     #[test]
@@ -49,7 +53,7 @@ mod tests {
             "
 let x := 2
 let y := 3
-add(x,y)
+add(x, y)
             "
             .to_string(),
             vec![],
@@ -63,7 +67,7 @@ add(x,y)
             "
 let x := 2
 let y := 3
-if lt(x, y) {
+if lt(y, x) {
     5
 }
             "
