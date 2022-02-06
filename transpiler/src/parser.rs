@@ -24,6 +24,7 @@ pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
             }
             Rule::EOI => (),
             r => {
+                dbg!(&statement);
                 panic!("Unreachable rule: {:?}", r);
             }
         }
@@ -232,6 +233,21 @@ mod tests {
         mstore(i, s)
       }
     }"
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+
+    #[test]
+    fn parse_cruft() {
+        let mut yul = "
+object \"fib\" {
+  code {
+  }
+}
+
+    "
         .to_string();
         let res = parse_yul_syntax(yul);
         dbg!(&res);

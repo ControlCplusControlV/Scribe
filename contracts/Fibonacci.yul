@@ -11,6 +11,6 @@ object "fib" {
                 a := b
                 b := c
             }
-
+            b
   }
 }
