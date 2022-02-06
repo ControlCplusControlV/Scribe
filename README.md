@@ -9,7 +9,7 @@
       
 # 📜 Scribe 📜
 
-Scribe is compact Yul transpiler written in Rust that targets the Polygon Miden VM. Scribe works by compiling Yul down to Miden opcodes, allowing developers to write smart contracts in Yul and run them on Polygon Miden. Since Yul is the intermediate language for Solidity, Vyper and Yul+ Scribe is a great foundation for various smart contract languages to compile code to run on Polygon Miden.
+Scribe is a compact Yul transpiler written in Rust that targets the Polygon Miden VM. Scribe works by compiling Yul down to Miden opcodes, allowing developers to write smart contracts in Yul and run them on Polygon Miden. Since Yul is the intermediate language for Solidity, Vyper and Yul+ Scribe is a great foundation for various smart contract languages to compile code to run on Polygon Miden.
 
 Currently, Scribe is able to transpile Yul syntax including blocks, for loops, if statements, break/continue, number literals, true literals, false literals, variable declarations, assignments, and function calls. We are still in the process of adding recognition for function definitions, switch/case statements, leave statements, string literals and hex numbers.
 
