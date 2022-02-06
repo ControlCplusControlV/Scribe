@@ -152,7 +152,7 @@ Miden Output
       
 ## How to transpile your own contract.
       
-Explain here, if they want to compile from solidity or vyper, maybe link it? Then we can explain how to drop their own contracts and maybe just quickly do something like `scribe` or `scribe build`, then maybe if they want to see the output `scribe test`.      
+To transpile and test your own contracts simple drop your own Yul Contracts inside the contracts folder then transpile then by running the transpiler crate with `cargo run`. Note that some Yul operations are still unsupported, but basic arithmatic, and control structures are supported, as well as variables.   
 
 
 Scribe was meant to focus on real world applicability, and because of this uses Miden v0.2. Due to Miden v0.2 not being done yet certain crates of it like the zk prover are broken atm as the developers build away on the new release. So certain functionality like zk proof generation can't be done at the moment, but execution can still be tested in the zk VM environment.
@@ -170,5 +170,3 @@ cd transpiler
 ```
 
 Then init the git submodule, and you should be good to go!
-
-TODO Add instructions for people to compile and run their own Yul Programs
