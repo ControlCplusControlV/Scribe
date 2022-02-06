@@ -116,6 +116,8 @@ push.0
 push.0
 push.0
 mem.pop.0
+      
+      
 ect...
    
 ```
