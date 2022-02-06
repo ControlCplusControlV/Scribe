@@ -25,6 +25,16 @@ fn block(program: &mut String, op: &ExprBlock, context: &mut Context) {
     }
 }
 
+fn for_loop(program: &mut String, op: &ExprForLoop, context: &mut Context) {
+    transpile_op(&op.init_block, program, context);
+    transpile_op(&op.conditional, program, context);
+    add_line(program, &format!("while.true"));
+    block(&op.interior, program, context);
+    transpile_op(&op.after_block, program, context);
+    transpile_op(&op.conditional, program, context);
+    add_line(program, &format!("end"));
+}
+
 fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
