@@ -67,9 +67,32 @@ add(x, y)
             "
 let x := 2
 let y := 3
-if lt(y, x) {
+if lt(x, y) {
     5
 }
+            "
+            .to_string(),
+            vec![],
+            vec![5],
+        );
+    }
+
+    #[test]
+    fn integration_fib() {
+        run_example(
+            "
+            let n := 10
+            let a := 0
+            let b := 1
+            let c := 0
+
+            for { let i := 0 } lt(i, n) { i := add(i, 1)}
+            {
+                c := add(a,b)
+                a := b
+                b := c
+            }
+            b
             "
             .to_string(),
             vec![],
