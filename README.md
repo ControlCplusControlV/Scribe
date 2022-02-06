@@ -130,8 +130,8 @@ println!("{}", last_stack_value);
 And here is the output!
       
 ```
-      
-      
+Miden Output
+89    
 ```
       
 ## How to transpile your own contract.
