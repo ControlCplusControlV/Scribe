@@ -12,8 +12,6 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     let address = context.next_open_memory_address;
     context.next_open_memory_address += 1;
     context.variables.insert(op.identifier.clone(), address);
-    // TODO: recursee, transpile expr
-    // add_line(program, &format!("push.{}", op.rhs));
     if let Some(rhs) = &op.rhs {
         transpile_op(&rhs, program, context);
     }
@@ -57,10 +55,6 @@ fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     add_line(program, &format!("add"), context);
 }
 
-fn mstore(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
-    add_line(program, &format!("mstore_todo"), context);
-}
-
 fn gt(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
@@ -73,8 +67,6 @@ fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Contex
     add_line(program, &format!("if.true"), context);
     context.indentation += 4;
     block(program, &op.second_expr, context);
-    // add_line(program, &format!("else"), context);
-    // add_line(program, &format!("noop"));
     context.indentation -= 4;
     add_line(program, &format!("end"), context);
 }
@@ -111,11 +103,14 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
     match expr {
         Expr::Literal(value) => insert_literal(program, *value, context),
         Expr::Assignment(op) => assignment(program, op, context),
+        Expr::DeclareVariable(op) => declare_var(program, op, context),
+        Expr::ForLoop(op) => for_loop(program, op, context),
+        Expr::Variable(op) => load_variable(program, op, context),
+        Expr::Block(op) => block(program, op, context),
+        Expr::IfStatement(op) => if_statement(program, op, context),
         Expr::FunctionCall(op) => {
             if (op.function_name == "add") {
                 add(program, op, context)
-            } else if (op.function_name == "mstore") {
-                mstore(program, op, context)
             } else if (op.function_name == "gt") {
                 gt(program, op, context)
             } else if (op.function_name == "lt") {
@@ -124,11 +119,6 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
         }
-        Expr::DeclareVariable(op) => declare_var(program, op, context),
-        Expr::ForLoop(op) => for_loop(program, op, context),
-        Expr::Variable(op) => load_variable(program, op, context),
-        Expr::Block(op) => block(program, op, context),
-        Expr::IfStatement(op) => if_statement(program, op, context),
         x => todo!("{:?} unimplemented", x),
     }
 }

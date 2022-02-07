@@ -2,11 +2,11 @@
 mod tests {
     use colored::*;
     use miden_processor::StarkField;
-    use transpiler::executor;
-    use transpiler::miden_generator;
-    use transpiler::parser;
-    use transpiler::types;
-    use transpiler::types::expressions_to_tree;
+    use scribe::executor;
+    use scribe::miden_generator;
+    use scribe::parser;
+    use scribe::types;
+    use scribe::types::expressions_to_tree;
 
     fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u64>) {
         fn print_title(s: &str) {
@@ -98,7 +98,7 @@ if lt(x, y) {
             "
             .to_string(),
             vec![],
-            vec![5],
+            vec![89],
         );
     }
 }

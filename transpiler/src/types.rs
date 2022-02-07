@@ -1,6 +1,3 @@
-use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
-// AST stuff
-
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
     Literal(u128),
@@ -12,6 +9,51 @@ pub enum Expr {
     Block(ExprBlock),
     Variable(ExprVariableReference),
 }
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprVariableReference {
+    pub identifier: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprBlock {
+    pub exprs: Vec<Expr>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprAssignment {
+    pub identifier: String,
+    pub rhs: Box<Expr>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprForLoop {
+    pub init_block: Box<ExprBlock>,
+    pub conditional: Box<Expr>,
+    pub after_block: Box<ExprBlock>,
+    pub interior_block: Box<ExprBlock>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprDeclareVariable {
+    pub identifier: String,
+    pub rhs: Option<Box<Expr>>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprIfStatement {
+    pub first_expr: Box<Expr>,
+    pub second_expr: Box<ExprBlock>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprFunctionCall {
+    pub function_name: String,
+    pub first_expr: Box<Expr>,
+    pub second_expr: Box<Expr>,
+}
+
+use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 
 impl Expr {
     fn add_to_tree(&self, tree: &mut TreeBuilder) {
@@ -103,47 +145,4 @@ fn test_tree_printing() {
         second_expr: Box::new(Expr::Literal(2)),
     })];
     println!("{}", expressions_to_tree(&expressions));
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprVariableReference {
-    pub identifier: String,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprBlock {
-    pub exprs: Vec<Expr>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprAssignment {
-    pub identifier: String,
-    pub rhs: Box<Expr>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprForLoop {
-    pub init_block: Box<ExprBlock>,
-    pub conditional: Box<Expr>,
-    pub after_block: Box<ExprBlock>,
-    pub interior_block: Box<ExprBlock>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprDeclareVariable {
-    pub identifier: String,
-    pub rhs: Option<Box<Expr>>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprIfStatement {
-    pub first_expr: Box<Expr>,
-    pub second_expr: Box<ExprBlock>,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprFunctionCall {
-    pub function_name: String,
-    pub first_expr: Box<Expr>,
-    pub second_expr: Box<Expr>,
 }

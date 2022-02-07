@@ -156,6 +156,9 @@ First clone this repo and download its submodule
 
 ```
 git clone https://github.com/ControlCplusControlV/Scribe
+cd Scribe
+git submodule init
+git submodule update
 ```
 
 then cd into the transpiler crate
