@@ -66,35 +66,42 @@ pub enum Expr {
 Each `Expr` is pushed to a `Vec<Expr>`, which is then passed into the `miden_generator::transpile_program()` function. This function generates the Miden opcodes and keeps track of the variables as well as open memory addresses.  
       
 ```rust
-
 pub fn transpile_program(expressions: Vec<Expr>) -> String {
     let mut context = Context {
         variables: HashMap::new(),
         next_open_memory_address: 0,
+        indentation: 4,
     };
-    let mut program = "begin\npush.0\npush.0\npush.0".to_string();
+    let mut program = "begin".to_string();
     for expr in expressions {
         transpile_op(&expr, &mut program, &mut context);
     }
-    add_line(&mut program, "end");
+    context.indentation -= 4;
+    add_line(&mut program, "end", &context);
     return program;
 }
 
 fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
     match expr {
         Expr::Literal(value) => insert_literal(program, *value, context),
+        Expr::Assignment(op) => assignment(program, op, context),
+        Expr::DeclareVariable(op) => declare_var(program, op, context),
+        Expr::ForLoop(op) => for_loop(program, op, context),
+        Expr::Variable(op) => load_variable(program, op, context),
+        Expr::Block(op) => block(program, op, context),
+        Expr::IfStatement(op) => if_statement(program, op, context),
         Expr::FunctionCall(op) => {
             if (op.function_name == "add") {
                 add(program, op, context)
+            } else if (op.function_name == "gt") {
+                gt(program, op, context)
+            } else if (op.function_name == "lt") {
+                lt(program, op, context)
             } else {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
         }
-        Expr::Lt(op) => lt(program, op, context),
-        Expr::Gt(op) => gt(program, op, context),
-        Expr::DeclareVariable(op) => declare_var(program, op, context),
-        Expr::Variable(op) => load_variable(program, op, context),
-        _ => todo!(),
+        x => todo!("{:?} unimplemented", x),
     }
 }
 ```
@@ -120,11 +127,9 @@ Now the generated Miden code is ready to run! Scribe can test your code on the M
 ```rust
 //Parse the Yul code
 let parsed_yul_code = parser::parse_yul_syntax(yul_code);
-print_title("Parsed Expressions");
 
 //Generate Miden opcodes from the parsed Yul code
 let miden_code = miden_generator::transpile_program(parsed);
-print_title("Generated Miden Assembly");
 
 //Execute the Miden code on the Miden VM
 let execution_value = executor::execute(miden_code, inputs).unwrap();
@@ -132,7 +137,7 @@ let stack = execution_value.last_stack_state();
 let last_stack_value = stack.first().unwrap();
 
 //Print the output
-print_title("Miden Output");
+println!("Miden Output");
 println!("{}", last_stack_value);
 ```
       
@@ -148,7 +153,6 @@ Miden Output
 ## How to transpile your own contract.
 
 To transpile and test your own contracts simple drop your own Yul Contracts inside the contracts folder then transpile then by running the transpiler crate with `cargo run`. Note that some Yul operations are still unsupported, but basic arithmatic, and control structures are supported, as well as variables.   
-
 
 Scribe was meant to focus on real world applicability, and because of this uses Miden v0.2. Due to Miden v0.2 not being done yet certain crates of it like the zk prover are broken atm as the developers build away on the new release. So certain functionality like zk proof generation can't be done at the moment, but execution can still be tested in the zk VM environment.
 
