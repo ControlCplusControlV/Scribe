@@ -6,9 +6,7 @@ pub fn execute(program: String, pub_inputs: Vec<u128>) -> Result<ExecutionTrace,
         .compile_script(&program)
         .unwrap();
 
-    // let options = get_proof_options();
     let pub_inputs = vec![];
-    // These are the values in the stack when the program starts
     let inputs = ProgramInputs::new(&pub_inputs, &[], vec![]).unwrap();
     miden_processor::execute(&program, &inputs)
 }
