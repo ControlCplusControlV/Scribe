@@ -143,23 +143,6 @@ Miden Output
 89    
 ```
       
-## How to transpile your own contract.
       
-To transpile and test your own contracts simple drop your own Yul Contracts inside the contracts folder then transpile then by running the transpiler crate with `cargo run`. Note that some Yul operations are still unsupported, but basic arithmatic, and control structures are supported, as well as variables.   
-
-
-Scribe was meant to focus on real world applicability, and because of this uses Miden v0.2. Due to Miden v0.2 not being done yet certain crates of it like the zk prover are broken atm as the developers build away on the new release. So certain functionality like zk proof generation can't be done at the moment, but execution can still be tested in the zk VM environment.
-
-First clone this repo and download its submodule
-
-```
-git clone https://github.com/ControlCplusControlV/Scribe
-```
-
-then cd into the transpiler crate
-
-```
-cd transpiler
-```
-
-Then init the git submodule, and you should be good to go!
+      
+      
