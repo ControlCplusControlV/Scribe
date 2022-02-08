@@ -24,27 +24,35 @@ fn pause() {
     stdin().read(&mut [0]).unwrap();
 }
 
+fn clear_screen() {
+    print!("{esc}c", esc = 27 as char);
+}
+
 fn main() {
     let yul_contracts = read_yul_contracts();
 
     for yul_code in yul_contracts {
+        clear_screen();
         print_title("Input File");
         println!("{}", yul_code.file_contents);
         pause();
         let inputs = vec![];
         let parsed = parser::parse_yul_syntax(yul_code.file_contents);
 
+        clear_screen();
         print_title("Parsed Expressions");
         println!("{}", expressions_to_tree(&parsed));
         println!("");
         pause();
 
+        clear_screen();
         let miden_code = miden_generator::transpile_program(parsed);
         print_title("Generated Miden Assembly");
         println!("{}", miden_code);
         println!("");
         pause();
 
+        clear_screen();
         print_title("Miden Output");
         let execution_value = executor::execute(miden_code, inputs).unwrap();
         let stack = execution_value.last_stack_state();
