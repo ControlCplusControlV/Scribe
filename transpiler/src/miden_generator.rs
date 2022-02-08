@@ -14,19 +14,17 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
     context.variables.insert(op.identifier.clone(), address);
     if let Some(rhs) = &op.rhs {
         transpile_op(&rhs, program, context);
+        add_line(program, "padw", context);
+        add_line(program, "drop", context);
+        add_line(program, &format!("mem.pop.{}", address), context);
     }
-    add_line(program, "push.0", context);
-    add_line(program, "push.0", context);
-    add_line(program, "push.0", context);
-    add_line(program, &format!("mem.pop.{}", address), context);
 }
 
 fn assignment(program: &mut String, op: &ExprAssignment, context: &mut Context) {
     let address = context.variables.get(&op.identifier).unwrap().clone();
     transpile_op(&op.rhs, program, context);
-    add_line(program, "push.0", context);
-    add_line(program, "push.0", context);
-    add_line(program, "push.0", context);
+    add_line(program, "padw", context);
+    add_line(program, "drop", context);
     add_line(program, &format!("mem.pop.{}", address), context);
 }
 
@@ -85,9 +83,8 @@ fn insert_literal(program: &mut String, value: u128, context: &mut Context) {
 fn load_variable(program: &mut String, op: &ExprVariableReference, context: &mut Context) {
     let address = context.variables.get(&op.identifier).unwrap();
     add_line(program, &format!("mem.push.{}", address), context);
-    add_line(program, "drop", context);
-    add_line(program, "drop", context);
-    add_line(program, "drop", context);
+    add_line(program, "dup", context);
+    add_line(program, "dropw", context);
 }
 
 fn add_line(program: &mut String, line: &str, context: &Context) {
