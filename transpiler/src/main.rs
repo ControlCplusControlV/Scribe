@@ -69,20 +69,17 @@ pub struct YulFile {
 
 fn read_yul_contracts() -> Vec<YulFile> {
     let mut yul_files: Vec<YulFile> = Vec::new();
-
-    let mut file_path = fs::read_dir("../contracts/").unwrap();
-
-    for file in file_path {
-        let file_name = file.as_ref().unwrap().file_name().to_str().unwrap().to_string();
-
-        let mut unwrapped_file = file.unwrap().path().display().to_string();
-        let mut contents = fs::read_to_string(unwrapped_file)
+    let mut paths: Vec<_> = fs::read_dir("../contracts/")
+        .unwrap()
+        .map(|r| r.unwrap())
+        .collect();
+    paths.sort_by_key(|dir| dir.path());
+    for path in paths {
+        let contents = fs::read_to_string(path.path())
             .expect("Something went wrong readingfrom the contracts directory");
-    
-
 
         yul_files.push(YulFile {
-            file_name: file_name,
+            file_name: path.path().display().to_string(),
             file_contents: contents,
         });
     }

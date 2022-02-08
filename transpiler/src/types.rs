@@ -116,7 +116,6 @@ impl Expr {
                 }
             }
             Expr::Block(ExprBlock { exprs }) => {
-                let _branch = tree.add_branch("block");
                 for expr in exprs {
                     expr.add_to_tree(tree);
                 }

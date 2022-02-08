@@ -53,6 +53,13 @@ fn add(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     add_line(program, &format!("add"), context);
 }
 
+fn mul(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
+    for expr in [&op.first_expr, &op.second_expr] {
+        transpile_op(expr, program, context);
+    }
+    add_line(program, &format!("mul"), context);
+}
+
 fn gt(program: &mut String, op: &ExprFunctionCall, context: &mut Context) {
     for expr in [&op.first_expr, &op.second_expr] {
         transpile_op(expr, program, context);
@@ -108,6 +115,8 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
         Expr::FunctionCall(op) => {
             if (op.function_name == "add") {
                 add(program, op, context)
+            } else if (op.function_name == "mul") {
+                mul(program, op, context)
             } else if (op.function_name == "gt") {
                 gt(program, op, context)
             } else if (op.function_name == "lt") {
