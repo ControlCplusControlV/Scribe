@@ -1,4 +1,4 @@
 [submodule "miden-yul/miden"]
-	path = transpiler/miden
-	url = git@github.com:marcusbuffett/miden.git
+  path = transpiler/miden
+  url = https://github.com/marcusbuffett/miden
   branch = next
