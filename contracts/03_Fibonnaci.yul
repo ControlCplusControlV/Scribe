@@ -1,4 +1,4 @@
-object "fib" {
+object "fibonnaci" {
   code {
     let n := 10
     let a := 0
