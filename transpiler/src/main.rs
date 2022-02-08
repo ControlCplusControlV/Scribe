@@ -1,4 +1,5 @@
 use colored::*;
+use debug_tree::default;
 use miden_processor::StarkField;
 use scribe::executor;
 use scribe::miden_generator;
@@ -61,17 +62,19 @@ pub struct YulFile {
 fn read_yul_contracts() -> Vec<YulFile> {
     let mut yul_files: Vec<YulFile> = Vec::new();
 
-    let file_path = fs::read_dir("../contracts/").unwrap();
+    let mut file_path = fs::read_dir("../contracts/").unwrap();
 
     for file in file_path {
-        //TODO: get the file name
+        let file_name = file.as_ref().unwrap().file_name().to_str().unwrap().to_string();
 
         let mut unwrapped_file = file.unwrap().path().display().to_string();
         let mut contents = fs::read_to_string(unwrapped_file)
             .expect("Something went wrong readingfrom the contracts directory");
+    
+
 
         yul_files.push(YulFile {
-            file_name: "".to_string(),
+            file_name: file_name,
             file_contents: contents,
         });
     }
