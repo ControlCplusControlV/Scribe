@@ -69,7 +69,7 @@ pub struct YulFile {
 
 fn read_yul_contracts() -> Vec<YulFile> {
     let mut yul_files: Vec<YulFile> = Vec::new();
-    let mut paths: Vec<_> = fs::read_dir("./contracts/")
+    let mut paths: Vec<_> = fs::read_dir("../contracts/")
         .unwrap()
         .map(|r| r.unwrap())
         .collect();
