@@ -94,7 +94,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     match inner.as_rule() {
         Rule::literal => {
             let i = inner.as_str();
-            return Expr::Literal(i.parse::<u128>().unwrap());
+            return Expr::Literal(i.parse::<u32>().unwrap());
         }
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
