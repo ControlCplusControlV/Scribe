@@ -36,7 +36,7 @@ impl Stack {
         let mut instructions = vec![];
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            instructions.append(dbg!(&mut self.push_refs_to_top(v)));
+            instructions.append(&mut self.push_refs_to_top(v));
         }
         return instructions;
     }
@@ -48,7 +48,13 @@ impl Stack {
     fn push_ref_to_top(&mut self, identifier: &str) -> Vec<MidenInstruction> {
         let mut identifiers = HashSet::new();
         identifiers.insert(identifier.to_string());
-        self.push_refs_to_top(&identifiers)
+        let location = self
+            .0
+            .iter()
+            .position(|sv| identifiers.is_subset(sv))
+            .unwrap();
+        self.0.insert(0, identifiers);
+        return vec![format!("dup.{}", location)];
     }
 
     fn push_refs_to_top(&mut self, identifiers: &HashSet<String>) -> Vec<MidenInstruction> {
@@ -60,8 +66,7 @@ impl Stack {
             .iter()
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
-        let duped = self.0.get(location).unwrap().clone();
-        self.0.insert(0, duped);
+        self.0.insert(0, identifiers.clone());
         return vec![format!("dup.{}", location)];
     }
 
@@ -99,17 +104,17 @@ fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Con
 fn assignment(program: &mut String, op: &ExprAssignment, context: &mut Context) {
     // TODO: in the future we should be able to just mark that two variables share the same
     // stack address, but I can't quite figure it out for the fibonacci example currently
-    // if let Expr::Variable(ExprVariableReference {
-    //     identifier: target_ident,
-    // }) = &*op.rhs
-    // {
-    //     context
-    //         .stack
-    //         .equate_reference(&op.identifier.clone(), &target_ident);
-    // } else {
-    transpile_op(&op.rhs, program, context);
-    context.stack.top_is_var(&op.identifier.clone());
-    // }
+    if let Expr::Variable(ExprVariableReference {
+        identifier: target_ident,
+    }) = &*op.rhs
+    {
+        context
+            .stack
+            .equate_reference(&op.identifier.clone(), &target_ident);
+    } else {
+        transpile_op(&op.rhs, program, context);
+        context.stack.top_is_var(&op.identifier.clone());
+    }
 }
 
 fn block(program: &mut String, op: &ExprBlock, context: &mut Context) {
@@ -132,6 +137,16 @@ fn for_loop(program: &mut String, op: &ExprForLoop, context: &mut Context) {
     transpile_op(&op.conditional, program, context);
     // Because the while.true will consume the top of the stack
     context.stack.consume(1);
+    context.indentation -= 4;
+    add_line(program, &format!("end"), context);
+}
+
+fn transpile_repeat(program: &mut String, op: &ExprRepeat, context: &mut Context) {
+    let stack_target = context.stack.clone();
+    add_line(program, &format!("repeat.{}", op.iterations), context);
+    context.indentation += 4;
+    block(program, &op.interior_block, context);
+    add_lines(context.stack.target(stack_target), program, context);
     context.indentation -= 4;
     add_line(program, &format!("end"), context);
 }
@@ -209,6 +224,7 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
                 todo!("Need to implement {} function in miden", op.function_name)
             }
         }
+        Expr::Repeat(op) => transpile_repeat(program, op, context),
     }
 }
 
@@ -231,18 +247,9 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
 pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     let mut assignment_visitor = VariableAssignmentVisitor::default();
     let ast = walk_ast(ast, &mut assignment_visitor);
-    let const_variables = assignment_visitor
-        .assignment_counter
-        .into_iter()
-        .filter(|(k, v)| *v == 1)
-        .filter_map(|(k, _)| {
-            if let Some(value) = assignment_visitor.last_assignment.get(&k) {
-                return Some((k, *value));
-            }
-            return None;
-        })
-        .collect::<HashMap<String, u32>>();
+    let const_variables = assignment_visitor.get_const_variables();
     let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
+    let ast = walk_ast(ast, &mut ForLoopToRepeatVisitor {});
     ast
 }
 
@@ -266,9 +273,107 @@ struct ConstVariableVisitor {
 }
 
 #[derive(Default)]
+struct ForLoopToRepeatVisitor {}
+
+#[derive(Default)]
 struct VariableAssignmentVisitor {
     assignment_counter: HashMap<String, u32>,
     last_assignment: HashMap<String, u32>,
+}
+
+impl VariableAssignmentVisitor {
+    fn get_const_variables(&self) -> HashMap<String, u32> {
+        self.assignment_counter
+            .iter()
+            .filter(|(k, v)| **v == 1)
+            .filter_map(|(k, _)| {
+                if let Some(value) = self.last_assignment.get(k) {
+                    return Some((k.clone(), *value));
+                }
+                return None;
+            })
+            .collect::<HashMap<String, u32>>()
+    }
+}
+
+// TODO: unstable for now, as it will incorrectly transform for loops that modify the iterator in
+// the interior block. To fix this we should have the variable assignment visitor walk the interior
+// block, for assignments. Also need to make sure the var isn't referenced within the for loop
+//
+// TODO: there's a lot of ways we can miss this optimization currently. Even just flipping i :=
+// add(i, 1) to i := add(1, i) will break this optimization. In the future we should support gt,
+// subtracting, etc.
+impl ExpressionVisitor for ForLoopToRepeatVisitor {
+    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
+        match &expr {
+            Expr::ForLoop(ExprForLoop {
+                init_block,
+                conditional,
+                after_block,
+                interior_block,
+            }) => {
+                let start: Option<u32>;
+                let iterator_identifier: Option<String>;
+                if let Some(first_expr) = (*init_block.exprs).first() {
+                    if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
+                        first_expr
+                    {
+                        if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
+                            start = Some(value);
+                            iterator_identifier = Some(identifier.to_string());
+                        } else {
+                            return Some(expr);
+                        }
+                    } else {
+                        return Some(expr);
+                    }
+                } else {
+                    return Some(expr);
+                }
+
+                if let Some(Expr::Assignment(assignment)) = (*after_block.exprs).first() {
+                    if *assignment
+                        == (ExprAssignment {
+                            identifier: iterator_identifier.clone().unwrap(),
+                            rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
+                                function_name: "add".to_string(),
+                                first_expr: Box::new(Expr::Variable(ExprVariableReference {
+                                    identifier: iterator_identifier.clone().unwrap(),
+                                })),
+                                second_expr: Box::new(Expr::Literal(1)),
+                            })),
+                        })
+                    {}
+                } else {
+                    return Some(expr);
+                }
+                if let Expr::FunctionCall(ExprFunctionCall {
+                    function_name,
+                    first_expr,
+                    second_expr,
+                }) = &**conditional
+                {
+                    if function_name == "lt"
+                        && *first_expr
+                            == Box::new(Expr::Variable(ExprVariableReference {
+                                identifier: iterator_identifier.clone().unwrap(),
+                            }))
+                    {
+                        if let Expr::Literal(value) = **second_expr {
+                            return Some(Expr::Repeat(ExprRepeat {
+                                interior_block: interior_block.clone(),
+                                iterations: value - start.unwrap(),
+                            }));
+                        }
+                    }
+                } else {
+                    return Some(expr);
+                }
+            }
+            _ => {}
+        }
+        return Some(expr);
+    }
 }
 
 impl ExpressionVisitor for VariableAssignmentVisitor {
@@ -352,6 +457,15 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                     rhs: rhs.map(|rhs| Box::new(walk_expr(*rhs, visitor).unwrap())),
                 })
             }
+            Expr::Repeat(ExprRepeat {
+                interior_block,
+                iterations,
+            }) => Expr::Repeat(ExprRepeat {
+                iterations,
+                interior_block: Box::new(ExprBlock {
+                    exprs: walk_ast(interior_block.exprs, visitor),
+                }),
+            }),
             Expr::ForLoop(ExprForLoop {
                 init_block,
                 conditional,

@@ -8,6 +8,8 @@ pub enum Expr {
     ForLoop(ExprForLoop),
     Block(ExprBlock),
     Variable(ExprVariableReference),
+    // Intermediate-AST-only expressions
+    Repeat(ExprRepeat),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -32,6 +34,12 @@ pub struct ExprForLoop {
     pub conditional: Box<Expr>,
     pub after_block: Box<ExprBlock>,
     pub interior_block: Box<ExprBlock>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprRepeat {
+    pub interior_block: Box<ExprBlock>,
+    pub iterations: u32,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -86,6 +94,17 @@ impl Expr {
                 let _branch = tree.add_branch(&format!("declare - {}", &identifier.to_string()));
                 if let Some(rhs) = rhs {
                     rhs.add_to_tree(tree);
+                }
+            }
+            Expr::Repeat(ExprRepeat {
+                interior_block,
+                iterations,
+            }) => {
+                let _branch = tree.add_branch(&format!("repeat {}", iterations));
+                {
+                    let _after_branch = tree.add_branch("interior block");
+                    let block = *interior_block.clone();
+                    Expr::Block(block).add_to_tree(tree);
                 }
             }
             Expr::ForLoop(ExprForLoop {
