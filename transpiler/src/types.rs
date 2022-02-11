@@ -1,6 +1,6 @@
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
-    Literal(u128),
+    Literal(u32),
     FunctionCall(ExprFunctionCall),
     IfStatement(ExprIfStatement),
     Assignment(ExprAssignment),
