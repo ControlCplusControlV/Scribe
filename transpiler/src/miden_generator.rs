@@ -212,16 +212,23 @@ fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
         Expr::IfStatement(op) => if_statement(program, op, context),
         Expr::FunctionCall(op) => {
             // TODO: All functions are assumed to consume 2 stack elements and add one, for now
-            if op.function_name == "add" {
-                transpile_miden_function("add", program, op, context)
-            } else if op.function_name == "mul" {
-                transpile_miden_function("mul", program, op, context)
-            } else if op.function_name == "gt" {
-                transpile_miden_function("gt", program, op, context)
-            } else if op.function_name == "lt" {
-                transpile_miden_function("lt", program, op, context)
-            } else {
-                todo!("Need to implement {} function in miden", op.function_name)
+            // I how Rust handles strings, why are &str and String different? Just to torment me?
+            match op.function_name.as_str() {
+                // Basic Arithmetic Operations
+                "add" => transpile_miden_function("add", program, op, context),
+                "sub" => transpile_miden_function("add", program, op, context),
+                "mul" => transpile_miden_function("mul", program, op, context),
+                "sub" => transpile_miden_function("div", program, op, context),
+
+                // Boolean Operations
+                "gt" => transpile_miden_function("gt", program, op, context),
+                "lt" => transpile_miden_function("lt", program, op, context),
+                "eq" => transpile_miden_function("eq", program, op, context),
+                "and" => transpile_miden_function("and", program, op, context),
+                "or" => transpile_miden_function("or", program, op, context),
+
+                _ => todo!("Need to implement {} function in miden", op.function_name)
+
             }
         }
         Expr::Repeat(op) => transpile_repeat(program, op, context),
