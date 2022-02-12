@@ -51,15 +51,18 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         }
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
-            let identifier = parts.next().unwrap().as_str();
-            println!("debugging check here __{}__", identifier);
+            let identifier_list = parts.next().unwrap();
+            let mut identifiers = Vec::new();
+            for identifier_rule in identifier_list.into_inner() {
+                identifiers.push(identifier_rule.as_str())
+            }
             let rhs = parts.next();
             let mut rhs_expr = None;
             if let Some(rhs) = rhs {
                 rhs_expr = Some(parse_expression(rhs));
             }
             return Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: identifier.to_string(),
+                identifier: identifiers.get(0).unwrap().to_string(),
                 rhs: rhs_expr.map(Box::new),
             });
         }
@@ -163,7 +166,7 @@ mod tests {
                 rhs: Some(Box::new(Expr::Literal(2))),
             }),
         ];
-        
+
         assert_eq!(parse_yul_syntax(yul), expected_ops);
     }
 
@@ -224,7 +227,7 @@ mod tests {
     // let f := 1
     // let s := 1
     // let next
-    // for { let i := 0 } lt(i, 10) { i := add(i, 1)} 
+    // for { let i := 0 } lt(i, 10) { i := add(i, 1)}
     // {
     //   if lt(i, 2) {
     //     mstore(i, 1)
@@ -242,18 +245,18 @@ mod tests {
     //     todo!();
     // }
 
-//     #[test]
-//     fn parse_cruft() {
-//         let yul = r###"
-// object "fib" {
-//   code {
-//   }
-// }
+    //     #[test]
+    //     fn parse_cruft() {
+    //         let yul = r###"
+    // object "fib" {
+    //   code {
+    //   }
+    // }
 
-//     "###
-//         .to_string();
-//         let res = parse_yul_syntax(yul);
-//         dbg!(&res);
-//         todo!();
-//     }
+    //     "###
+    //         .to_string();
+    //         let res = parse_yul_syntax(yul);
+    //         dbg!(&res);
+    //         todo!();
+    //     }
 }

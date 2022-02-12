@@ -14,7 +14,7 @@ statement = { NEWLINE* ~ (variable_declaration | assignment | if_statement | blo
 function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list? ~ ")" ~ ( "->" ~ typed_identifier_list)? ~ block }
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
 assignment = { identifier_list ~ ":=" ~ expr }
-expr = { function_call | identifier | literal  }
+expr = { function_call | literal | identifier  }
 if_statement = { "if" ~ expr ~ block}
 switch = { "switch" ~ expr ~ ((case+ ~ default?) | default) }
 case = { "case" ~ literal ~ block }
