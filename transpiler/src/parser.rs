@@ -21,9 +21,22 @@ pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
     let mut expressions: Vec<Expr> = vec![];
     for statement in file.into_inner() {
         match statement.as_rule() {
+
+            //rule is statement
             Rule::statement => {
                 expressions.push(parse_statement(statement));
             }
+
+            //rule is object
+
+
+            //rule is code
+
+
+            //rule is data
+            
+
+            //rule is EOI
             Rule::EOI => (),
             r => {
                 dbg!(&statement);
@@ -38,7 +51,16 @@ pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
 fn parse_statement(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
+        //rule is expression
         Rule::expr => parse_expression(inner),
+
+        //rule is block
+
+        //rule is function definition
+
+        //rule is variable declaration
+
+        //rule is assignment
         Rule::assignment => {
             let mut parts = inner.into_inner();
             let identifier = parts.next().unwrap().as_str();
@@ -49,6 +71,45 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 rhs: Box::new(rhs_expr),
             });
         }
+
+        //rule is if statement
+        Rule::if_statement => {
+            let mut inners = inner.into_inner();
+            let first_arg = inners.next().unwrap();
+            let second_arg = inners.next().unwrap();
+            return Expr::IfStatement(ExprIfStatement {
+                first_expr: Box::new(parse_expression(first_arg)),
+                second_expr: Box::new(parse_block(second_arg)),
+            });
+        }
+
+        //rule is switch 
+
+        //rule is case
+
+        //rule is default
+
+        //rule is for loop
+        Rule::for_loop => {
+            let mut parts = inner.into_inner();
+            let init_block = parts.next().unwrap();
+            let conditional = parts.next().unwrap();
+            let after_block = parts.next().unwrap();
+            let interior_block = parts.next().unwrap();
+
+            return Expr::ForLoop(ExprForLoop {
+                init_block: Box::new(parse_block(init_block)),
+                conditional: Box::new(parse_expression(conditional)),
+                after_block: Box::new(parse_block(after_block)),
+                interior_block: Box::new(parse_block(interior_block)),
+            });
+        }
+
+        //rule is break continue
+
+        //rule is leave
+
+        //rule is variable declaration
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let identifier_list = parts.next().unwrap();
@@ -66,29 +127,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 rhs: rhs_expr.map(Box::new),
             });
         }
-        Rule::if_statement => {
-            let mut inners = inner.into_inner();
-            let first_arg = inners.next().unwrap();
-            let second_arg = inners.next().unwrap();
-            return Expr::IfStatement(ExprIfStatement {
-                first_expr: Box::new(parse_expression(first_arg)),
-                second_expr: Box::new(parse_block(second_arg)),
-            });
-        }
-        Rule::for_loop => {
-            let mut parts = inner.into_inner();
-            let init_block = parts.next().unwrap();
-            let conditional = parts.next().unwrap();
-            let after_block = parts.next().unwrap();
-            let interior_block = parts.next().unwrap();
 
-            return Expr::ForLoop(ExprForLoop {
-                init_block: Box::new(parse_block(init_block)),
-                conditional: Box::new(parse_expression(conditional)),
-                after_block: Box::new(parse_block(after_block)),
-                interior_block: Box::new(parse_block(interior_block)),
-            });
-        }
+        
+
+
+        //if rule is not defined
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
@@ -99,6 +142,13 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
+
+
+        //TODO: need to add type name? 
+
+        //TODO: need to add type identifier list?
+
+        //TODO: need to add identifier list?
 
         //if the matched rule is a literal
         Rule::literal => {

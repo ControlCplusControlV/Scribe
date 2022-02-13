@@ -6,7 +6,7 @@ mod tests {
     use scribe::miden_generator;
     use scribe::miden_generator::optimize_ast;
     use scribe::parser;
-    use scribe::types;
+    // use scribe::types;
     use scribe::types::expressions_to_tree;
 
     fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u64>) {
@@ -43,7 +43,7 @@ mod tests {
 
         print_title("Miden Output");
         println!("{}", last_stack_value);
-        if (*expected_output.first().unwrap() != last_stack_value.as_int()) {
+        if *expected_output.first().unwrap() != last_stack_value.as_int() {
             print_title("Miden Stack");
             println!("{:?}", stack);
             panic!("Failed, stack result not right");
