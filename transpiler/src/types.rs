@@ -8,6 +8,8 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
+    Break(ExprBreak),
+    Continue(ExprContinue),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
     Repeat(ExprRepeat),
@@ -17,6 +19,12 @@ pub enum Expr {
 pub struct ExprVariableReference {
     pub identifier: String,
 }
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprBreak {}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprContinue {}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionDefinition {
@@ -33,6 +41,12 @@ pub struct ExprBlock {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprAssignment {
+    pub identifier: String,
+    pub rhs: Box<Expr>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprBreakContinue {
     pub identifier: String,
     pub rhs: Box<Expr>,
 }
@@ -74,7 +88,10 @@ use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 impl Expr {
     fn add_to_tree(&self, tree: &mut TreeBuilder) {
         match self {
+            //is literal
             Expr::Literal(x) => tree.add_leaf(&x.to_string()),
+
+            //is function call
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
                 exprs,
@@ -84,6 +101,8 @@ impl Expr {
                     expression.add_to_tree(tree);
                 }
             }
+
+            //is if statement
             Expr::IfStatement(ExprIfStatement {
                 first_expr,
                 second_expr,
@@ -94,16 +113,22 @@ impl Expr {
                 let block = *second_expr.clone();
                 Expr::Block(block).add_to_tree(tree);
             }
+
+            // is expr assignment
             Expr::Assignment(ExprAssignment { identifier, rhs }) => {
                 let _branch = tree.add_branch(&format!("assign - {}", &identifier.to_string()));
                 rhs.add_to_tree(tree);
             }
+
+            //is declare variable
             Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
                 let _branch = tree.add_branch(&format!("declare - {}", &identifier.to_string()));
                 if let Some(rhs) = rhs {
                     rhs.add_to_tree(tree);
                 }
             }
+
+            //is repeat
             Expr::Repeat(ExprRepeat {
                 interior_block,
                 iterations,
@@ -115,6 +140,8 @@ impl Expr {
                     Expr::Block(block).add_to_tree(tree);
                 }
             }
+
+            //is for loop
             Expr::ForLoop(ExprForLoop {
                 init_block,
                 conditional,
@@ -142,15 +169,20 @@ impl Expr {
                     Expr::Block(block).add_to_tree(tree);
                 }
             }
+
+            //is block
             Expr::Block(ExprBlock { exprs }) => {
                 for expr in exprs {
                     expr.add_to_tree(tree);
                 }
             }
+
+            //is variable
             Expr::Variable(ExprVariableReference { identifier }) => {
                 let _branch = tree.add_branch(&format!("var - {}", identifier));
             }
 
+            //is function definition
             //TODO: Add function Definition to tree
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name,
@@ -158,6 +190,12 @@ impl Expr {
                 return_typed_identifier_list,
                 block,
             }) => {}
+
+            //is break
+            Expr::Break(ExprBreak {}) => {}
+
+            //is continue
+            Expr::Continue(ExprContinue {}) => {}
         }
     }
 }

@@ -195,6 +195,12 @@ impl Transpiler {
     //TODO: update placeholder
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {}
 
+    //TODO: update placeholder
+    fn transpile_break(&mut self, op: &ExprBreak) {}
+
+    //TODO: update placeholder
+    fn transpile_continue(&mut self, op: &ExprContinue) {}
+
     fn add_line(&mut self, line: &str) {
         self.program = format!(
             "{}\n{}{}",
@@ -222,6 +228,8 @@ impl Transpiler {
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
             Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            Expr::Break(op) => self.transpile_break(op),
+            Expr::Continue(op) => self.transpile_continue(op),
         }
     }
 }

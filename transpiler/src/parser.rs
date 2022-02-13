@@ -83,8 +83,6 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is variable declaration
-
         //rule is assignment
         Rule::assignment => {
             let mut parts = inner.into_inner();
@@ -110,7 +108,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
         //rule is switch
 
-        //rule is case
+        // rule is case
 
         //rule is default
 
@@ -130,9 +128,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is break continue
+        //rule is break
+        Rule::break_ => Expr::Break(ExprBreak {}),
 
         //rule is leave
+        Rule::continue_ => Expr::Continue(ExprContinue {}),
 
         //rule is variable declaration
         Rule::variable_declaration => {

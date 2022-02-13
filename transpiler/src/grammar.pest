@@ -10,7 +10,7 @@ WHITESPACE = _{ " " }
 
 
 block = { "{" ~ NEWLINE* ~ statement* ~ NEWLINE* ~ "}" }
-statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_continue | leave | expr) ~ NEWLINE*  } 
+statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_ | continue_ | leave | expr) ~ NEWLINE*  } 
 function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list? ~ ")" ~ ( "->" ~ typed_identifier_list)? ~ block }
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
 assignment = { (identifier | identifier_list) ~ ":=" ~ expr }
@@ -20,8 +20,9 @@ switch = { "switch" ~ expr ~ ((case+ ~ default?) | default) }
 case = { "case" ~ literal ~ block }
 default = { "default" ~ block }
 for_loop = { "for" ~ block ~ expr ~ block ~ (NEWLINE*) ~ block}
-break_continue = { "break" | "continue" }
-leave = {"leave"}
+break_ = @{ "break" }
+continue_ = @{ "continue" }
+leave = @{"leave"}
 function_call = { identifier ~ "(" ~ (expr ~ ( "," ~ expr)* )? ~ ")" }
 identifier = @{ASCII_ALPHANUMERIC+}
 identifier_list = { "(" ~ identifier ~ ("," ~ identifier)* ~ ")" }

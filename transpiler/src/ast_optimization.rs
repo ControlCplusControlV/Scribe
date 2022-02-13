@@ -235,6 +235,12 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                 block,
             }) => Expr::Literal(0),
 
+            //TODO: Expr is function definition
+            Expr::Break(ExprBreak {}) => Expr::Literal(0),
+
+            //TODO: Expr is function definition
+            Expr::Continue(ExprContinue {}) => Expr::Literal(0),
+
             //Expr is repeat
             Expr::Repeat(ExprRepeat {
                 interior_block,
