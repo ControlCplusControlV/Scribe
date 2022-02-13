@@ -1,6 +1,5 @@
 use colored::*;
 
-
 use scribe::executor;
 use scribe::miden_generator;
 use scribe::parser;
@@ -11,6 +10,8 @@ use std::io::{stdin, stdout, Read, Write};
 
 #[macro_use]
 extern crate pest_derive;
+#[macro_use]
+extern crate insta;
 
 fn print_title(s: &str) {
     let s1 = format!("=== {} ===", s).blue().bold();

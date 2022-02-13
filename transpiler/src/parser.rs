@@ -21,7 +21,6 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     let mut expressions: Vec<Expr> = vec![];
     for statement in file.into_inner() {
         match statement.as_rule() {
-
             //rule is statement
             Rule::statement => {
                 expressions.push(parse_statement(statement));
@@ -29,12 +28,9 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
 
             //rule is object
 
-
             //rule is code
 
-
             //rule is data
-            
 
             //rule is EOI
             Rule::EOI => (),
@@ -55,9 +51,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         Rule::expr => parse_expression(inner),
 
         //rule is block
-        Rule::block => {
-            Expr::Block(parse_block(inner))
-        }
+        Rule::block => Expr::Block(parse_block(inner)),
 
         // //rule is function definition
         // Rule::function_definition =>{
@@ -67,7 +61,6 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
         //     //TODO: Add Expr::FunctionDefinition. Parse expression for each identifier in the typed identifier list to return a vec<Expr>
 
-        
         // }
 
         //rule is variable declaration
@@ -95,7 +88,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is switch 
+        //rule is switch
 
         //rule is case
 
@@ -140,9 +133,6 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             });
         }
 
-        
-
-
         //if rule is not defined
         r => {
             panic!("Unreachable rule: {:?}", r);
@@ -154,9 +144,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
-
-
-        //TODO: need to add type name? 
+        //TODO: need to add type name?
 
         //TODO: need to add type identifier list?
 
@@ -167,7 +155,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let i = inner.as_str();
             Expr::Literal(i.parse::<u32>().unwrap())
         }
-        
+
         //if the matched rule is an identifier
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
@@ -181,7 +169,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let function_name = get_identifier(inners.next().unwrap());
             let mut exprs: Vec<Expr> = Vec::new();
             // for each argument in the function, parse the expression and add it to exprs
-            for arg in inners.into_iter(){
+            for arg in inners.into_iter() {
                 exprs.push(parse_expression(arg));
             }
             return Expr::FunctionCall(ExprFunctionCall {
@@ -223,57 +211,32 @@ fn get_identifier(pair: Pair<Rule>) -> String {
 mod tests {
     use super::*;
 
-    #[test]
-    fn parse_var_declaration() {
-        let yul = "let x := 1
-            let y := 2";
-
-        let expected_ops = vec![
-            Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: "x".to_string(),
-                rhs: Some(Box::new(Expr::Literal(1))),
-            }),
-            Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: "y".to_string(),
-                rhs: Some(Box::new(Expr::Literal(2))),
-            }),
-        ];
-
-        assert_eq!(parse_yul_syntax(yul), expected_ops);
+    fn parse_to_tree(yul: &str) -> String {
+        expressions_to_tree(&parse_yul_syntax(yul))
     }
 
+    #[test]
+    fn parse_var_declaration() {
+        insta::assert_snapshot!(parse_to_tree(
+            "let x := 1
+            let y := 2"
+        ));
+    }
 
     #[test]
-    fn parse_function_declaration() {
-        let yul = "add(1,2)".to_string();
-
-        let expected_ops = vec![
-            Expr::FunctionCall(ExprFunctionCall{
-                function_name:"add".to_string(),
-                exprs:Box::new(vec![Expr::Literal(1), Expr::Literal(2)])
-            }),
-        ];
-
-        assert_eq!(parse_yul_syntax(&yul), expected_ops);
+    fn parse_function_call() {
+        insta::assert_snapshot!(parse_to_tree("add(1,2)"));
     }
 
     #[test]
     fn parse_var_and_add() {
-        let yul = "let x := add(1,2)".to_string();
-
-        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
-            identifier: "x".to_string(),
-            rhs: Some(Box::new(Expr::FunctionCall(ExprFunctionCall {
-                function_name: "add".to_string(),
-                exprs: Box::new(vec![Expr::Literal(1), Expr::Literal(2)]),
-            }))),
-        })];
-        assert_eq!(parse_yul_syntax(&yul), expected_ops);
+        insta::assert_snapshot!(parse_to_tree("let x := add(1,2)"));
     }
 
     #[test]
     fn parse_fibonnaci() {
-        let yul = "
+        insta::assert_snapshot!(parse_to_tree(
+            "
     let f := 1
     let s := 1
     let next
@@ -289,63 +252,28 @@ mod tests {
         mstore(i, s)
       }
     }"
-        .to_string();
-        let res = parse_yul_syntax(&yul);
-        dbg!(&res);
-        todo!();
-    }
-    #[test]
-    fn parse_if() {
-        let yul = "
-      if lt(i, 2) {
-        mstore(i, 1)
-      }
-    "
-        .to_string();
-
-    // let expected_ops = vec![
-    //    ];    
-
-    // assert_eq!(parse_yul_syntax(&yul), expected_ops);
-
+        ));
     }
 
     #[test]
-    fn parse_for_loop() {
-        let yul = "
-    let f := 1
-    let s := 1
-    let next
-    for { let i := 0 } lt(i, 10) { i := add(i, 1)}
-    {
-      if lt(i, 2) {
-        mstore(i, 1)
-      }
-      if gt(i, 1) {
-        next := add(s, f)
-        f := s
-        s := next
-        mstore(i, s)
-      }
-    }"
-        .to_string();
-        let res = parse_yul_syntax(&yul);
-        dbg!(&res);
-        todo!();
+    fn parse_if() {
+        insta::assert_snapshot!(parse_to_tree(
+            "
+            if lt(i, 2) {
+               mstore(i, 1)
+            }"
+        ));
     }
 
-        #[test]
-        fn parse_cruft() {
-            let yul = r###"
+    #[test]
+    fn parse_cruft() {
+        let yul = r###"
     object "fib" {
       code {
       }
     }
 
-        "###
-            .to_string();
-            let res = parse_yul_syntax(&yul);
-            dbg!(&res);
-            todo!();
-        }
+        "###;
+        insta::assert_snapshot!(parse_to_tree(yul));
+    }
 }

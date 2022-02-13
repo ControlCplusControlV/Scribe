@@ -1,0 +1,11 @@
+---
+source: src/parser.rs
+assertion_line: 215
+expression: expressions_to_tree(&parse_yul_syntax(yul))
+
+---
+AST
+├╼ declare - x
+│ └╼ 1
+└╼ declare - y
+  └╼ 2

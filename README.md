@@ -174,3 +174,13 @@ cd transpiler
 Then init the git submodule, and you should be good to go!
       
       
+## Contributing
+
+### Testing
+
+Scribe has unit tests and integration tests that can be run with `cargo test`
+
+Our parsing tests use the [insta](https://github.com/mitsuhiko/insta)
+snapshot-testing crate. After running a new test, run `cargo insta review`,
+verify that the generated AST looks right, then accept the output as correct.
+In future tests the output will be compared to this snapshot.
