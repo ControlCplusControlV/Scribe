@@ -1,3 +1,5 @@
+use primitive_types::U256;
+
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
     Literal(ExprLiteral),
@@ -8,17 +10,18 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
-    Break(ExprBreak),
-    Continue(ExprContinue),
     Default(ExprDefault),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
     Repeat(ExprRepeat),
+    Break,
+    Continue,
+    Leave,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum ExprLiteral {
-    Number(u128),
+    Number(U256),
     String(String),
 }
 
@@ -26,12 +29,6 @@ pub enum ExprLiteral {
 pub struct ExprVariableReference {
     pub identifier: String,
 }
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprBreak {}
-
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprContinue {}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDefault {
@@ -205,17 +202,28 @@ impl Expr {
                 return_typed_identifier_list,
                 block,
             }) => {
-                let _branch =
-                    tree.add_branch(&format!("function definition - {} - TODO", function_name));
+                let _branch = tree.add_branch(&format!("function definition - {}", function_name));
+                {
+                    let _params_branch = tree.add_branch(&format!("params"));
+                    for param in typed_identifier_list {
+                        param.add_to_tree(tree);
+                    }
+                }
+                {
+                    let _params_branch = tree.add_branch(&format!("returns"));
+                    for param in return_typed_identifier_list {
+                        param.add_to_tree(tree);
+                    }
+                }
+                let _branch = tree.add_branch(&format!("body"));
+                Expr::Block(block.clone()).add_to_tree(tree);
             }
 
             //is break
             //TODO: add body
-            Expr::Break(ExprBreak {}) => {}
-
-            //is continue
-            //TODO: add body
-            Expr::Continue(ExprContinue {}) => {}
+            Expr::Break => tree.add_leaf("break"),
+            Expr::Continue => tree.add_leaf("continue"),
+            Expr::Leave => tree.add_leaf("leave"),
 
             //is default
             //TODO: add body

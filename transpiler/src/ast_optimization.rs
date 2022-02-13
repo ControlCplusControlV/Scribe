@@ -236,10 +236,11 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             }) => todo!(),
 
             //TODO: Expr is break
-            Expr::Break(ExprBreak {}) => todo!(),
+            Expr::Break => todo!(),
 
             //TODO: Expr is continue
-            Expr::Continue(ExprContinue {}) => todo!(),
+            Expr::Continue => todo!(),
+            Expr::Leave => todo!(),
 
             //TODO: Expr is default
             Expr::Default(ExprDefault { block }) => Expr::Default(ExprDefault {

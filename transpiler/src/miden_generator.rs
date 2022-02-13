@@ -1,5 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
+use primitive_types::U256;
+
 use crate::{ast_optimization::optimize_ast, types::*};
 
 #[derive(Default)]
@@ -71,7 +73,7 @@ impl Transpiler {
         return vec![format!("dup.{}", location)];
     }
 
-    fn push(&mut self, value: u128) {
+    fn push(&mut self, value: U256) {
         self.stack.0.insert(0, HashSet::new());
         self.add_line(&format!("push.{}", value));
     }
@@ -186,6 +188,7 @@ impl Transpiler {
     fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
             ExprLiteral::Number(v) => {
+                // TODO: check size
                 self.push(*v);
             }
             ExprLiteral::String(_) => todo!(),
@@ -201,10 +204,12 @@ impl Transpiler {
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {}
 
     //TODO: update placeholder
-    fn transpile_break(&mut self, op: &ExprBreak) {}
+    fn transpile_break(&mut self) {}
+
+    fn transpile_leave(&mut self) {}
 
     //TODO: update placeholder
-    fn transpile_continue(&mut self, op: &ExprContinue) {}
+    fn transpile_continue(&mut self) {}
 
     //TODO: update placeholder
     fn transpile_default(&mut self, op: &ExprDefault) {}
@@ -236,8 +241,9 @@ impl Transpiler {
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
             Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
-            Expr::Break(op) => self.transpile_break(op),
-            Expr::Continue(op) => self.transpile_continue(op),
+            Expr::Break => self.transpile_break(),
+            Expr::Continue => self.transpile_continue(),
+            Expr::Leave => self.transpile_leave(),
             Expr::Default(op) => self.transpile_default(op),
         }
     }

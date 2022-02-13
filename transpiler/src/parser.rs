@@ -2,6 +2,7 @@
 use pest::iterators::Pair;
 use pest::Parser;
 use pest_derive::Parser;
+use primitive_types::U256;
 
 use crate::types::*;
 
@@ -56,25 +57,25 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is function definition
         Rule::function_definition => {
             let mut parts = inner.into_inner();
-            let function_name = parts.next().unwrap().to_string();
+            let function_name = parts.next().unwrap().as_str();
 
             //get the typed identifiers from the function and parse each expression
             let mut params: Vec<Expr> = vec![];
             for identifier in parts.next().unwrap().into_inner() {
-                params.push(parse_expression(identifier));
+                params.push(parse_identifier(identifier));
             }
 
             //get the return typed identifiers from the function and parse each expression
             let mut returns: Vec<Expr> = vec![];
             for identifier in parts.next().unwrap().into_inner() {
-                todo!()
-                // returns.push(parse_identifier(identifier));
+                // todo!()
+                returns.push(parse_identifier(identifier));
             }
 
             let block = parts.next().unwrap();
 
             Expr::FunctionDefinition(ExprFunctionDefinition {
-                function_name: function_name,
+                function_name: function_name.to_string(),
                 typed_identifier_list: params,
                 return_typed_identifier_list: returns,
                 block: parse_block(block),
@@ -134,10 +135,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         }
 
         //rule is break
-        Rule::break_ => Expr::Break(ExprBreak {}),
+        Rule::break_ => Expr::Break,
 
         //rule is leave
-        Rule::continue_ => Expr::Continue(ExprContinue {}),
+        Rule::continue_ => Expr::Continue,
+        Rule::leave => Expr::Leave,
 
         //rule is variable declaration
         Rule::variable_declaration => {
@@ -183,9 +185,19 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             parse_expression(expression)
         }
         Rule::number_literal => parse_expression(expression),
+        Rule::hex_number => {
+            // TODO: parse hex numbers
+            let i = expression.as_str();
+            Expr::Literal(ExprLiteral::Number(U256::MAX))
+        }
+        Rule::hex_literal => {
+            // TODO: parse hex numbers
+            let i = expression.as_str();
+            Expr::Literal(ExprLiteral::Number(U256::MAX))
+        }
         Rule::decimal_number => {
             let i = expression.as_str();
-            Expr::Literal(ExprLiteral::Number(i.parse::<u128>().unwrap()))
+            Expr::Literal(ExprLiteral::Number(U256::from_dec_str(i).unwrap()))
         }
         Rule::string_literal => {
             let content = expression.into_inner().next().unwrap();
@@ -198,16 +210,12 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             todo!()
         }
         //if the matched rule is an identifier
-        Rule::identifier => {
-            return Expr::Variable(ExprVariableReference {
-                identifier: expression.as_str().to_string(),
-            })
-        }
+        Rule::identifier => parse_identifier(expression),
 
         //if the matched rule is a function call
         Rule::function_call => {
             let mut inners = expression.into_inner();
-            let function_name = get_identifier(inners.next().unwrap());
+            let function_name = inners.next().unwrap().as_str();
             let mut exprs: Vec<Expr> = Vec::new();
             // for each argument in the function, parse the expression and add it to exprs
             for arg in inners.into_iter() {
@@ -224,6 +232,12 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             panic!("Unreachable rule: {:?}", r);
         }
     }
+}
+
+fn parse_identifier(identifier: Pair<Rule>) -> Expr {
+    return Expr::Variable(ExprVariableReference {
+        identifier: identifier.as_str().to_string(),
+    });
 }
 
 fn parse_block(expression: Pair<Rule>) -> ExprBlock {
