@@ -6,7 +6,7 @@ mod tests {
     use scribe::executor;
     use scribe::miden_generator;
     use scribe::parser;
-    
+
     use scribe::types::expressions_to_tree;
 
     fn run_example(yul_code: &str, expected_output: Vec<u64>) {
@@ -76,10 +76,10 @@ mod tests {
     fn integration_variables() {
         run_example(
             "
-let x := 2
-let y := 3
-x := 4
-add(x, y)
+            let x := 2
+            let y := 3
+            x := 4
+            add(x, y)
             ",
             vec![5],
         );
@@ -89,11 +89,11 @@ add(x, y)
     fn integration_if() {
         run_example(
             "
-let x := 2
-let y := 3
-if lt(x, y) {
-    5
-}
+            let x := 2
+            let y := 3
+            if lt(x, y) {
+                5
+            }
             ",
             vec![5],
         );
@@ -103,11 +103,11 @@ if lt(x, y) {
     fn integration_for() {
         run_example(
             "
-    let x := 2
-    for { let i := 0 } lt(i, 5) { i := add(i, 1)} { 
-        x := 3
-    }
-    i
+            let x := 2
+            for { let i := 0 } lt(i, 5) { i := add(i, 1)} { 
+                x := 3
+            }
+            i
             ",
             vec![5],
         );

@@ -20,42 +20,40 @@ impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for value in self.0.iter() {
             write!(f, "\n{:?}", value).unwrap();
-        };
+        }
         Ok(())
     }
 }
 
 type MidenInstruction = String;
 
-impl Stack {
-    // ex if `x := y`, we can keep track of that on our stack
+impl Transpiler {
     fn equate_reference(&mut self, x: &str, y: &str) {
-        let stack_value = self.0.iter_mut().find(|sv| sv.contains(y)).unwrap();
+        let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(y)).unwrap();
         stack_value.insert(x.to_string());
     }
 
-    fn target(&mut self, target_stack: Stack) -> Vec<MidenInstruction> {
-        let mut instructions = vec![];
+    fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            instructions.append(&mut self.push_refs_to_top(v));
+            &mut self.push_refs_to_top(v);
         }
-        instructions
     }
 
     fn add_unknown(&mut self) {
-        self.0.insert(0, HashSet::new());
+        self.stack.0.insert(0, HashSet::new());
     }
 
     fn push_ref_to_top(&mut self, identifier: &str) -> Vec<MidenInstruction> {
         let mut identifiers = HashSet::new();
         identifiers.insert(identifier.to_string());
         let location = self
+            .stack
             .0
             .iter()
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
-        self.0.insert(0, identifiers);
+        self.stack.0.insert(0, identifiers);
         return vec![format!("dup.{}", location)];
     }
 
@@ -64,27 +62,28 @@ impl Stack {
         // w/ multiple references, there are probably cases that fail currently, where variables
         // are equal to each other before a for loop but not after
         let location = self
+            .stack
             .0
             .iter()
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
-        self.0.insert(0, identifiers.clone());
+        self.stack.0.insert(0, identifiers.clone());
         return vec![format!("dup.{}", location)];
     }
 
-    fn push(&mut self, value: u32) -> Vec<MidenInstruction> {
-        self.0.insert(0, HashSet::new());
-        return vec![format!("push.{}", value)];
+    fn push(&mut self, value: u32) {
+        self.stack.0.insert(0, HashSet::new());
+        self.add_line(&format!("push.{}", value));
     }
 
     fn consume(&mut self, n: u32) {
         for _ in 0..n {
-            self.0.remove(0);
+            self.stack.0.remove(0);
         }
     }
 
     fn top_is_var(&mut self, identifier: &str) {
-        let idents = self.0.get_mut(0).unwrap();
+        let idents = self.stack.0.get_mut(0).unwrap();
         idents.clear();
         idents.insert(identifier.to_string());
     }
@@ -97,7 +96,7 @@ impl Transpiler {
         self.variables.insert(op.identifier.clone(), address);
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs);
-            self.stack.top_is_var(&op.identifier);
+            self.top_is_var(&op.identifier);
         }
     }
 
@@ -108,11 +107,10 @@ impl Transpiler {
             identifier: target_ident,
         }) = &*op.rhs
         {
-            self.stack
-                .equate_reference(&op.identifier.clone(), target_ident);
+            self.equate_reference(&op.identifier.clone(), target_ident);
         } else {
             self.transpile_op(&op.rhs);
-            self.stack.top_is_var(&op.identifier.clone());
+            self.top_is_var(&op.identifier.clone());
         }
     }
 
@@ -128,14 +126,13 @@ impl Transpiler {
         self.transpile_op(&op.conditional);
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack
-        self.stack.consume(1);
+        self.consume(1);
         self.indentation += 4;
         self.transpile_block(&op.interior_block);
         self.transpile_block(&op.after_block);
-        let instructions = self.stack.target(stack_target);
-        self.add_lines(instructions);
+        self.target_stack(stack_target);
         self.transpile_op(&op.conditional);
-        self.stack.consume(1);
+        self.consume(1);
         self.indentation -= 4;
         self.add_line("end");
     }
@@ -145,8 +142,7 @@ impl Transpiler {
         self.add_line(&format!("repeat.{}", op.iterations));
         self.indentation += 4;
         self.transpile_block(&op.interior_block);
-        let instructions = self.stack.target(stack_target);
-        self.add_lines(instructions);
+        self.target_stack(stack_target);
         self.indentation -= 4;
         self.add_line("end");
     }
@@ -173,8 +169,8 @@ impl Transpiler {
         for expr in [&op.first_expr, &op.second_expr] {
             self.transpile_op(expr);
         }
-        self.stack.consume(2);
-        self.stack.add_unknown();
+        self.consume(2);
+        self.add_unknown();
         self.add_line(miden_function_name);
     }
 
@@ -188,12 +184,11 @@ impl Transpiler {
     }
 
     fn transpile_literal(&mut self, value: u32) {
-        let instructions = self.stack.push(value);
-        self.add_lines(instructions);
+        self.push(value);
     }
 
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
-        let instructions = self.stack.push_ref_to_top(&op.identifier);
+        let instructions = self.push_ref_to_top(&op.identifier);
         self.add_lines(instructions);
     }
 
