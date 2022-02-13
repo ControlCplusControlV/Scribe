@@ -117,7 +117,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::function_call => {
             let mut inners = inner.into_inner();
             let function_name = get_identifier(inners.next().unwrap());
-            let exprs: Vec<Expr>;
+            let mut exprs: Vec<Expr> = Vec::new();
             // for each argument in the function, parse the expression and add it to exprs
             for arg in inners.into_iter(){
                 exprs.push(parse_expression(arg));

@@ -73,7 +73,7 @@ impl Expr {
                 exprs,
             }) => {
                 let _branch = tree.add_branch(&format!("{}()", &function_name.to_string()));
-                for expression in exprs.into_iter(){
+                for expression in exprs.clone().into_iter(){
                     expression.add_to_tree(tree);
                 }
             }

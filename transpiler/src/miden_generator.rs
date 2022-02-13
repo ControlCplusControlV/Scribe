@@ -157,8 +157,8 @@ fn transpile_miden_function(
     op: &ExprFunctionCall,
     context: &mut Context,
 ) {
-    for expr in [&op.first_expr, &op.second_expr] {
-        transpile_op(expr, program, context);
+    for expr in op.exprs.to_vec() {
+        transpile_op(&expr, program, context);
     }
     context.stack.consume(2);
     context.stack.add_unknown();
@@ -344,10 +344,10 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                             identifier: iterator_identifier.clone().unwrap(),
                             rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
                                 function_name: "add".to_string(),
-                                first_expr: Box::new(Expr::Variable(ExprVariableReference {
-                                    identifier: iterator_identifier.clone().unwrap(),
-                                })),
-                                second_expr: Box::new(Expr::Literal(1)),
+                                exprs: Box::new(vec![Expr::Variable(ExprVariableReference{
+                                    identifier: iterator_identifier.clone().unwrap()}),
+                                    Expr::Literal(1), 
+                                ]),
                             })),
                         })
                     {}
@@ -356,17 +356,16 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                 }
                 if let Expr::FunctionCall(ExprFunctionCall {
                     function_name,
-                    first_expr,
-                    second_expr,
+                    exprs ,
                 }) = &**conditional
                 {
                     if function_name == "lt"
-                        && *first_expr
-                            == Box::new(Expr::Variable(ExprVariableReference {
+                        && exprs[0]
+                            == Expr::Variable(ExprVariableReference {
                                 identifier: iterator_identifier.clone().unwrap(),
-                            }))
+                            })
                     {
-                        if let Expr::Literal(value) = **second_expr {
+                        if let Expr::Literal(value) = exprs[1] {
                             return Some(Expr::Repeat(ExprRepeat {
                                 interior_block: interior_block.clone(),
                                 iterations: value - start.unwrap(),
@@ -436,12 +435,10 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             Expr::Literal(x) => expr,
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
-                first_expr,
-                second_expr,
+                exprs,
             }) => Expr::FunctionCall(ExprFunctionCall {
                 function_name,
-                first_expr: Box::new(walk_expr(*first_expr, visitor).unwrap()),
-                second_expr: Box::new(walk_expr(*second_expr, visitor).unwrap()),
+                exprs: Box::new(vec![walk_expr(exprs[0].clone(), visitor).unwrap(), walk_expr(exprs[1].clone(), visitor).unwrap()]),
             }),
             Expr::IfStatement(ExprIfStatement {
                 first_expr,
