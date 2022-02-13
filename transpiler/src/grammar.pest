@@ -1,7 +1,4 @@
-file = { SOI ~ intro? ~ statement* ~ outro? ~ EOI }
-intro = _{ NEWLINE* ~ "object" ~ "\"" ~ ASCII_ALPHANUMERIC* ~ "\"" ~ "{" ~ NEWLINE* ~ "code" ~ "{" }
-outro = _{ NEWLINE* ~ "}" ~ NEWLINE* ~ "}" ~ NEWLINE* }
-
+file = { SOI ~ NEWLINE* ~ object ~ NEWLINE* ~ EOI }
 
 alpha = { 'a'..'z' | 'A'..'Z' }
 digit = { '0'..'9' }
