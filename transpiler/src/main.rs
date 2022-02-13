@@ -1,10 +1,10 @@
 use colored::*;
-use debug_tree::default;
-use miden_processor::StarkField;
+
+
 use scribe::executor;
 use scribe::miden_generator;
 use scribe::parser;
-use scribe::types;
+
 use scribe::types::expressions_to_tree;
 use std::fs;
 use std::io::{stdin, stdout, Read, Write};
@@ -42,14 +42,14 @@ fn main() {
         clear_screen();
         print_title("Parsed Expressions");
         println!("{}", expressions_to_tree(&parsed));
-        println!("");
+        println!();
         pause();
 
         clear_screen();
         let miden_code = miden_generator::transpile_program(parsed);
         print_title("Generated Miden Assembly");
         println!("{}", miden_code);
-        println!("");
+        println!();
         pause();
 
         clear_screen();
@@ -83,5 +83,5 @@ fn read_yul_contracts() -> Vec<YulFile> {
             file_contents: contents,
         });
     }
-    return yul_files;
+    yul_files
 }

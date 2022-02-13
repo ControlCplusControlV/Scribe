@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap};
 
 use crate::types::*;
 
@@ -7,8 +7,8 @@ pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     let ast = walk_ast(ast, &mut assignment_visitor);
     let const_variables = assignment_visitor.get_const_variables();
     let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
-    let ast = walk_ast(ast, &mut ForLoopToRepeatVisitor {});
-    ast
+    
+    walk_ast(ast, &mut ForLoopToRepeatVisitor {})
 }
 
 fn walk_ast<V: ExpressionVisitor>(ast: Vec<Expr>, visitor: &mut V) -> Vec<Expr> {
@@ -18,7 +18,7 @@ fn walk_ast<V: ExpressionVisitor>(ast: Vec<Expr>, visitor: &mut V) -> Vec<Expr> 
             new_ast.push(expr);
         }
     }
-    return new_ast;
+    new_ast
 }
 
 trait ExpressionVisitor {
@@ -43,12 +43,12 @@ impl VariableAssignmentVisitor {
     fn get_const_variables(&self) -> HashMap<String, u32> {
         self.assignment_counter
             .iter()
-            .filter(|(k, v)| **v == 1)
+            .filter(|(_k, v)| **v == 1)
             .filter_map(|(k, _)| {
                 if let Some(value) = self.last_assignment.get(k) {
                     return Some((k.clone(), *value));
                 }
-                return None;
+                None
             })
             .collect::<HashMap<String, u32>>()
     }
@@ -114,7 +114,7 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                     if function_name == "lt"
                         && *first_expr
                             == Box::new(Expr::Variable(ExprVariableReference {
-                                identifier: iterator_identifier.clone().unwrap(),
+                                identifier: iterator_identifier.unwrap(),
                             }))
                     {
                         if let Expr::Literal(value) = **second_expr {
@@ -130,7 +130,7 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
             }
             _ => {}
         }
-        return Some(expr);
+        Some(expr)
     }
 }
 
@@ -156,7 +156,7 @@ impl ExpressionVisitor for VariableAssignmentVisitor {
             }
             _ => {}
         }
-        return Some(expr);
+        Some(expr)
     }
 }
 
@@ -175,16 +175,16 @@ impl ExpressionVisitor for ConstVariableVisitor {
             }
             _ => {}
         }
-        return Some(expr);
+        Some(expr)
     }
 }
 
 // TODO: it would be nice if there wasn't so much cloning in here
 fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> {
-    let expr = visitor.visit_expr(expr.clone());
-    if let Some(expr) = expr.clone() {
+    let expr = visitor.visit_expr(expr);
+    if let Some(expr) = expr {
         return Some(match expr {
-            Expr::Literal(x) => expr,
+            Expr::Literal(_x) => expr,
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
                 first_expr,

@@ -1,7 +1,7 @@
 use miden_processor::{ExecutionError, ExecutionTrace};
 pub use miden_processor::{Felt as BaseElement, FieldElement, ProgramInputs};
 
-pub fn execute(program: String, pub_inputs: Vec<u128>) -> Result<ExecutionTrace, ExecutionError> {
+pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, ExecutionError> {
     let program = miden_assembly::Assembler::new()
         .compile_script(&program)
         .unwrap();
@@ -55,7 +55,7 @@ end
         "{}",
         &stack
             .iter()
-            .map(|x| format!("{}", x).to_string())
+            .map(|x| format!("{}", x))
             .collect::<Vec<String>>()
             .join("\n")
     );

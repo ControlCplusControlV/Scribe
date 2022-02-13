@@ -18,9 +18,10 @@ struct Stack(Vec<StackValue>);
 
 impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Ok(for value in self.0.iter() {
+        for value in self.0.iter() {
             write!(f, "\n{:?}", value).unwrap();
-        })
+        };
+        Ok(())
     }
 }
 
@@ -39,7 +40,7 @@ impl Stack {
             // TODO: can do a no-op or padding op if no identifiers
             instructions.append(&mut self.push_refs_to_top(v));
         }
-        return instructions;
+        instructions
     }
 
     fn add_unknown(&mut self) {
@@ -95,7 +96,7 @@ impl Transpiler {
         self.next_open_memory_address += 1;
         self.variables.insert(op.identifier.clone(), address);
         if let Some(rhs) = &op.rhs {
-            self.transpile_op(&rhs);
+            self.transpile_op(rhs);
             self.stack.top_is_var(&op.identifier);
         }
     }
@@ -108,7 +109,7 @@ impl Transpiler {
         }) = &*op.rhs
         {
             self.stack
-                .equate_reference(&op.identifier.clone(), &target_ident);
+                .equate_reference(&op.identifier.clone(), target_ident);
         } else {
             self.transpile_op(&op.rhs);
             self.stack.top_is_var(&op.identifier.clone());
@@ -117,7 +118,7 @@ impl Transpiler {
 
     fn transpile_block(&mut self, op: &ExprBlock) {
         for op in &op.exprs {
-            self.transpile_op(&op);
+            self.transpile_op(op);
         }
     }
 
@@ -125,7 +126,7 @@ impl Transpiler {
         self.transpile_block(&op.init_block);
         let stack_target = self.stack.clone();
         self.transpile_op(&op.conditional);
-        self.add_line(&format!("while.true"));
+        self.add_line("while.true");
         // Because the while.true will consume the top of the stack
         self.stack.consume(1);
         self.indentation += 4;
@@ -136,7 +137,7 @@ impl Transpiler {
         self.transpile_op(&op.conditional);
         self.stack.consume(1);
         self.indentation -= 4;
-        self.add_line(&format!("end"));
+        self.add_line("end");
     }
 
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
@@ -147,7 +148,7 @@ impl Transpiler {
         let instructions = self.stack.target(stack_target);
         self.add_lines(instructions);
         self.indentation -= 4;
-        self.add_line(&format!("end"));
+        self.add_line("end");
     }
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
@@ -179,11 +180,11 @@ impl Transpiler {
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
-        self.add_line(&format!("if.true"));
+        self.add_line("if.true");
         self.indentation += 4;
         self.transpile_block(&op.second_expr);
         self.indentation -= 4;
-        self.add_line(&format!("end"));
+        self.add_line("end");
     }
 
     fn transpile_literal(&mut self, value: u32) {
@@ -240,5 +241,5 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     }
     transpiler.indentation -= 4;
     transpiler.add_line("end");
-    return transpiler.program;
+    transpiler.program
 }

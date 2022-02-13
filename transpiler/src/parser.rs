@@ -12,7 +12,7 @@ struct IdentParser;
 //function to parse yul syntax into miden opcodes
 pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     // Parse the entire file as a string
-    let file = IdentParser::parse(Rule::file, &syntax)
+    let file = IdentParser::parse(Rule::file, syntax)
         .expect("unsuccessful parse")
         .next()
         .unwrap();
@@ -31,7 +31,7 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
             }
         }
     }
-    return expressions;
+    expressions
 }
 
 //Function to parse a statement, match a rule defined in grammar.pest and return an Expr
@@ -44,10 +44,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let identifier = parts.next().unwrap().as_str();
             let rhs = parts.next().unwrap();
             let rhs_expr = parse_expression(rhs);
-            return Expr::Assignment(ExprAssignment {
+            Expr::Assignment(ExprAssignment {
                 identifier: identifier.to_string(),
                 rhs: Box::new(rhs_expr),
-            });
+            })
         }
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
@@ -70,10 +70,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let mut inners = inner.into_inner();
             let first_arg = inners.next().unwrap();
             let second_arg = inners.next().unwrap();
-            return Expr::IfStatement(ExprIfStatement {
+            Expr::IfStatement(ExprIfStatement {
                 first_expr: Box::new(parse_expression(first_arg)),
                 second_expr: Box::new(parse_block(second_arg)),
-            });
+            })
         }
         Rule::for_loop => {
             let mut parts = inner.into_inner();
@@ -82,12 +82,12 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let after_block = parts.next().unwrap();
             let interior_block = parts.next().unwrap();
 
-            return Expr::ForLoop(ExprForLoop {
+            Expr::ForLoop(ExprForLoop {
                 init_block: Box::new(parse_block(init_block)),
                 conditional: Box::new(parse_expression(conditional)),
                 after_block: Box::new(parse_block(after_block)),
                 interior_block: Box::new(parse_block(interior_block)),
-            });
+            })
         }
         r => {
             panic!("Unreachable rule: {:?}", r);
@@ -100,7 +100,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     match inner.as_rule() {
         Rule::literal => {
             let i = inner.as_str();
-            return Expr::Literal(i.parse::<u32>().unwrap());
+            Expr::Literal(i.parse::<u32>().unwrap())
         }
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
@@ -112,11 +112,11 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let function_name = get_identifier(inners.next().unwrap());
             let first_arg = inners.next().unwrap();
             let second_arg = inners.next().unwrap();
-            return Expr::FunctionCall(ExprFunctionCall {
-                function_name: function_name.to_string(),
+            Expr::FunctionCall(ExprFunctionCall {
+                function_name,
                 first_expr: Box::new(parse_expression(first_arg)),
                 second_expr: Box::new(parse_expression(second_arg)),
-            });
+            })
         }
         r => {
             panic!("Unreachable rule: {:?}", r);
@@ -130,7 +130,7 @@ fn parse_block(expression: Pair<Rule>) -> ExprBlock {
         exprs.push(parse_statement(statement));
     }
 
-    return ExprBlock { exprs: exprs };
+    ExprBlock { exprs }
 }
 
 fn get_identifier(pair: Pair<Rule>) -> String {

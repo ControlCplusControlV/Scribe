@@ -6,7 +6,7 @@ mod tests {
     use scribe::executor;
     use scribe::miden_generator;
     use scribe::parser;
-    use scribe::types;
+    
     use scribe::types::expressions_to_tree;
 
     fn run_example(yul_code: &str, expected_output: Vec<u64>) {
@@ -15,27 +15,27 @@ mod tests {
             println!("{}", s1);
             println!(" ");
         }
-        println!("");
-        println!("");
+        println!();
+        println!();
         print_title("Input Yul");
         println!("{}", yul_code);
-        println!("");
+        println!();
 
         let parsed = parser::parse_yul_syntax(yul_code);
 
         print_title("AST");
         println!("{}", expressions_to_tree(&parsed));
-        println!("");
+        println!();
 
         let ast = optimize_ast(parsed);
         print_title("Optimized AST");
         println!("{}", expressions_to_tree(&ast));
-        println!("");
+        println!();
 
         let miden_code = miden_generator::transpile_program(ast);
         print_title("Generated Miden Assembly");
         println!("{}", miden_code);
-        println!("");
+        println!();
 
         let execution_value = executor::execute(miden_code, vec![]).unwrap();
         let stack = execution_value.last_stack_state();
@@ -43,7 +43,7 @@ mod tests {
 
         print_title("Miden Output");
         println!("{}", last_stack_value);
-        if (*expected_output.first().unwrap() != last_stack_value.as_int()) {
+        if *expected_output.first().unwrap() != last_stack_value.as_int() {
             print_title("Miden Stack");
             println!("{:?}", stack);
             panic!("Failed, stack result not right");

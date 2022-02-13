@@ -69,7 +69,7 @@ pub struct ExprFunctionCall {
 // }
 
 
-use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
+use debug_tree::{TreeBuilder};
 
 impl Expr {
     fn add_to_tree(&self, tree: &mut TreeBuilder) {
