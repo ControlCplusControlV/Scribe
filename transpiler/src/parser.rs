@@ -95,29 +95,40 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
     }
 }
 
+//Function to parse grammar within an expression rule
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
+
+        //if the matched rule is a literal
         Rule::literal => {
             let i = inner.as_str();
             return Expr::Literal(i.parse::<u32>().unwrap());
         }
+        
+        //if the matched rule is an identifier
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
                 identifier: inner.as_str().to_string(),
             })
         }
+
+        //if the matched rule is a function call
         Rule::function_call => {
             let mut inners = inner.into_inner();
             let function_name = get_identifier(inners.next().unwrap());
-            let first_arg = inners.next().unwrap();
-            let second_arg = inners.next().unwrap();
+            let exprs: Vec<Expr>;
+            // for each argument in the function, parse the expression and add it to exprs
+            for arg in inners.into_iter(){
+                exprs.push(parse_expression(arg));
+            }
             return Expr::FunctionCall(ExprFunctionCall {
                 function_name: function_name.to_string(),
-                first_expr: Box::new(parse_expression(first_arg)),
-                second_expr: Box::new(parse_expression(second_arg)),
+                exprs: Box::new(exprs),
             });
         }
+
+        //if the rule has not been defined yet
         r => {
             panic!("Unreachable rule: {:?}", r);
         }
@@ -170,93 +181,107 @@ mod tests {
         assert_eq!(parse_yul_syntax(yul), expected_ops);
     }
 
-    // #[test]
-    // fn parse_var_and_add() {
-    //     let yul = "let x := add(1,2)".to_string();
 
-    //     let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
-    //         identifier: "x".to_string(),
-    //         rhs: Some(Box::new(Expr::FunctionCall(ExprFunctionCall {
-    //             function_name: "add".to_string(),
-    //             first_expr: Box::new(Expr::Literal(1)),
-    //             second_expr: Box::new(Expr::Literal(2)),
-    //         }))),
-    //     })];
-    //     assert_eq!(parse_yul_syntax(yul), expected_ops);
-    // }
+    #[test]
+    fn parse_function_declaration() {
+        let yul = "add(1,2)".to_string();
 
-    // #[test]
-    // fn parse_fibonnaci() {
-    //     let yul = "
-    // let f := 1
-    // let s := 1
-    // let next
-    // for { let i := 0 } lt(i, 10) { i := add(i, 1)}
-    // {
-    //   if lt(i, 2) {
-    //     mstore(i, 1)
-    //   }
-    //   if gt(i, 1) {
-    //     next := add(s, f)
-    //     f := s
-    //     s := next
-    //     mstore(i, s)
-    //   }
-    // }"
-    //     .to_string();
-    //     let res = parse_yul_syntax(yul);
-    //     dbg!(&res);
-    //     todo!();
-    // }
-    // #[test]
-    // fn parse_if() {
-    //     let yul = "
-    //   if lt(i, 2) {
-    //     mstore(i, 1)
-    //   }
-    // "
-    //     .to_string();
-    //     let res = parse_yul_syntax(yul);
-    //     dbg!(&res);
-    //     todo!();
-    // }
+        let expected_ops = vec![
+            Expr::FunctionCall(ExprFunctionCall{
+                function_name:"add".to_string(),
+                exprs:Box::new(vec![Expr::Literal(1), Expr::Literal(2)])
+            }),
+        ];
 
-    // #[test]
-    // fn parse_for_loop() {
-    //     let yul = "
-    // let f := 1
-    // let s := 1
-    // let next
-    // for { let i := 0 } lt(i, 10) { i := add(i, 1)}
-    // {
-    //   if lt(i, 2) {
-    //     mstore(i, 1)
-    //   }
-    //   if gt(i, 1) {
-    //     next := add(s, f)
-    //     f := s
-    //     s := next
-    //     mstore(i, s)
-    //   }
-    // }"
-    //     .to_string();
-    //     let res = parse_yul_syntax(yul);
-    //     dbg!(&res);
-    //     todo!();
-    // }
+        assert_eq!(parse_yul_syntax(yul), expected_ops);
+    }
 
-    //     #[test]
-    //     fn parse_cruft() {
-    //         let yul = r###"
-    // object "fib" {
-    //   code {
-    //   }
-    // }
+    #[test]
+    fn parse_var_and_add() {
+        let yul = "let x := add(1,2)".to_string();
 
-    //     "###
-    //         .to_string();
-    //         let res = parse_yul_syntax(yul);
-    //         dbg!(&res);
-    //         todo!();
-    //     }
+        let expected_ops = vec![Expr::DeclareVariable(ExprDeclareVariable {
+            identifier: "x".to_string(),
+            rhs: Some(Box::new(Expr::FunctionCall(ExprFunctionCall {
+                function_name: "add".to_string(),
+                exprs: Box::new(vec![Expr::Literal(1), Expr::Literal(2)]),
+            }))),
+        })];
+        assert_eq!(parse_yul_syntax(yul), expected_ops);
+    }
+
+    #[test]
+    fn parse_fibonnaci() {
+        let yul = "
+    let f := 1
+    let s := 1
+    let next
+    for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+    {
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+      if gt(i, 1) {
+        next := add(s, f)
+        f := s
+        s := next
+        mstore(i, s)
+      }
+    }"
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+    #[test]
+    fn parse_if() {
+        let yul = "
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+    "
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+
+    #[test]
+    fn parse_for_loop() {
+        let yul = "
+    let f := 1
+    let s := 1
+    let next
+    for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+    {
+      if lt(i, 2) {
+        mstore(i, 1)
+      }
+      if gt(i, 1) {
+        next := add(s, f)
+        f := s
+        s := next
+        mstore(i, s)
+      }
+    }"
+        .to_string();
+        let res = parse_yul_syntax(yul);
+        dbg!(&res);
+        todo!();
+    }
+
+        #[test]
+        fn parse_cruft() {
+            let yul = r###"
+    object "fib" {
+      code {
+      }
+    }
+
+        "###
+            .to_string();
+            let res = parse_yul_syntax(yul);
+            dbg!(&res);
+            todo!();
+        }
 }
