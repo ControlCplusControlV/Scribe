@@ -22,7 +22,7 @@ pub struct ExprVariableReference {
 pub struct ExprFunctionDefinition {
     pub function_name: String,
     pub typed_identifier_list: Vec<Expr>,
-    pub typed_return_identifier_list: Vec<Expr>,
+    pub return_typed_identifier_list: Vec<Expr>,
     pub block: ExprBlock,
 }
 
@@ -155,7 +155,7 @@ impl Expr {
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name,
                 typed_identifier_list,
-                typed_return_identifier_list,
+                return_typed_identifier_list,
                 block,
             }) => {}
         }

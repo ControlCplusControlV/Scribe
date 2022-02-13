@@ -231,7 +231,7 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name,
                 typed_identifier_list,
-                typed_return_identifier_list,
+                return_typed_identifier_list,
                 block,
             }) => Expr::Literal(0),
 

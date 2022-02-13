@@ -66,8 +66,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             }
 
             //get the return typed identifiers from the function and parse each expression
-            let typed_return_identifiers = parts.next().unwrap();
-            let mut typed_return_identifier_list: Vec<Expr> = vec![];
+            let return_typed_identifiers = parts.next().unwrap();
+            let mut return_typed_identifier_list: Vec<Expr> = vec![];
+            for identifier in return_typed_identifiers.into_inner() {
+                return_typed_identifier_list.push(parse_expression(identifier));
+            }
 
             //get the function block
             let block = parts.next().unwrap();
@@ -75,7 +78,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name: function_name,
                 typed_identifier_list: typed_identifier_list,
-                typed_return_identifier_list: typed_return_identifier_list,
+                return_typed_identifier_list: return_typed_identifier_list,
                 block: parse_block(block),
             })
         }
