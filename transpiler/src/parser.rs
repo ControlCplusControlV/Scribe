@@ -59,26 +59,24 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let function_name = parts.next().unwrap().to_string();
 
             //get the typed identifiers from the function and parse each expression
-            let typed_identifiers = parts.next().unwrap();
-            let mut typed_identifier_list: Vec<Expr> = vec![];
-            for identifier in typed_identifiers.into_inner() {
-                typed_identifier_list.push(parse_expression(identifier));
+            let mut params: Vec<Expr> = vec![];
+            for identifier in parts.next().unwrap().into_inner() {
+                params.push(parse_expression(identifier));
             }
 
             //get the return typed identifiers from the function and parse each expression
-            let return_typed_identifiers = parts.next().unwrap();
-            let mut return_typed_identifier_list: Vec<Expr> = vec![];
-            for identifier in return_typed_identifiers.into_inner() {
-                return_typed_identifier_list.push(parse_expression(identifier));
+            let mut returns: Vec<Expr> = vec![];
+            for identifier in parts.next().unwrap().into_inner() {
+                todo!()
+                // returns.push(parse_identifier(identifier));
             }
 
-            //get the function block
             let block = parts.next().unwrap();
 
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name: function_name,
-                typed_identifier_list: typed_identifier_list,
-                return_typed_identifier_list: return_typed_identifier_list,
+                typed_identifier_list: params,
+                return_typed_identifier_list: returns,
                 block: parse_block(block),
             })
         }
@@ -169,8 +167,9 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
 //Function to parse grammar within an expression rule
 fn parse_expression(expression: Pair<Rule>) -> Expr {
-    let inner = expression.clone().into_inner().next().unwrap();
-    match inner.as_rule() {
+    let expression = expression.clone().into_inner().next().unwrap();
+    match expression.as_rule() {
+        // Rule::expr => parse_expression(expression.into_inner().next().unwrap()),
         //TODO: need to add type name?
 
         //TODO: need to add type identifier list?
@@ -181,15 +180,16 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::literal => {
             // We're parsing any literal, now we need to recurse because it could be a number,
             // string, true/false, etc.
-            parse_expression(inner)
+            parse_expression(expression)
         }
-        Rule::number_literal => parse_expression(inner),
+        Rule::number_literal => parse_expression(expression),
         Rule::decimal_number => {
-            let i = inner.as_str();
-            Expr::Literal(i.parse::<u32>().unwrap())
+            let i = expression.as_str();
+            Expr::Literal(ExprLiteral::Number(i.parse::<u128>().unwrap()))
         }
         Rule::string_literal => {
-            todo!()
+            let content = expression.into_inner().next().unwrap();
+            Expr::Literal(ExprLiteral::String(content.as_str().to_string()))
         }
         Rule::false_literal => {
             todo!()
@@ -200,13 +200,13 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         //if the matched rule is an identifier
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
-                identifier: inner.as_str().to_string(),
+                identifier: expression.as_str().to_string(),
             })
         }
 
         //if the matched rule is a function call
         Rule::function_call => {
-            let mut inners = inner.into_inner();
+            let mut inners = expression.into_inner();
             let function_name = get_identifier(inners.next().unwrap());
             let mut exprs: Vec<Expr> = Vec::new();
             // for each argument in the function, parse the expression and add it to exprs
@@ -229,7 +229,10 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
 fn parse_block(expression: Pair<Rule>) -> ExprBlock {
     let mut exprs: Vec<Expr> = Vec::new();
     for statement in expression.into_inner() {
-        exprs.push(parse_statement(statement));
+        // for comments, probably better solution here
+        if (statement.clone().into_inner().next().is_some()) {
+            exprs.push(parse_statement(statement));
+        }
     }
 
     ExprBlock { exprs }
@@ -278,6 +281,7 @@ mod tests {
     fn parse_literals() {
         insta::assert_snapshot!(parse_to_tree(
             "
+            \"string_literal\"
             true
             false
             1
@@ -312,9 +316,8 @@ mod tests {
     fn parse_if() {
         insta::assert_snapshot!(parse_to_tree(
             "
-            if lt(i, 2) {
-               mstore(i, 1)
-            }"
+        if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }
+            "
         ));
     }
 
@@ -353,6 +356,16 @@ mod tests {
                 continue
             }
         "
+        ));
+    }
+
+    #[test]
+    fn parse_function_def() {
+        insta::assert_snapshot!(parse_to_tree(
+            "
+            function allocate_unbounded() -> memPtr {
+                memPtr := mload(64)
+            }"
         ));
     }
     //TODO: add test for default

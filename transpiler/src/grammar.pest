@@ -1,4 +1,4 @@
-file = { SOI ~ NEWLINE* ~ object ~ NEWLINE* ~ EOI }
+file = { SOI ~ NEWLINE* ~ (object | statement*) ~ NEWLINE* ~ EOI }
 
 alpha = { 'a'..'z' | 'A'..'Z' }
 digit = { '0'..'9' }
@@ -7,10 +7,10 @@ WHITESPACE = _{ " " }
 
 
 block = { "{" ~ NEWLINE* ~ statement* ~ NEWLINE* ~ "}" }
-statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_ | continue_ | leave | expr) ~ NEWLINE*  } 
-function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list? ~ ")" ~ ( "->" ~ typed_identifier_list)? ~ block }
+statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_ | continue_ | leave | expr | comment)  ~ NEWLINE*  } 
+function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list ~ ")" ~ ( "->" ~ typed_identifier_list) ~ block }
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
-assignment = { (identifier | identifier_list) ~ ":=" ~ expr }
+assignment = { (identifier_list) ~ ":=" ~ NEWLINE * ~ expr }
 expr = { function_call | literal | identifier  }
 if_statement = { "if" ~ expr ~ block}
 switch = { "switch" ~ expr ~ ((case+ ~ default?) | default) }
@@ -21,18 +21,25 @@ break_ = @{ "break" }
 continue_ = @{ "continue" }
 leave = @{"leave"}
 function_call = { identifier ~ "(" ~ (expr ~ ( "," ~ expr)* )? ~ ")" }
-identifier = @{ASCII_ALPHANUMERIC+}
-identifier_list = { "(" ~ identifier ~ ("," ~ identifier)* ~ ")" }
+identifier = @{(ASCII_ALPHANUMERIC | "_" | "$")+}
+identifier_list = { identifier ~ ("," ~ identifier)*  }
 type_name = { identifier }
-typed_identifier_list = { identifier ~ (":" ~ type_name)? ~ ("," ~ identifier ~ (":" ~ type_name)? )* }
+typed_identifier_list = { (identifier ~ (":" ~ type_name)?)? ~ ("," ~ identifier ~ (":" ~ type_name)? )* }
 literal = { (number_literal | string_literal | true_literal | false_literal | hex_literal) ~ (":" ~ type_name)? }
 number_literal = { hex_number | decimal_number }
-string_literal = @{"\"" ~ ( NEWLINE | ANY )* ~ "\"" }
+comment = _{"//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE}
+string_literal = ${ "\"" ~ string_inner ~ "\"" }
+string_inner = @{ string_char* }
+string_char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
 true_literal = @{ "true" }
 false_literal = @{ "false" }
 hex_number = @{ "0x" ~ ('0'..'9'| 'a'..'f'|'A'..'F')+ }
 decimal_number = @{ digit+ }
-object = { "object" ~ string_literal ~ "{" ~ code ~ (object | data)* ~ "}" }
+object = { "object" ~ string_literal ~ "{" ~ NEWLINE* ~ code ~ (object | data)* ~ NEWLINE* ~ "}" }
 code = { "code" ~ block }
 data = {"data" ~ string_literal ~ (hex_literal | string_literal) }
 hex_literal = @{ "hex" ~ ( ("\""  ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\"") | "\'" ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\'") }

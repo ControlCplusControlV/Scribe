@@ -71,7 +71,7 @@ impl Transpiler {
         return vec![format!("dup.{}", location)];
     }
 
-    fn push(&mut self, value: u32) {
+    fn push(&mut self, value: u128) {
         self.stack.0.insert(0, HashSet::new());
         self.add_line(&format!("push.{}", value));
     }
@@ -183,8 +183,13 @@ impl Transpiler {
         self.add_line("end");
     }
 
-    fn transpile_literal(&mut self, value: u32) {
-        self.push(value);
+    fn transpile_literal(&mut self, literal: &ExprLiteral) {
+        match literal {
+            ExprLiteral::Number(v) => {
+                self.push(*v);
+            }
+            ExprLiteral::String(_) => todo!(),
+        }
     }
 
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
@@ -221,7 +226,7 @@ impl Transpiler {
 
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
-            Expr::Literal(value) => self.transpile_literal(*value),
+            Expr::Literal(value) => self.transpile_literal(value),
             Expr::Assignment(op) => self.transpile_assignment(op),
             Expr::DeclareVariable(op) => self.transpile_variable_declaration(op),
             Expr::ForLoop(op) => self.transpile_for_loop(op),

@@ -1,6 +1,6 @@
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
-    Literal(u32),
+    Literal(ExprLiteral),
     FunctionDefinition(ExprFunctionDefinition),
     FunctionCall(ExprFunctionCall),
     IfStatement(ExprIfStatement),
@@ -14,6 +14,12 @@ pub enum Expr {
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
     Repeat(ExprRepeat),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum ExprLiteral {
+    Number(u128),
+    String(String),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -95,7 +101,10 @@ impl Expr {
     fn add_to_tree(&self, tree: &mut TreeBuilder) {
         match self {
             //is literal
-            Expr::Literal(x) => tree.add_leaf(&x.to_string()),
+            Expr::Literal(literal) => match literal {
+                ExprLiteral::Number(x) => tree.add_leaf(&x.to_string()),
+                ExprLiteral::String(x) => tree.add_leaf(&x),
+            },
 
             //is function call
             Expr::FunctionCall(ExprFunctionCall {
@@ -195,7 +204,10 @@ impl Expr {
                 typed_identifier_list,
                 return_typed_identifier_list,
                 block,
-            }) => {}
+            }) => {
+                let _branch =
+                    tree.add_branch(&format!("function definition - {} - TODO", function_name));
+            }
 
             //is break
             //TODO: add body
@@ -219,13 +231,4 @@ pub fn expressions_to_tree(expressions: &Vec<Expr>) -> String {
         expr.add_to_tree(&mut tree);
     }
     tree.string()
-}
-
-#[test]
-fn test_tree_printing() {
-    let expressions = vec![Expr::FunctionCall(ExprFunctionCall {
-        function_name: "add".to_string(),
-        exprs: Box::new(vec![Expr::Literal(1), Expr::Literal(2)]),
-    })];
-    println!("{}", expressions_to_tree(&expressions));
 }

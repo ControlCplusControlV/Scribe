@@ -27,7 +27,7 @@ trait ExpressionVisitor {
 
 #[derive(Default)]
 struct ConstVariableVisitor {
-    const_variables: HashMap<String, u32>,
+    const_variables: HashMap<String, ExprLiteral>,
 }
 
 #[derive(Default)]
@@ -36,21 +36,21 @@ struct ForLoopToRepeatVisitor {}
 #[derive(Default)]
 struct VariableAssignmentVisitor {
     assignment_counter: HashMap<String, u32>,
-    last_assignment: HashMap<String, u32>,
+    last_assignment: HashMap<String, ExprLiteral>,
 }
 
 impl VariableAssignmentVisitor {
-    fn get_const_variables(&self) -> HashMap<String, u32> {
+    fn get_const_variables(&self) -> HashMap<String, ExprLiteral> {
         self.assignment_counter
             .iter()
             .filter(|(_k, v)| **v == 1)
             .filter_map(|(k, _)| {
                 if let Some(value) = self.last_assignment.get(k) {
-                    return Some((k.clone(), *value));
+                    return Some((k.clone(), value.clone()));
                 }
                 None
             })
-            .collect::<HashMap<String, u32>>()
+            .collect::<HashMap<String, ExprLiteral>>()
     }
 }
 
@@ -70,14 +70,14 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                 after_block,
                 interior_block,
             }) => {
-                let start: Option<u32>;
+                let start: Option<u128>;
                 let iterator_identifier: Option<String>;
                 if let Some(first_expr) = (*init_block.exprs).first() {
                     if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
                         first_expr
                     {
                         if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
-                            start = Some(value);
+                            start = Some(todo!("Need to get literal value here"));
                             iterator_identifier = Some(identifier.to_string());
                         } else {
                             return Some(expr);
@@ -99,7 +99,7 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                                     Expr::Variable(ExprVariableReference {
                                         identifier: iterator_identifier.clone().unwrap(),
                                     }),
-                                    Expr::Literal(1),
+                                    Expr::Literal(todo!("Need to get literal value here")),
                                 ]),
                             })),
                         })
@@ -121,7 +121,7 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                         if let Expr::Literal(value) = exprs[1] {
                             return Some(Expr::Repeat(ExprRepeat {
                                 interior_block: interior_block.clone(),
-                                iterations: value - start.unwrap(),
+                                iterations: todo!("Get end value from literal"),
                             }));
                         }
                     }
@@ -139,8 +139,8 @@ impl ExpressionVisitor for VariableAssignmentVisitor {
     fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
         match &expr {
             Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                if let Some(Expr::Literal(v)) = rhs.clone().map(|r| *r) {
-                    self.last_assignment.insert(identifier.clone(), v);
+                if let Some(Expr::Literal(literal)) = rhs.clone().map(|r| *r) {
+                    self.last_assignment.insert(identifier.clone(), literal);
                 }
                 let count = self
                     .assignment_counter
@@ -171,7 +171,7 @@ impl ExpressionVisitor for ConstVariableVisitor {
             }
             Expr::Variable(ExprVariableReference { identifier }) => {
                 if let Some(value) = self.const_variables.get(identifier) {
-                    return Some(Expr::Literal(*value));
+                    return Some(Expr::Literal(value.clone()));
                 }
             }
             _ => {}
@@ -186,7 +186,7 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
     if let Some(expr) = expr {
         return Some(match expr {
             //Expr is literal
-            Expr::Literal(_x) => expr,
+            Expr::Literal(ref _x) => expr,
 
             //Expr is function call
             Expr::FunctionCall(ExprFunctionCall {
@@ -233,13 +233,13 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                 typed_identifier_list,
                 return_typed_identifier_list,
                 block,
-            }) => Expr::Literal(0),
+            }) => todo!(),
 
             //TODO: Expr is break
-            Expr::Break(ExprBreak {}) => Expr::Literal(0),
+            Expr::Break(ExprBreak {}) => todo!(),
 
             //TODO: Expr is continue
-            Expr::Continue(ExprContinue {}) => Expr::Literal(0),
+            Expr::Continue(ExprContinue {}) => todo!(),
 
             //TODO: Expr is default
             Expr::Default(ExprDefault { block }) => Expr::Default(ExprDefault {
