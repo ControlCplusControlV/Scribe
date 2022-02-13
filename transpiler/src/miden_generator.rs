@@ -166,8 +166,8 @@ impl Transpiler {
 
             _ => todo!("Need to implement {} function in miden", op.function_name),
         };
-        for expr in [&op.first_expr, &op.second_expr] {
-            self.transpile_op(expr);
+        for expr in op.exprs.clone().into_iter() {
+            self.transpile_op(&expr);
         }
         self.consume(2);
         self.add_unknown();

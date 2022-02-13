@@ -6,7 +6,6 @@ mod tests {
     use scribe::executor;
     use scribe::miden_generator;
     use scribe::parser;
-
     use scribe::types::expressions_to_tree;
 
     fn run_example(yul_code: &str, expected_output: Vec<u64>) {

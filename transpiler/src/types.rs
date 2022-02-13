@@ -54,22 +54,15 @@ pub struct ExprIfStatement {
     pub second_expr: Box<ExprBlock>,
 }
 
+
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionCall {
     pub function_name: String,
-    pub first_expr: Box<Expr>,
-    pub second_expr: Box<Expr>,
+    pub exprs: Box<Vec<Expr>>
 }
 
 
-// #[derive(Clone, PartialEq, Eq, Debug)]
-// pub struct ExprFunctionCall {
-//     pub function_name: String,
-//     pub exprs: Box<Vec<Expr>>,
-// }
-
-
-use debug_tree::{TreeBuilder};
+use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 
 impl Expr {
     fn add_to_tree(&self, tree: &mut TreeBuilder) {
@@ -77,12 +70,12 @@ impl Expr {
             Expr::Literal(x) => tree.add_leaf(&x.to_string()),
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
-                first_expr,
-                second_expr,
+                exprs,
             }) => {
                 let _branch = tree.add_branch(&format!("{}()", &function_name.to_string()));
-                first_expr.add_to_tree(tree);
-                second_expr.add_to_tree(tree);
+                for expression in exprs.clone().into_iter(){
+                    expression.add_to_tree(tree);
+                }
             }
             Expr::IfStatement(ExprIfStatement {
                 first_expr,
@@ -167,8 +160,7 @@ pub fn expressions_to_tree(expressions: &Vec<Expr>) -> String {
 fn test_tree_printing() {
     let expressions = vec![Expr::FunctionCall(ExprFunctionCall {
         function_name: "add".to_string(),
-        first_expr: Box::new(Expr::Literal(1)),
-        second_expr: Box::new(Expr::Literal(2)),
+        exprs: Box::new(vec![Expr::Literal(1), Expr::Literal(2)]),
     })];
     println!("{}", expressions_to_tree(&expressions));
 }
