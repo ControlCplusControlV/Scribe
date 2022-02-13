@@ -1,4 +1,4 @@
-use std::{collections::{HashMap}, vec};
+use std::{collections::HashMap, vec};
 
 use crate::types::*;
 
@@ -7,7 +7,7 @@ pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     let ast = walk_ast(ast, &mut assignment_visitor);
     let const_variables = assignment_visitor.get_const_variables();
     let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
-    
+
     walk_ast(ast, &mut ForLoopToRepeatVisitor {})
 }
 
@@ -95,10 +95,12 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                             identifier: iterator_identifier.clone().unwrap(),
                             rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
                                 function_name: "add".to_string(),
-                                exprs: Box::new(vec![Expr::Variable(ExprVariableReference {
-                                    identifier: iterator_identifier.clone().unwrap()}),
-                                    Expr::Literal(1)
-                                    ]),
+                                exprs: Box::new(vec![
+                                    Expr::Variable(ExprVariableReference {
+                                        identifier: iterator_identifier.clone().unwrap(),
+                                    }),
+                                    Expr::Literal(1),
+                                ]),
                             })),
                         })
                     {}
@@ -107,7 +109,7 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                 }
                 if let Expr::FunctionCall(ExprFunctionCall {
                     function_name,
-                    exprs
+                    exprs,
                 }) = &**conditional
                 {
                     if function_name == "lt"
@@ -183,16 +185,22 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
     let expr = visitor.visit_expr(expr);
     if let Some(expr) = expr {
         return Some(match expr {
+            //Expr is literal
             Expr::Literal(_x) => expr,
+
+            //Expr is function call
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
                 exprs,
             }) => Expr::FunctionCall(ExprFunctionCall {
                 function_name,
-                exprs:Box::new(vec![
-                walk_expr(exprs[0].clone(), visitor).unwrap(), 
-                walk_expr(exprs[1].clone(), visitor).unwrap(),]),
+                exprs: Box::new(vec![
+                    walk_expr(exprs[0].clone(), visitor).unwrap(),
+                    walk_expr(exprs[1].clone(), visitor).unwrap(),
+                ]),
             }),
+
+            //Expr is if statement
             Expr::IfStatement(ExprIfStatement {
                 first_expr,
                 second_expr,
@@ -202,18 +210,32 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                     exprs: walk_ast(second_expr.exprs, visitor),
                 }),
             }),
+
+            //Expr is assignment
             Expr::Assignment(ExprAssignment { identifier, rhs }) => {
                 Expr::Assignment(ExprAssignment {
                     identifier,
                     rhs: Box::new(walk_expr(*rhs, visitor).unwrap()),
                 })
             }
+
+            //Expr is declare variable
             Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
                 Expr::DeclareVariable(ExprDeclareVariable {
                     identifier,
                     rhs: rhs.map(|rhs| Box::new(walk_expr(*rhs, visitor).unwrap())),
                 })
             }
+
+            //TODO: Expr is function definition
+            Expr::FunctionDefinition(ExprFunctionDefinition {
+                function_name,
+                typed_identifier_list,
+                typed_return_identifier_list,
+                block,
+            }) => Expr::Literal(0),
+
+            //Expr is repeat
             Expr::Repeat(ExprRepeat {
                 interior_block,
                 iterations,
@@ -223,6 +245,8 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                     exprs: walk_ast(interior_block.exprs, visitor),
                 }),
             }),
+
+            //Expr is for loop
             Expr::ForLoop(ExprForLoop {
                 init_block,
                 conditional,
@@ -240,9 +264,13 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                     exprs: walk_ast(interior_block.exprs, visitor),
                 }),
             }),
+
+            //Expr is block
             Expr::Block(ExprBlock { exprs }) => Expr::Block(ExprBlock {
                 exprs: walk_ast(exprs, visitor),
             }),
+
+            //Expr is variable
             Expr::Variable(ExprVariableReference { identifier: _ }) => expr,
         });
     }

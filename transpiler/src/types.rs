@@ -1,7 +1,7 @@
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
     Literal(u32),
-    // FunctionDefinition(ExprFunctionDefinition),
+    FunctionDefinition(ExprFunctionDefinition),
     FunctionCall(ExprFunctionCall),
     IfStatement(ExprIfStatement),
     Assignment(ExprAssignment),
@@ -18,11 +18,13 @@ pub struct ExprVariableReference {
     pub identifier: String,
 }
 
-// #[derive(Clone, PartialEq, Eq, Debug)]
-// pub struct ExprFunctionDefinition {
-//     pub function_name: String,
-//     pub typed_identifier_list: Box<Vec<Expr>>
-// }
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprFunctionDefinition {
+    pub function_name: String,
+    pub typed_identifier_list: Vec<Expr>,
+    pub typed_return_identifier_list: Vec<Expr>,
+    pub block: ExprBlock,
+}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprBlock {
@@ -61,13 +63,11 @@ pub struct ExprIfStatement {
     pub second_expr: Box<ExprBlock>,
 }
 
-
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionCall {
     pub function_name: String,
-    pub exprs: Box<Vec<Expr>>
+    pub exprs: Box<Vec<Expr>>,
 }
-
 
 use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 
@@ -80,7 +80,7 @@ impl Expr {
                 exprs,
             }) => {
                 let _branch = tree.add_branch(&format!("{}()", &function_name.to_string()));
-                for expression in exprs.clone().into_iter(){
+                for expression in exprs.clone().into_iter() {
                     expression.add_to_tree(tree);
                 }
             }
@@ -151,9 +151,13 @@ impl Expr {
                 let _branch = tree.add_branch(&format!("var - {}", identifier));
             }
 
-            // Expr::FunctionDefinition(ExprFunctionDefinition { function_name, typed_identifier_list }) =>{
-            //     //TODO: Add function Definition to tree
-            // }
+            //TODO: Add function Definition to tree
+            Expr::FunctionDefinition(ExprFunctionDefinition {
+                function_name,
+                typed_identifier_list,
+                typed_return_identifier_list,
+                block,
+            }) => {}
         }
     }
 }

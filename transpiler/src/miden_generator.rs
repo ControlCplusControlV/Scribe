@@ -192,6 +192,9 @@ impl Transpiler {
         self.add_lines(instructions);
     }
 
+    //TODO: update placeholder
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {}
+
     fn add_line(&mut self, line: &str) {
         self.program = format!(
             "{}\n{}{}",
@@ -218,6 +221,7 @@ impl Transpiler {
             Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
+            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
         }
     }
 }

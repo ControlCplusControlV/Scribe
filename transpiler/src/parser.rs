@@ -53,15 +53,32 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is block
         Rule::block => Expr::Block(parse_block(inner)),
 
-        // //rule is function definition
-        // Rule::function_definition =>{
-        //     let mut parts = inner.into_inner();
-        //     let function_name= parts.next().unwrap().to_string();
-        //     let typed_identifier_list = parts.next().unwrap();
+        //rule is function definition
+        Rule::function_definition => {
+            let mut parts = inner.into_inner();
+            let function_name = parts.next().unwrap().to_string();
 
-        //     //TODO: Add Expr::FunctionDefinition. Parse expression for each identifier in the typed identifier list to return a vec<Expr>
+            //get the typed identifiers from the function and parse each expression
+            let typed_identifiers = parts.next().unwrap();
+            let mut typed_identifier_list: Vec<Expr> = vec![];
+            for identifier in typed_identifiers.into_inner() {
+                typed_identifier_list.push(parse_expression(identifier));
+            }
 
-        // }
+            //get the return typed identifiers from the function and parse each expression
+            let typed_return_identifiers = parts.next().unwrap();
+            let mut typed_return_identifier_list: Vec<Expr> = vec![];
+
+            //get the function block
+            let block = parts.next().unwrap();
+
+            Expr::FunctionDefinition(ExprFunctionDefinition {
+                function_name: function_name,
+                typed_identifier_list: typed_identifier_list,
+                typed_return_identifier_list: typed_return_identifier_list,
+                block: parse_block(block),
+            })
+        }
 
         //rule is variable declaration
 
@@ -276,4 +293,6 @@ mod tests {
         "###;
         insta::assert_snapshot!(parse_to_tree(yul));
     }
+
+    //TODO: add test for parse function delcaration
 }
