@@ -90,7 +90,7 @@ impl Stack {
 }
 
 impl Transpiler {
-    fn declare_var(&mut self, op: &ExprDeclareVariable) {
+    fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         let address = self.next_open_memory_address;
         self.next_open_memory_address += 1;
         self.variables.insert(op.identifier.clone(), address);
@@ -100,7 +100,7 @@ impl Transpiler {
         }
     }
 
-    fn assignment(&mut self, op: &ExprAssignment) {
+    fn transpile_assignment(&mut self, op: &ExprAssignment) {
         // TODO: in the future we should be able to just mark that two variables share the same
         // stack address, but I can't quite figure it out for the fibonacci example currently
         if let Expr::Variable(ExprVariableReference {
@@ -121,7 +121,7 @@ impl Transpiler {
         }
     }
 
-    fn for_loop(&mut self, op: &ExprForLoop) {
+    fn transpile_for_loop(&mut self, op: &ExprForLoop) {
         self.transpile_block(&op.init_block);
         let stack_target = self.stack.clone();
         self.transpile_op(&op.conditional);
@@ -186,12 +186,12 @@ impl Transpiler {
         self.add_line(&format!("end"));
     }
 
-    fn insert_literal(&mut self, value: u32) {
+    fn transpile_literal(&mut self, value: u32) {
         let instructions = self.stack.push(value);
         self.add_lines(instructions);
     }
 
-    fn load_variable(&mut self, op: &ExprVariableReference) {
+    fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
         let instructions = self.stack.push_ref_to_top(&op.identifier);
         self.add_lines(instructions);
     }
@@ -213,11 +213,11 @@ impl Transpiler {
 
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
-            Expr::Literal(value) => self.insert_literal(*value),
-            Expr::Assignment(op) => self.assignment(op),
-            Expr::DeclareVariable(op) => self.declare_var(op),
-            Expr::ForLoop(op) => self.for_loop(op),
-            Expr::Variable(op) => self.load_variable(op),
+            Expr::Literal(value) => self.transpile_literal(*value),
+            Expr::Assignment(op) => self.transpile_assignment(op),
+            Expr::DeclareVariable(op) => self.transpile_variable_declaration(op),
+            Expr::ForLoop(op) => self.transpile_for_loop(op),
+            Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
             Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
