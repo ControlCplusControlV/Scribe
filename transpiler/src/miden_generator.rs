@@ -201,6 +201,9 @@ impl Transpiler {
     //TODO: update placeholder
     fn transpile_continue(&mut self, op: &ExprContinue) {}
 
+    //TODO: update placeholder
+    fn transpile_default(&mut self, op: &ExprDefault) {}
+
     fn add_line(&mut self, line: &str) {
         self.program = format!(
             "{}\n{}{}",
@@ -230,6 +233,7 @@ impl Transpiler {
             Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
             Expr::Break(op) => self.transpile_break(op),
             Expr::Continue(op) => self.transpile_continue(op),
+            Expr::Default(op) => self.transpile_default(op),
         }
     }
 }

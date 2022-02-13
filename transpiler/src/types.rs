@@ -10,6 +10,7 @@ pub enum Expr {
     Block(ExprBlock),
     Break(ExprBreak),
     Continue(ExprContinue),
+    Default(ExprDefault),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
     Repeat(ExprRepeat),
@@ -25,6 +26,11 @@ pub struct ExprBreak {}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprContinue {}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprDefault {
+    pub block: ExprBlock,
+}
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionDefinition {
@@ -192,10 +198,16 @@ impl Expr {
             }) => {}
 
             //is break
+            //TODO: add body
             Expr::Break(ExprBreak {}) => {}
 
             //is continue
+            //TODO: add body
             Expr::Continue(ExprContinue {}) => {}
+
+            //is default
+            //TODO: add body
+            Expr::Default(ExprDefault { block }) => {}
         }
     }
 }

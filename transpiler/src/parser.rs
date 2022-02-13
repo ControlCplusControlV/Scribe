@@ -111,6 +111,13 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         // rule is case
 
         //rule is default
+        Rule::default => {
+            let mut parts = inner.into_inner();
+            let block = parts.next().unwrap();
+            Expr::Default(ExprDefault {
+                block: parse_block(block),
+            })
+        }
 
         //rule is for loop
         Rule::for_loop => {
@@ -323,5 +330,11 @@ mod tests {
         insta::assert_snapshot!(parse_to_tree(yul));
     }
 
-    //TODO: add test for parse function delcaration
+    //TODO: add test for parse function definition
+
+    //TODO: add test for break
+
+    //TODO add test for continue
+
+    //TODO: add test for default
 }
