@@ -9,7 +9,7 @@ mod tests {
     use scribe::types;
     use scribe::types::expressions_to_tree;
 
-    fn run_example(yul_code: String, inputs: Vec<u128>, expected_output: Vec<u64>) {
+    fn run_example(yul_code: &str, expected_output: Vec<u64>) {
         fn print_title(s: &str) {
             let s1 = format!("=== {} ===", s).blue().bold();
             println!("{}", s1);
@@ -37,7 +37,7 @@ mod tests {
         println!("{}", miden_code);
         println!("");
 
-        let execution_value = executor::execute(miden_code, inputs).unwrap();
+        let execution_value = executor::execute(miden_code, vec![]).unwrap();
         let stack = execution_value.last_stack_state();
         let last_stack_value = stack.first().unwrap();
 
@@ -51,22 +51,27 @@ mod tests {
     }
 
     #[test]
-    fn integration_add() {
-        run_example("add(1,2)".to_string(), vec![], vec![3]);
+    fn integration_math() {
+        run_example("add(1, 2)", vec![3]);
+        run_example("mul(2, 3)", vec![6]);
+        run_example("mul(2, 3)", vec![6]);
+        run_example("sub(4, 2)", vec![2]);
+        run_example("div(8, 2)", vec![4]);
     }
 
     #[test]
-    fn integration_optimize_const() {
-        run_example(
-            "
-let x := 42
-add(x, 2)
-            "
-            .to_string(),
-            vec![],
-            vec![5],
-        );
+    fn integration_boolean() {
+        run_example("lt(2, 6)", vec![1]);
+        run_example("lt(6, 2)", vec![0]);
+        run_example("eq(2, 2)", vec![1]);
+        run_example("eq(4, 2)", vec![0]);
+        run_example("or(1, 0)", vec![1]);
+        run_example("or(0, 0)", vec![0]);
+        run_example("and(1, 1)", vec![1]);
+        run_example("and(0, 1)", vec![0]);
+        run_example("and(0, 0)", vec![0]);
     }
+
     #[test]
     fn integration_variables() {
         run_example(
@@ -75,9 +80,7 @@ let x := 2
 let y := 3
 x := 4
 add(x, y)
-            "
-            .to_string(),
-            vec![],
+            ",
             vec![5],
         );
     }
@@ -91,9 +94,7 @@ let y := 3
 if lt(x, y) {
     5
 }
-            "
-            .to_string(),
-            vec![],
+            ",
             vec![5],
         );
     }
@@ -107,9 +108,7 @@ if lt(x, y) {
         x := 3
     }
     i
-            "
-            .to_string(),
-            vec![],
+            ",
             vec![5],
         );
     }
@@ -130,9 +129,7 @@ if lt(x, y) {
                 b := c
             }
             b
-            "
-            .to_string(),
-            vec![],
+            ",
             vec![89],
         );
     }

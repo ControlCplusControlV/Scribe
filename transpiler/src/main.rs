@@ -37,7 +37,7 @@ fn main() {
         println!("{}", yul_code.file_contents);
         pause();
         let inputs = vec![];
-        let parsed = parser::parse_yul_syntax(yul_code.file_contents);
+        let parsed = parser::parse_yul_syntax(&yul_code.file_contents);
 
         clear_screen();
         print_title("Parsed Expressions");

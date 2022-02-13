@@ -10,7 +10,7 @@ use crate::types::*;
 struct IdentParser;
 
 //function to parse yul syntax into miden opcodes
-pub fn parse_yul_syntax(syntax: String) -> Vec<Expr> {
+pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     // Parse the entire file as a string
     let file = IdentParser::parse(Rule::file, &syntax)
         .expect("unsuccessful parse")
@@ -153,8 +153,7 @@ mod tests {
     #[test]
     fn parse_var_declaration() {
         let yul = "let x := 1
-            let y := 2"
-            .to_string();
+            let y := 2";
 
         let expected_ops = vec![
             Expr::DeclareVariable(ExprDeclareVariable {

@@ -10,7 +10,7 @@ WHITESPACE = _{ " " }
 
 
 block = { "{" ~ statement* ~ "}" }
-statement = { NEWLINE* ~ (variable_declaration | assignment | if_statement | block | function_definition | switch | for_loop | break_continue | leave | expr) ~ NEWLINE*  } 
+statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_continue | leave | expr) ~ NEWLINE*  } 
 function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list? ~ ")" ~ ( "->" ~ typed_identifier_list)? ~ block }
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
 assignment = { identifier_list ~ ":=" ~ expr }
