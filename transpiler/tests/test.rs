@@ -2,9 +2,9 @@
 mod tests {
     use colored::*;
     use miden_processor::StarkField;
+    use scribe::ast_optimization::optimize_ast;
     use scribe::executor;
     use scribe::miden_generator;
-    use scribe::miden_generator::optimize_ast;
     use scribe::parser;
     use scribe::types;
     use scribe::types::expressions_to_tree;

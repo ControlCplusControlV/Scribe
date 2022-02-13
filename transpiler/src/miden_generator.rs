@@ -1,13 +1,14 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::types::*;
+use crate::{ast_optimization::optimize_ast, types::*};
 
 #[derive(Default)]
-struct Context {
+struct Transpiler {
     variables: HashMap<String, u32>,
     indentation: u32,
     next_open_memory_address: u32,
     stack: Stack,
+    program: String,
 }
 
 type StackValue = HashSet<String>;
@@ -18,7 +19,7 @@ struct Stack(Vec<StackValue>);
 impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         Ok(for value in self.0.iter() {
-            write!(f, "{:?}\n", value);
+            write!(f, "\n{:?}", value).unwrap();
         })
     }
 }
@@ -88,413 +89,156 @@ impl Stack {
     }
 }
 
-fn declare_var(program: &mut String, op: &ExprDeclareVariable, context: &mut Context) {
-    let address = context.next_open_memory_address;
-    context.next_open_memory_address += 1;
-    context.variables.insert(op.identifier.clone(), address);
-    if let Some(rhs) = &op.rhs {
-        transpile_op(&rhs, program, context);
-        context.stack.top_is_var(&op.identifier);
-        // add_line(program, "padw", context);
-        // add_line(program, "drop", context);
-        // add_line(program, &format!("mem.pop.{}", address), context);
-    }
-}
-
-fn assignment(program: &mut String, op: &ExprAssignment, context: &mut Context) {
-    // TODO: in the future we should be able to just mark that two variables share the same
-    // stack address, but I can't quite figure it out for the fibonacci example currently
-    if let Expr::Variable(ExprVariableReference {
-        identifier: target_ident,
-    }) = &*op.rhs
-    {
-        context
-            .stack
-            .equate_reference(&op.identifier.clone(), &target_ident);
-    } else {
-        transpile_op(&op.rhs, program, context);
-        context.stack.top_is_var(&op.identifier.clone());
-    }
-}
-
-fn block(program: &mut String, op: &ExprBlock, context: &mut Context) {
-    for op in &op.exprs {
-        transpile_op(&op, program, context);
-    }
-}
-
-fn for_loop(program: &mut String, op: &ExprForLoop, context: &mut Context) {
-    block(program, &op.init_block, context);
-    let stack_target = context.stack.clone();
-    transpile_op(&op.conditional, program, context);
-    add_line(program, &format!("while.true"), context);
-    // Because the while.true will consume the top of the stack
-    context.stack.consume(1);
-    context.indentation += 4;
-    block(program, &op.interior_block, context);
-    block(program, &op.after_block, context);
-    add_lines(context.stack.target(stack_target), program, context);
-    transpile_op(&op.conditional, program, context);
-    // Because the while.true will consume the top of the stack
-    context.stack.consume(1);
-    context.indentation -= 4;
-    add_line(program, &format!("end"), context);
-}
-
-fn transpile_repeat(program: &mut String, op: &ExprRepeat, context: &mut Context) {
-    let stack_target = context.stack.clone();
-    add_line(program, &format!("repeat.{}", op.iterations), context);
-    context.indentation += 4;
-    block(program, &op.interior_block, context);
-    add_lines(context.stack.target(stack_target), program, context);
-    context.indentation -= 4;
-    add_line(program, &format!("end"), context);
-}
-
-fn transpile_miden_function(
-    miden_function: &str,
-    program: &mut String,
-    op: &ExprFunctionCall,
-    context: &mut Context,
-) {
-    for expr in [&op.first_expr, &op.second_expr] {
-        transpile_op(expr, program, context);
-    }
-    context.stack.consume(2);
-    context.stack.add_unknown();
-    add_line(program, miden_function, context);
-}
-
-fn if_statement(program: &mut String, op: &ExprIfStatement, context: &mut Context) {
-    transpile_op(&op.first_expr, program, context);
-    add_line(program, &format!("if.true"), context);
-    context.indentation += 4;
-    block(program, &op.second_expr, context);
-    context.indentation -= 4;
-    add_line(program, &format!("end"), context);
-}
-
-fn insert_literal(program: &mut String, value: u32, context: &mut Context) {
-    add_lines(context.stack.push(value), program, context);
-}
-
-fn load_variable(program: &mut String, op: &ExprVariableReference, context: &mut Context) {
-    add_lines(
-        context.stack.push_ref_to_top(&op.identifier),
-        program,
-        context,
-    );
-}
-
-fn add_line(program: &mut String, line: &str, context: &Context) {
-    *program = format!(
-        "{}\n{}{}",
-        program,
-        " ".repeat(context.indentation.try_into().unwrap()),
-        line
-    )
-}
-
-fn add_lines(lines: Vec<MidenInstruction>, program: &mut String, context: &Context) {
-    for line in lines {
-        add_line(program, &line, context);
-    }
-}
-
-fn transpile_op(expr: &Expr, program: &mut String, context: &mut Context) {
-    match expr {
-        Expr::Literal(value) => insert_literal(program, *value, context),
-        Expr::Assignment(op) => assignment(program, op, context),
-        Expr::DeclareVariable(op) => declare_var(program, op, context),
-        Expr::ForLoop(op) => for_loop(program, op, context),
-        Expr::Variable(op) => load_variable(program, op, context),
-        Expr::Block(op) => block(program, op, context),
-        Expr::IfStatement(op) => if_statement(program, op, context),
-        Expr::FunctionCall(op) => {
-            // TODO: All functions are assumed to consume 2 stack elements and add one, for now
-            // I how Rust handles strings, why are &str and String different? Just to torment me?
-            match op.function_name.as_str() {
-                // Basic Arithmetic Operations
-                "add" => transpile_miden_function("add", program, op, context),
-                "sub" => transpile_miden_function("add", program, op, context),
-                "mul" => transpile_miden_function("mul", program, op, context),
-                "sub" => transpile_miden_function("div", program, op, context),
-
-                // Boolean Operations
-                "gt" => transpile_miden_function("gt", program, op, context),
-                "lt" => transpile_miden_function("lt", program, op, context),
-                "eq" => transpile_miden_function("eq", program, op, context),
-                "and" => transpile_miden_function("and", program, op, context),
-                "or" => transpile_miden_function("or", program, op, context),
-
-                _ => todo!("Need to implement {} function in miden", op.function_name)
-
-            }
+impl Transpiler {
+    fn declare_var(&mut self, op: &ExprDeclareVariable) {
+        let address = self.next_open_memory_address;
+        self.next_open_memory_address += 1;
+        self.variables.insert(op.identifier.clone(), address);
+        if let Some(rhs) = &op.rhs {
+            self.transpile_op(&rhs);
+            self.stack.top_is_var(&op.identifier);
         }
-        Expr::Repeat(op) => transpile_repeat(program, op, context),
+    }
+
+    fn assignment(&mut self, op: &ExprAssignment) {
+        // TODO: in the future we should be able to just mark that two variables share the same
+        // stack address, but I can't quite figure it out for the fibonacci example currently
+        if let Expr::Variable(ExprVariableReference {
+            identifier: target_ident,
+        }) = &*op.rhs
+        {
+            self.stack
+                .equate_reference(&op.identifier.clone(), &target_ident);
+        } else {
+            self.transpile_op(&op.rhs);
+            self.stack.top_is_var(&op.identifier.clone());
+        }
+    }
+
+    fn transpile_block(&mut self, op: &ExprBlock) {
+        for op in &op.exprs {
+            self.transpile_op(&op);
+        }
+    }
+
+    fn for_loop(&mut self, op: &ExprForLoop) {
+        self.transpile_block(&op.init_block);
+        let stack_target = self.stack.clone();
+        self.transpile_op(&op.conditional);
+        self.add_line(&format!("while.true"));
+        // Because the while.true will consume the top of the stack
+        self.stack.consume(1);
+        self.indentation += 4;
+        self.transpile_block(&op.interior_block);
+        self.transpile_block(&op.after_block);
+        let instructions = self.stack.target(stack_target);
+        self.add_lines(instructions);
+        self.transpile_op(&op.conditional);
+        self.stack.consume(1);
+        self.indentation -= 4;
+        self.add_line(&format!("end"));
+    }
+
+    fn transpile_repeat(&mut self, op: &ExprRepeat) {
+        let stack_target = self.stack.clone();
+        self.add_line(&format!("repeat.{}", op.iterations));
+        self.indentation += 4;
+        self.transpile_block(&op.interior_block);
+        let instructions = self.stack.target(stack_target);
+        self.add_lines(instructions);
+        self.indentation -= 4;
+        self.add_line(&format!("end"));
+    }
+
+    fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
+        // TODO: All functions are assumed to consume 2 stack elements and add one, for now
+        // I how Rust handles strings, why are &str and String different? Just to torment me?
+        let miden_function_name = match op.function_name.as_str() {
+            // Basic Arithmetic Operations
+            "add" => "add",
+            "sub" => "sub",
+            "mul" => "mul",
+            "div" => "div",
+
+            // Boolean Operations
+            "gt" => "gt",
+            "lt" => "lt",
+            "eq" => "eq",
+            "and" => "and",
+            "or" => "or",
+
+            _ => todo!("Need to implement {} function in miden", op.function_name),
+        };
+        for expr in [&op.first_expr, &op.second_expr] {
+            self.transpile_op(expr);
+        }
+        self.stack.consume(2);
+        self.stack.add_unknown();
+        self.add_line(miden_function_name);
+    }
+
+    fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
+        self.transpile_op(&op.first_expr);
+        self.add_line(&format!("if.true"));
+        self.indentation += 4;
+        self.transpile_block(&op.second_expr);
+        self.indentation -= 4;
+        self.add_line(&format!("end"));
+    }
+
+    fn insert_literal(&mut self, value: u32) {
+        let instructions = self.stack.push(value);
+        self.add_lines(instructions);
+    }
+
+    fn load_variable(&mut self, op: &ExprVariableReference) {
+        let instructions = self.stack.push_ref_to_top(&op.identifier);
+        self.add_lines(instructions);
+    }
+
+    fn add_line(&mut self, line: &str) {
+        self.program = format!(
+            "{}\n{}{}",
+            self.program,
+            " ".repeat(self.indentation.try_into().unwrap()),
+            line
+        )
+    }
+
+    fn add_lines(&mut self, lines: Vec<MidenInstruction>) {
+        for line in lines {
+            self.add_line(&line);
+        }
+    }
+
+    fn transpile_op(&mut self, expr: &Expr) {
+        match expr {
+            Expr::Literal(value) => self.insert_literal(*value),
+            Expr::Assignment(op) => self.assignment(op),
+            Expr::DeclareVariable(op) => self.declare_var(op),
+            Expr::ForLoop(op) => self.for_loop(op),
+            Expr::Variable(op) => self.load_variable(op),
+            Expr::Block(op) => self.transpile_block(op),
+            Expr::IfStatement(op) => self.transpile_if_statement(op),
+            Expr::FunctionCall(op) => self.transpile_miden_function(op),
+            Expr::Repeat(op) => self.transpile_repeat(op),
+        }
     }
 }
 
 pub fn transpile_program(expressions: Vec<Expr>) -> String {
-    let mut context = Context {
+    let mut transpiler = Transpiler {
         variables: HashMap::new(),
         next_open_memory_address: 0,
         indentation: 4,
         stack: Stack::default(),
+        program: "begin".to_string(),
     };
-    let mut program = "begin".to_string();
-    for expr in expressions {
-        transpile_op(&expr, &mut program, &mut context);
-    }
-    context.indentation -= 4;
-    add_line(&mut program, "end", &context);
-    return program;
-}
-
-pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
-    let mut assignment_visitor = VariableAssignmentVisitor::default();
-    let ast = walk_ast(ast, &mut assignment_visitor);
-    let const_variables = assignment_visitor.get_const_variables();
-    let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
-    let ast = walk_ast(ast, &mut ForLoopToRepeatVisitor {});
-    ast
-}
-
-fn walk_ast<V: ExpressionVisitor>(ast: Vec<Expr>, visitor: &mut V) -> Vec<Expr> {
-    let mut new_ast = vec![];
+    let ast = optimize_ast(expressions);
     for expr in ast {
-        if let Some(expr) = walk_expr(expr, visitor) {
-            new_ast.push(expr);
-        }
+        transpiler.transpile_op(&expr);
     }
-    return new_ast;
-}
-
-trait ExpressionVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr>;
-}
-
-#[derive(Default)]
-struct ConstVariableVisitor {
-    const_variables: HashMap<String, u32>,
-}
-
-#[derive(Default)]
-struct ForLoopToRepeatVisitor {}
-
-#[derive(Default)]
-struct VariableAssignmentVisitor {
-    assignment_counter: HashMap<String, u32>,
-    last_assignment: HashMap<String, u32>,
-}
-
-impl VariableAssignmentVisitor {
-    fn get_const_variables(&self) -> HashMap<String, u32> {
-        self.assignment_counter
-            .iter()
-            .filter(|(k, v)| **v == 1)
-            .filter_map(|(k, _)| {
-                if let Some(value) = self.last_assignment.get(k) {
-                    return Some((k.clone(), *value));
-                }
-                return None;
-            })
-            .collect::<HashMap<String, u32>>()
-    }
-}
-
-// TODO: unstable for now, as it will incorrectly transform for loops that modify the iterator in
-// the interior block. To fix this we should have the variable assignment visitor walk the interior
-// block, for assignments. Also need to make sure the var isn't referenced within the for loop
-//
-// TODO: there's a lot of ways we can miss this optimization currently. Even just flipping i :=
-// add(i, 1) to i := add(1, i) will break this optimization. In the future we should support gt,
-// subtracting, etc.
-impl ExpressionVisitor for ForLoopToRepeatVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::ForLoop(ExprForLoop {
-                init_block,
-                conditional,
-                after_block,
-                interior_block,
-            }) => {
-                let start: Option<u32>;
-                let iterator_identifier: Option<String>;
-                if let Some(first_expr) = (*init_block.exprs).first() {
-                    if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
-                        first_expr
-                    {
-                        if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
-                            start = Some(value);
-                            iterator_identifier = Some(identifier.to_string());
-                        } else {
-                            return Some(expr);
-                        }
-                    } else {
-                        return Some(expr);
-                    }
-                } else {
-                    return Some(expr);
-                }
-
-                if let Some(Expr::Assignment(assignment)) = (*after_block.exprs).first() {
-                    if *assignment
-                        == (ExprAssignment {
-                            identifier: iterator_identifier.clone().unwrap(),
-                            rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
-                                function_name: "add".to_string(),
-                                first_expr: Box::new(Expr::Variable(ExprVariableReference {
-                                    identifier: iterator_identifier.clone().unwrap(),
-                                })),
-                                second_expr: Box::new(Expr::Literal(1)),
-                            })),
-                        })
-                    {}
-                } else {
-                    return Some(expr);
-                }
-                if let Expr::FunctionCall(ExprFunctionCall {
-                    function_name,
-                    first_expr,
-                    second_expr,
-                }) = &**conditional
-                {
-                    if function_name == "lt"
-                        && *first_expr
-                            == Box::new(Expr::Variable(ExprVariableReference {
-                                identifier: iterator_identifier.clone().unwrap(),
-                            }))
-                    {
-                        if let Expr::Literal(value) = **second_expr {
-                            return Some(Expr::Repeat(ExprRepeat {
-                                interior_block: interior_block.clone(),
-                                iterations: value - start.unwrap(),
-                            }));
-                        }
-                    }
-                } else {
-                    return Some(expr);
-                }
-            }
-            _ => {}
-        }
-        return Some(expr);
-    }
-}
-
-impl ExpressionVisitor for VariableAssignmentVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                if let Some(Expr::Literal(v)) = rhs.clone().map(|r| *r) {
-                    self.last_assignment.insert(identifier.clone(), v);
-                }
-                let count = self
-                    .assignment_counter
-                    .entry(identifier.clone())
-                    .or_insert(0);
-                *count += 1;
-            }
-            Expr::Assignment(ExprAssignment { identifier, rhs: _ }) => {
-                let count = self
-                    .assignment_counter
-                    .entry(identifier.clone())
-                    .or_insert(0);
-                *count += 1;
-            }
-            _ => {}
-        }
-        return Some(expr);
-    }
-}
-
-impl ExpressionVisitor for ConstVariableVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs: _ }) => {
-                if self.const_variables.get(identifier).is_some() {
-                    return None;
-                }
-            }
-            Expr::Variable(ExprVariableReference { identifier }) => {
-                if let Some(value) = self.const_variables.get(identifier) {
-                    return Some(Expr::Literal(*value));
-                }
-            }
-            _ => {}
-        }
-        return Some(expr);
-    }
-}
-
-// TODO: it would be nice if there wasn't so much cloning in here
-fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> {
-    let expr = visitor.visit_expr(expr.clone());
-    if let Some(expr) = expr.clone() {
-        return Some(match expr {
-            Expr::Literal(x) => expr,
-            Expr::FunctionCall(ExprFunctionCall {
-                function_name,
-                first_expr,
-                second_expr,
-            }) => Expr::FunctionCall(ExprFunctionCall {
-                function_name,
-                first_expr: Box::new(walk_expr(*first_expr, visitor).unwrap()),
-                second_expr: Box::new(walk_expr(*second_expr, visitor).unwrap()),
-            }),
-            Expr::IfStatement(ExprIfStatement {
-                first_expr,
-                second_expr,
-            }) => Expr::IfStatement(ExprIfStatement {
-                first_expr: Box::new(walk_expr(*first_expr, visitor).unwrap()),
-                second_expr: Box::new(ExprBlock {
-                    exprs: walk_ast(second_expr.exprs, visitor),
-                }),
-            }),
-            Expr::Assignment(ExprAssignment { identifier, rhs }) => {
-                Expr::Assignment(ExprAssignment {
-                    identifier,
-                    rhs: Box::new(walk_expr(*rhs, visitor).unwrap()),
-                })
-            }
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                Expr::DeclareVariable(ExprDeclareVariable {
-                    identifier,
-                    rhs: rhs.map(|rhs| Box::new(walk_expr(*rhs, visitor).unwrap())),
-                })
-            }
-            Expr::Repeat(ExprRepeat {
-                interior_block,
-                iterations,
-            }) => Expr::Repeat(ExprRepeat {
-                iterations,
-                interior_block: Box::new(ExprBlock {
-                    exprs: walk_ast(interior_block.exprs, visitor),
-                }),
-            }),
-            Expr::ForLoop(ExprForLoop {
-                init_block,
-                conditional,
-                after_block,
-                interior_block,
-            }) => Expr::ForLoop(ExprForLoop {
-                init_block: Box::new(ExprBlock {
-                    exprs: walk_ast(init_block.exprs, visitor),
-                }),
-                conditional: Box::new(walk_expr(*conditional, visitor).unwrap()),
-                after_block: Box::new(ExprBlock {
-                    exprs: walk_ast(after_block.exprs, visitor),
-                }),
-                interior_block: Box::new(ExprBlock {
-                    exprs: walk_ast(interior_block.exprs, visitor),
-                }),
-            }),
-            Expr::Block(ExprBlock { exprs }) => Expr::Block(ExprBlock {
-                exprs: walk_ast(exprs, visitor),
-            }),
-            Expr::Variable(ExprVariableReference { identifier: _ }) => expr,
-        });
-    }
-    None
+    transpiler.indentation -= 4;
+    transpiler.add_line("end");
+    return transpiler.program;
 }
