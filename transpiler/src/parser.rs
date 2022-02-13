@@ -332,9 +332,28 @@ mod tests {
 
     //TODO: add test for parse function definition
 
-    //TODO: add test for break
+    #[test]
+    fn parse_break() {
+        insta::assert_snapshot!(parse_to_tree(
+            "for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+        {
+            if lt(i,3){
+                break
+            }
+        "
+        ));
+    }
 
-    //TODO add test for continue
-
+    #[test]
+    fn parse_continue() {
+        insta::assert_snapshot!(parse_to_tree(
+            "for { let i := 0 } lt(i, 10) { i := add(i, 1)}
+        {
+            if lt(i,3){
+                continue
+            }
+        "
+        ));
+    }
     //TODO: add test for default
 }
