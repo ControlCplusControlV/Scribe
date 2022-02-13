@@ -55,8 +55,20 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         Rule::expr => parse_expression(inner),
 
         //rule is block
+        Rule::block => {
+            Expr::Block(parse_block(inner))
+        }
 
-        //rule is function definition
+        // //rule is function definition
+        // Rule::function_definition =>{
+        //     let mut parts = inner.into_inner();
+        //     let function_name= parts.next().unwrap().to_string();
+        //     let typed_identifier_list = parts.next().unwrap();
+
+        //     //TODO: Add Expr::FunctionDefinition. Parse expression for each identifier in the typed identifier list to return a vec<Expr>
+
+        
+        // }
 
         //rule is variable declaration
 
@@ -290,9 +302,12 @@ mod tests {
       }
     "
         .to_string();
-        let res = parse_yul_syntax(&yul);
-        dbg!(&res);
-        todo!();
+
+    // let expected_ops = vec![
+    //    ];    
+
+    // assert_eq!(parse_yul_syntax(&yul), expected_ops);
+
     }
 
     #[test]

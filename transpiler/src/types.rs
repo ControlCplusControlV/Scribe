@@ -1,6 +1,7 @@
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Expr {
     Literal(u32),
+    // FunctionDefinition(ExprFunctionDefinition),
     FunctionCall(ExprFunctionCall),
     IfStatement(ExprIfStatement),
     Assignment(ExprAssignment),
@@ -16,6 +17,12 @@ pub enum Expr {
 pub struct ExprVariableReference {
     pub identifier: String,
 }
+
+// #[derive(Clone, PartialEq, Eq, Debug)]
+// pub struct ExprFunctionDefinition {
+//     pub function_name: String,
+//     pub typed_identifier_list: Box<Vec<Expr>>
+// }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprBlock {
@@ -143,6 +150,10 @@ impl Expr {
             Expr::Variable(ExprVariableReference { identifier }) => {
                 let _branch = tree.add_branch(&format!("var - {}", identifier));
             }
+
+            // Expr::FunctionDefinition(ExprFunctionDefinition { function_name, typed_identifier_list }) =>{
+            //     //TODO: Add function Definition to tree
+            // }
         }
     }
 }
