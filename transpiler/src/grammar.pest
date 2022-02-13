@@ -9,11 +9,11 @@ underscore = { "_" }
 WHITESPACE = _{ " " }
 
 
-block = { "{" ~ statement* ~ "}" }
+block = { "{" ~ NEWLINE* ~ statement* ~ NEWLINE* ~ "}" }
 statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_continue | leave | expr) ~ NEWLINE*  } 
 function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list? ~ ")" ~ ( "->" ~ typed_identifier_list)? ~ block }
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
-assignment = { identifier_list ~ ":=" ~ expr }
+assignment = { (identifier | identifier_list) ~ ":=" ~ expr }
 expr = { function_call | literal | identifier  }
 if_statement = { "if" ~ expr ~ block}
 switch = { "switch" ~ expr ~ ((case+ ~ default?) | default) }
@@ -29,15 +29,15 @@ type_name = { identifier }
 typed_identifier_list = { identifier ~ (":" ~ type_name)? ~ ("," ~ identifier ~ (":" ~ type_name)? )* }
 literal = { (number_literal | string_literal | true_literal | false_literal | hex_literal) ~ (":" ~ type_name)? }
 number_literal = { hex_number | decimal_number }
-string_literal = {"\"" ~ ( NEWLINE | ANY )* ~ "\"" }
-true_literal = { "true" }
-false_literal = { "false" }
-hex_number = { "0x" ~ ('0'..'9'| 'a'..'f'|'A'..'F')+ }
-decimal_number = { digit+ }
+string_literal = @{"\"" ~ ( NEWLINE | ANY )* ~ "\"" }
+true_literal = @{ "true" }
+false_literal = @{ "false" }
+hex_number = @{ "0x" ~ ('0'..'9'| 'a'..'f'|'A'..'F')+ }
+decimal_number = @{ digit+ }
 object = { "object" ~ string_literal ~ "{" ~ code ~ (object | data)* ~ "}" }
 code = { "code" ~ block }
 data = {"data" ~ string_literal ~ (hex_literal | string_literal) }
-hex_literal = { "hex" ~ ( ("\""  ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\"") | "\'" ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\'") }
+hex_literal = @{ "hex" ~ ( ("\""  ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\"") | "\'" ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\'") }
 
 
 

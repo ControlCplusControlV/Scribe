@@ -162,7 +162,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
 //Function to parse grammar within an expression rule
 fn parse_expression(expression: Pair<Rule>) -> Expr {
-    let inner = expression.into_inner().next().unwrap();
+    let inner = expression.clone().into_inner().next().unwrap();
     match inner.as_rule() {
         //TODO: need to add type name?
 
@@ -172,10 +172,24 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
 
         //if the matched rule is a literal
         Rule::literal => {
+            // We're parsing any literal, now we need to recurse because it could be a number,
+            // string, true/false, etc.
+            parse_expression(inner)
+        }
+        Rule::number_literal => parse_expression(inner),
+        Rule::decimal_number => {
             let i = inner.as_str();
             Expr::Literal(i.parse::<u32>().unwrap())
         }
-
+        Rule::string_literal => {
+            todo!()
+        }
+        Rule::false_literal => {
+            todo!()
+        }
+        Rule::true_literal => {
+            todo!()
+        }
         //if the matched rule is an identifier
         Rule::identifier => {
             return Expr::Variable(ExprVariableReference {
@@ -251,6 +265,18 @@ mod tests {
     #[test]
     fn parse_var_and_add() {
         insta::assert_snapshot!(parse_to_tree("let x := add(1,2)"));
+    }
+
+    #[test]
+    fn parse_literals() {
+        insta::assert_snapshot!(parse_to_tree(
+            "
+            true
+            false
+            1
+            0x1
+            "
+        ));
     }
 
     #[test]
