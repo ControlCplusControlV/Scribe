@@ -177,6 +177,9 @@ impl Transpiler {
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
         if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
+            for expr in op.exprs.clone().into_iter() {
+                self.transpile_op(&expr);
+            }
             self.add_line(&format!("exec.{}", op.function_name));
             self.add_function_stack(function_stack);
             return;
@@ -233,6 +236,16 @@ impl Transpiler {
 
     //TODO: stack management not quite working
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
+        self.stack = Stack(
+            op.params
+                .iter()
+                .map(|param| {
+                    let mut identifiers = HashSet::new();
+                    identifiers.insert(param.clone());
+                    identifiers
+                })
+                .collect(),
+        );
         // let stack_target = self.stack.clone();
         self.add_line(&format!("proc.{}", op.function_name));
         self.indentation += 4;

@@ -102,17 +102,15 @@ mod tests {
     fn integration_function() {
         run_example(
             "
-            function foo() -> b {
-                let b := 7
+            function square(a) -> b {
+                let b := mul(a, a)
             }
-            function bar() -> f {
-                let a := 2
-                let b := 3
-                let f := add(a, b)
+            function secret() -> c {
+                let c := 42
             }
-            mul(foo(), bar())
+            mul(secret(), square(3))
             ",
-            vec![35],
+            vec![378],
         );
     }
 
