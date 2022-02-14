@@ -250,6 +250,7 @@ impl Transpiler {
             Expr::Continue => self.transpile_continue(),
             Expr::Leave => self.transpile_leave(),
             Expr::Default(op) => self.transpile_default(op),
+            Expr::Case(_) => todo!(),
             // Expr::Case(op) => self.transpile_case(op),
         }
     }

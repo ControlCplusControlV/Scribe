@@ -10,7 +10,7 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
-    // Case(ExprCase),
+    Case(ExprCase),
     Default(ExprDefault),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
@@ -36,11 +36,12 @@ pub struct ExprVariableReference {
     pub identifier: String,
 }
 
-// #[derive(Clone, PartialEq, Eq, Debug)]
-// pub struct ExprCase {
-//     literal: Box<Expr>,
-//     block: ExprBlock,
-// }
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprCase {
+    pub literal: ExprLiteral,
+    pub block: ExprBlock,
+}
+
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDefault {
     pub block: ExprBlock,
@@ -114,6 +115,7 @@ impl Expr {
                 ExprLiteral::String(x) => tree.add_leaf(&x),
                 ExprLiteral::Bool(x) => tree.add_leaf(&x.to_string()),
             },
+            Expr::Case(_) => todo!(),
 
             //is function call
             Expr::FunctionCall(ExprFunctionCall {

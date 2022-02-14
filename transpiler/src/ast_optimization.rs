@@ -284,6 +284,7 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
 
             //Expr is variable
             Expr::Variable(ExprVariableReference { identifier: _ }) => expr,
+            Expr::Case(_) => todo!(),
         });
     }
     None

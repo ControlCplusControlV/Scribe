@@ -117,16 +117,16 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is switch
 
         // // rule is case
-        // Rule::case => {
-        //     let mut parts = inner.into_inner();
-        //     let literal = parts.next().unwrap();
-        //     let block = parts.next().unwrap();
+        Rule::case => {
+            let mut parts = inner.into_inner();
+            let literal = parts.next().unwrap();
+            let block = parts.next().unwrap();
 
-        //     Expr::Case(ExprCase {
-        //         literal: Box::new(parse_expression(literal)),
-        //         block: parse_block(block),
-        //     })
-        // }
+            Expr::Case(ExprCase {
+                literal: parse_literal(literal),
+                block: parse_block(block),
+            })
+        }
 
         //rule is default
         Rule::default => {
@@ -186,6 +186,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
     }
 }
 
+fn parse_literal(literal: Pair<Rule>) -> ExprLiteral {
+    todo!()
+}
+
 //Function to parse grammar within an expression rule
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let expression = expression.clone().into_inner().next().unwrap();
@@ -201,7 +205,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::literal => {
             // We're parsing any literal, now we need to recurse because it could be a number,
             // string, true/false, etc.
-            parse_expression(expression)
+            Expr::Literal(parse_literal(expression))
         }
         Rule::number_literal => parse_expression(expression),
         Rule::hex_number => {
