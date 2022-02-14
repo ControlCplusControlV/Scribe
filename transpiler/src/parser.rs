@@ -20,11 +20,19 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
 
     //Parse each statement that matches a grammar pattern inside the file, add them the to Vec<Expr> and return the Vec
     let mut expressions: Vec<Expr> = vec![];
-    for statement in file.into_inner() {
+    for statement in file.clone().into_inner() {
         match statement.as_rule() {
             //rule is statement
             Rule::statement => {
                 expressions.push(parse_statement(statement));
+            }
+            Rule::object => {
+                // TODO: create an object type
+                let mut parts = statement.into_inner();
+                let object_name = parts.next().unwrap();
+                dbg!(&object_name);
+                let code = parts.next().unwrap();
+                expressions.push(parse_statement(code));
             }
 
             //rule is object
@@ -53,6 +61,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
         //rule is block
         Rule::block => Expr::Block(parse_block(inner)),
+        Rule::code => Expr::Block(parse_block(inner.into_inner().next().unwrap())),
 
         //rule is function definition
         Rule::function_definition => {
