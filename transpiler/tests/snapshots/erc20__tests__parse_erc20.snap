@@ -1,0 +1,3345 @@
+---
+source: tests/erc20.rs
+assertion_line: 14
+expression: "expressions_to_tree(&parse_yul_syntax(r###\" object \"ERC20_587\" {\n    code {\n        /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n        mstore(64, memoryguard(128))\n        if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n\n        let _1, _2 := copy_arguments_for_constructor_44_object_ERC20_587()\n        constructor_ERC20_587(_1, _2)\n\n        let _3 := allocate_unbounded()\n        codecopy(_3, dataoffset(\"ERC20_587_deployed\"), datasize(\"ERC20_587_deployed\"))\n\n        return(_3, datasize(\"ERC20_587_deployed\"))\n\n        function allocate_unbounded() -> memPtr {\n            memPtr := mload(64)\n        }\n\n        function revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() {\n            revert(0, 0)\n        }\n\n        function round_up_to_mul_of_32(value) -> result {\n            result := and(add(value, 31), not(31))\n        }\n\n        function panic_error_0x41() {\n            mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n            mstore(4, 0x41)\n            revert(0, 0x24)\n        }\n\n        function finalize_allocation(memPtr, size) {\n            let newFreePtr := add(memPtr, round_up_to_mul_of_32(size))\n            // protect against overflow\n            if or(gt(newFreePtr, 0xffffffffffffffff), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n            mstore(64, newFreePtr)\n        }\n\n        function allocate_memory(size) -> memPtr {\n            memPtr := allocate_unbounded()\n            finalize_allocation(memPtr, size)\n        }\n\n        function revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() {\n            revert(0, 0)\n        }\n\n        function revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() {\n            revert(0, 0)\n        }\n\n        function revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d() {\n            revert(0, 0)\n        }\n\n        function revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae() {\n            revert(0, 0)\n        }\n\n        function array_allocation_size_t_string_memory_ptr(length) -> size {\n            // Make sure we can allocate memory without overflow\n            if gt(length, 0xffffffffffffffff) { panic_error_0x41() }\n\n            size := round_up_to_mul_of_32(length)\n\n            // add length slot\n            size := add(size, 0x20)\n\n        }\n\n        function copy_memory_to_memory(src, dst, length) {\n            let i := 0\n            for { } lt(i, length) { i := add(i, 32) }\n            {\n                mstore(add(dst, i), mload(add(src, i)))\n            }\n            if gt(i, length)\n            {\n                // clear end\n                mstore(add(dst, length), 0)\n            }\n        }\n\n        function abi_decode_available_length_t_string_memory_ptr_fromMemory(src, length, end) -> array {\n            array := allocate_memory(array_allocation_size_t_string_memory_ptr(length))\n            mstore(array, length)\n            let dst := add(array, 0x20)\n            if gt(add(src, length), end) { revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae() }\n            copy_memory_to_memory(src, dst, length)\n        }\n\n        // string\n        function abi_decode_t_string_memory_ptr_fromMemory(offset, end) -> array {\n            if iszero(slt(add(offset, 0x1f), end)) { revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d() }\n            let length := mload(offset)\n            array := abi_decode_available_length_t_string_memory_ptr_fromMemory(add(offset, 0x20), length, end)\n        }\n\n        function abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory(headStart, dataEnd) -> value0, value1 {\n            if slt(sub(dataEnd, headStart), 64) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n            {\n\n                let offset := mload(add(headStart, 0))\n                if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }\n\n                value0 := abi_decode_t_string_memory_ptr_fromMemory(add(headStart, offset), dataEnd)\n            }\n\n            {\n\n                let offset := mload(add(headStart, 32))\n                if gt(offset, 0xffffffffffffffff) { revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() }\n\n                value1 := abi_decode_t_string_memory_ptr_fromMemory(add(headStart, offset), dataEnd)\n            }\n\n        }\n\n        function copy_arguments_for_constructor_44_object_ERC20_587() -> ret_param_0, ret_param_1 {\n            let programSize := datasize(\"ERC20_587\")\n            let argSize := sub(codesize(), programSize)\n\n            let memoryDataOffset := allocate_memory(argSize)\n            codecopy(memoryDataOffset, programSize, argSize)\n\n            ret_param_0, ret_param_1 := abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory(memoryDataOffset, add(memoryDataOffset, argSize))\n        }\n\n        function panic_error_0x00() {\n            mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n            mstore(4, 0x00)\n            revert(0, 0x24)\n        }\n\n        function array_length_t_string_memory_ptr(value) -> length {\n\n            length := mload(value)\n\n        }\n\n        function panic_error_0x22() {\n            mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n            mstore(4, 0x22)\n            revert(0, 0x24)\n        }\n\n        function extract_byte_array_length(data) -> length {\n            length := div(data, 2)\n            let outOfPlaceEncoding := and(data, 1)\n            if iszero(outOfPlaceEncoding) {\n                length := and(length, 0x7f)\n            }\n\n            if eq(outOfPlaceEncoding, lt(length, 32)) {\n                panic_error_0x22()\n            }\n        }\n\n        function array_dataslot_t_string_storage(ptr) -> data {\n            data := ptr\n\n            mstore(0, ptr)\n            data := keccak256(0, 0x20)\n\n        }\n\n        function divide_by_32_ceil(value) -> result {\n            result := div(add(value, 31), 32)\n        }\n\n        function shift_left_dynamic(bits, value) -> newValue {\n            newValue :=\n\n            shl(bits, value)\n\n        }\n\n        function update_byte_slice_dynamic32(value, shiftBytes, toInsert) -> result {\n            let shiftBits := mul(shiftBytes, 8)\n            let mask := shift_left_dynamic(shiftBits, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)\n            toInsert := shift_left_dynamic(shiftBits, toInsert)\n            value := and(value, not(mask))\n            result := or(value, and(toInsert, mask))\n        }\n\n        function cleanup_t_uint256(value) -> cleaned {\n            cleaned := value\n        }\n\n        function identity(value) -> ret {\n            ret := value\n        }\n\n        function convert_t_uint256_to_t_uint256(value) -> converted {\n            converted := cleanup_t_uint256(identity(cleanup_t_uint256(value)))\n        }\n\n        function prepare_store_t_uint256(value) -> ret {\n            ret := value\n        }\n\n        function update_storage_value_t_uint256_to_t_uint256(slot, offset, value_0) {\n            let convertedValue_0 := convert_t_uint256_to_t_uint256(value_0)\n            sstore(slot, update_byte_slice_dynamic32(sload(slot), offset, prepare_store_t_uint256(convertedValue_0)))\n        }\n\n        function zero_value_for_split_t_uint256() -> ret {\n            ret := 0\n        }\n\n        function storage_set_to_zero_t_uint256(slot, offset) {\n            let zero_0 := zero_value_for_split_t_uint256()\n            update_storage_value_t_uint256_to_t_uint256(slot, offset, zero_0)\n        }\n\n        function clear_storage_range_t_bytes1(start, end) {\n            for {} lt(start, end) { start := add(start, 1) }\n            {\n                storage_set_to_zero_t_uint256(start, 0)\n            }\n        }\n\n        function clean_up_bytearray_end_slots_t_string_storage(array, len, startIndex) {\n\n            if gt(len, 31) {\n                let dataArea := array_dataslot_t_string_storage(array)\n                let deleteStart := add(dataArea, divide_by_32_ceil(startIndex))\n                // If we are clearing array to be short byte array, we want to clear only data starting from array data area.\n                if lt(startIndex, 32) { deleteStart := dataArea }\n                clear_storage_range_t_bytes1(deleteStart, add(dataArea, divide_by_32_ceil(len)))\n            }\n\n        }\n\n        function shift_right_unsigned_dynamic(bits, value) -> newValue {\n            newValue :=\n\n            shr(bits, value)\n\n        }\n\n        function mask_bytes_dynamic(data, bytes) -> result {\n            let mask := not(shift_right_unsigned_dynamic(mul(8, bytes), not(0)))\n            result := and(data, mask)\n        }\n        function extract_used_part_and_set_length_of_short_byte_array(data, len) -> used {\n            // we want to save only elements that are part of the array after resizing\n            // others should be set to zero\n            data := mask_bytes_dynamic(data, len)\n            used := or(data, mul(2, len))\n        }\n        function copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage(slot, src) {\n\n            let newLen := array_length_t_string_memory_ptr(src)\n            // Make sure array length is sane\n            if gt(newLen, 0xffffffffffffffff) { panic_error_0x41() }\n\n            let oldLen := extract_byte_array_length(sload(slot))\n\n            // potentially truncate data\n            clean_up_bytearray_end_slots_t_string_storage(slot, oldLen, newLen)\n\n            let srcOffset := 0\n\n            srcOffset := 0x20\n\n            switch gt(newLen, 31)\n            case 1 {\n                let loopEnd := and(newLen, not(0x1f))\n\n                let dstPtr := array_dataslot_t_string_storage(slot)\n                let i := 0\n                for { } lt(i, loopEnd) { i := add(i, 0x20) } {\n                    sstore(dstPtr, mload(add(src, srcOffset)))\n                    dstPtr := add(dstPtr, 1)\n                    srcOffset := add(srcOffset, 32)\n                }\n                if lt(loopEnd, newLen) {\n                    let lastValue := mload(add(src, srcOffset))\n                    sstore(dstPtr, mask_bytes_dynamic(lastValue, and(newLen, 0x1f)))\n                }\n                sstore(slot, add(mul(newLen, 2), 1))\n            }\n            default {\n                let value := 0\n                if newLen {\n                    value := mload(add(src, srcOffset))\n                }\n                sstore(slot, extract_used_part_and_set_length_of_short_byte_array(value, newLen))\n            }\n        }\n\n        function update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage(slot, value_0) {\n\n            copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage(slot, value_0)\n        }\n\n        /// @ast-id 44\n        /// @src 1:1968:2081  \"constructor(string memory name_, string memory symbol_) {...\"\n        function constructor_ERC20_587(var_name__30_mpos, var_symbol__32_mpos) {\n\n            /// @src 1:1968:2081  \"constructor(string memory name_, string memory symbol_) {...\"\n            constructor_IERC20Metadata_712()\n\n            /// @src 1:2042:2047  \"name_\"\n            let _4_mpos := var_name__30_mpos\n            let expr_36_mpos := _4_mpos\n            /// @src 1:2034:2047  \"_name = name_\"\n            update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage(0x03, expr_36_mpos)\n            let _5_slot := 0x03\n            let expr_37_slot := _5_slot\n            /// @src 1:2067:2074  \"symbol_\"\n            let _6_mpos := var_symbol__32_mpos\n            let expr_40_mpos := _6_mpos\n            /// @src 1:2057:2074  \"_symbol = symbol_\"\n            update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage(0x04, expr_40_mpos)\n            let _7_slot := 0x04\n            let expr_41_slot := _7_slot\n\n        }\n        /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n        /// @src 3:277:682  \"interface IERC20Metadata is IERC20 {...\"\n        function constructor_IERC20Metadata_712() {\n\n            /// @src 3:277:682  \"interface IERC20Metadata is IERC20 {...\"\n            constructor_IERC20_687()\n\n        }\n        /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n        /// @src 2:202:2766  \"interface IERC20 {...\"\n        function constructor_IERC20_687() {\n\n            /// @src 2:202:2766  \"interface IERC20 {...\"\n            constructor_Context_609()\n\n        }\n        /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n        /// @src 0:608:843  \"abstract contract Context {...\"\n        function constructor_Context_609() {\n\n            /// @src 0:608:843  \"abstract contract Context {...\"\n\n        }\n        /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n    }\n    /// @use-src 0:\"Context.sol\", 1:\"ERC20.sol\"\n    object \"ERC20_587_deployed\" {\n        code {\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n            mstore(64, memoryguard(128))\n\n            if iszero(lt(calldatasize(), 4))\n            {\n                let selector := shift_right_224_unsigned(calldataload(0))\n                switch selector\n\n                case 0x06fdde03\n                {\n                    // name()\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    abi_decode_tuple_(4, calldatasize())\n                    let ret_0 :=  fun_name_54()\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x095ea7b3\n                {\n                    // approve(address,uint256)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1 :=  abi_decode_tuple_t_addresst_uint256(4, calldatasize())\n                    let ret_0 :=  fun_approve_166(param_0, param_1)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_bool__to_t_bool__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x18160ddd\n                {\n                    // totalSupply()\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    abi_decode_tuple_(4, calldatasize())\n                    let ret_0 :=  fun_totalSupply_84()\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x23b872dd\n                {\n                    // transferFrom(address,address,uint256)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1, param_2 :=  abi_decode_tuple_t_addresst_addresst_uint256(4, calldatasize())\n                    let ret_0 :=  fun_transferFrom_199(param_0, param_1, param_2)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_bool__to_t_bool__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x313ce567\n                {\n                    // decimals()\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    abi_decode_tuple_(4, calldatasize())\n                    let ret_0 :=  fun_decimals_74()\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_uint8__to_t_uint8__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x39509351\n                {\n                    // increaseAllowance(address,uint256)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1 :=  abi_decode_tuple_t_addresst_uint256(4, calldatasize())\n                    let ret_0 :=  fun_increaseAllowance_229(param_0, param_1)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_bool__to_t_bool__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x70a08231\n                {\n                    // balanceOf(address)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0 :=  abi_decode_tuple_t_address(4, calldatasize())\n                    let ret_0 :=  fun_balanceOf_98(param_0)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0x95d89b41\n                {\n                    // symbol()\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    abi_decode_tuple_(4, calldatasize())\n                    let ret_0 :=  fun_symbol_64()\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0xa457c2d7\n                {\n                    // decreaseAllowance(address,uint256)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1 :=  abi_decode_tuple_t_addresst_uint256(4, calldatasize())\n                    let ret_0 :=  fun_decreaseAllowance_271(param_0, param_1)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_bool__to_t_bool__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0xa9059cbb\n                {\n                    // transfer(address,uint256)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1 :=  abi_decode_tuple_t_addresst_uint256(4, calldatasize())\n                    let ret_0 :=  fun_transfer_123(param_0, param_1)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_bool__to_t_bool__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                case 0xdd62ed3e\n                {\n                    // allowance(address,address)\n\n                    if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }\n                    let param_0, param_1 :=  abi_decode_tuple_t_addresst_address(4, calldatasize())\n                    let ret_0 :=  fun_allowance_141(param_0, param_1)\n                    let memPos := allocate_unbounded()\n                    let memEnd := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(memPos , ret_0)\n                    return(memPos, sub(memEnd, memPos))\n                }\n\n                default {}\n            }\n\n            revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74()\n\n            function shift_right_224_unsigned(value) -> newValue {\n                newValue :=\n\n                shr(224, value)\n\n            }\n\n            function allocate_unbounded() -> memPtr {\n                memPtr := mload(64)\n            }\n\n            function revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() {\n                revert(0, 0)\n            }\n\n            function revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() {\n                revert(0, 0)\n            }\n\n            function abi_decode_tuple_(headStart, dataEnd)   {\n                if slt(sub(dataEnd, headStart), 0) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n            }\n\n            function array_length_t_string_memory_ptr(value) -> length {\n\n                length := mload(value)\n\n            }\n\n            function array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, length) -> updated_pos {\n                mstore(pos, length)\n                updated_pos := add(pos, 0x20)\n            }\n\n            function copy_memory_to_memory(src, dst, length) {\n                let i := 0\n                for { } lt(i, length) { i := add(i, 32) }\n                {\n                    mstore(add(dst, i), mload(add(src, i)))\n                }\n                if gt(i, length)\n                {\n                    // clear end\n                    mstore(add(dst, length), 0)\n                }\n            }\n\n            function round_up_to_mul_of_32(value) -> result {\n                result := and(add(value, 31), not(31))\n            }\n\n            function abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack(value, pos) -> end {\n                let length := array_length_t_string_memory_ptr(value)\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, length)\n                copy_memory_to_memory(add(value, 0x20), pos, length)\n                end := add(pos, round_up_to_mul_of_32(length))\n            }\n\n            function abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack(headStart , value0) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack(value0,  tail)\n\n            }\n\n            function revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db() {\n                revert(0, 0)\n            }\n\n            function cleanup_t_uint160(value) -> cleaned {\n                cleaned := and(value, 0xffffffffffffffffffffffffffffffffffffffff)\n            }\n\n            function cleanup_t_address(value) -> cleaned {\n                cleaned := cleanup_t_uint160(value)\n            }\n\n            function validator_revert_t_address(value) {\n                if iszero(eq(value, cleanup_t_address(value))) { revert(0, 0) }\n            }\n\n            function abi_decode_t_address(offset, end) -> value {\n                value := calldataload(offset)\n                validator_revert_t_address(value)\n            }\n\n            function cleanup_t_uint256(value) -> cleaned {\n                cleaned := value\n            }\n\n            function validator_revert_t_uint256(value) {\n                if iszero(eq(value, cleanup_t_uint256(value))) { revert(0, 0) }\n            }\n\n            function abi_decode_t_uint256(offset, end) -> value {\n                value := calldataload(offset)\n                validator_revert_t_uint256(value)\n            }\n\n            function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1 {\n                if slt(sub(dataEnd, headStart), 64) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n                {\n\n                    let offset := 0\n\n                    value0 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n                {\n\n                    let offset := 32\n\n                    value1 := abi_decode_t_uint256(add(headStart, offset), dataEnd)\n                }\n\n            }\n\n            function cleanup_t_bool(value) -> cleaned {\n                cleaned := iszero(iszero(value))\n            }\n\n            function abi_encode_t_bool_to_t_bool_fromStack(value, pos) {\n                mstore(pos, cleanup_t_bool(value))\n            }\n\n            function abi_encode_tuple_t_bool__to_t_bool__fromStack(headStart , value0) -> tail {\n                tail := add(headStart, 32)\n\n                abi_encode_t_bool_to_t_bool_fromStack(value0,  add(headStart, 0))\n\n            }\n\n            function abi_encode_t_uint256_to_t_uint256_fromStack(value, pos) {\n                mstore(pos, cleanup_t_uint256(value))\n            }\n\n            function abi_encode_tuple_t_uint256__to_t_uint256__fromStack(headStart , value0) -> tail {\n                tail := add(headStart, 32)\n\n                abi_encode_t_uint256_to_t_uint256_fromStack(value0,  add(headStart, 0))\n\n            }\n\n            function abi_decode_tuple_t_addresst_addresst_uint256(headStart, dataEnd) -> value0, value1, value2 {\n                if slt(sub(dataEnd, headStart), 96) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n                {\n\n                    let offset := 0\n\n                    value0 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n                {\n\n                    let offset := 32\n\n                    value1 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n                {\n\n                    let offset := 64\n\n                    value2 := abi_decode_t_uint256(add(headStart, offset), dataEnd)\n                }\n\n            }\n\n            function cleanup_t_uint8(value) -> cleaned {\n                cleaned := and(value, 0xff)\n            }\n\n            function abi_encode_t_uint8_to_t_uint8_fromStack(value, pos) {\n                mstore(pos, cleanup_t_uint8(value))\n            }\n\n            function abi_encode_tuple_t_uint8__to_t_uint8__fromStack(headStart , value0) -> tail {\n                tail := add(headStart, 32)\n\n                abi_encode_t_uint8_to_t_uint8_fromStack(value0,  add(headStart, 0))\n\n            }\n\n            function abi_decode_tuple_t_address(headStart, dataEnd) -> value0 {\n                if slt(sub(dataEnd, headStart), 32) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n                {\n\n                    let offset := 0\n\n                    value0 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n            }\n\n            function abi_decode_tuple_t_addresst_address(headStart, dataEnd) -> value0, value1 {\n                if slt(sub(dataEnd, headStart), 64) { revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b() }\n\n                {\n\n                    let offset := 0\n\n                    value0 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n                {\n\n                    let offset := 32\n\n                    value1 := abi_decode_t_address(add(headStart, offset), dataEnd)\n                }\n\n            }\n\n            function revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74() {\n                revert(0, 0)\n            }\n\n            function zero_value_for_split_t_string_memory_ptr() -> ret {\n                ret := 96\n            }\n\n            function panic_error_0x22() {\n                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n                mstore(4, 0x22)\n                revert(0, 0x24)\n            }\n\n            function extract_byte_array_length(data) -> length {\n                length := div(data, 2)\n                let outOfPlaceEncoding := and(data, 1)\n                if iszero(outOfPlaceEncoding) {\n                    length := and(length, 0x7f)\n                }\n\n                if eq(outOfPlaceEncoding, lt(length, 32)) {\n                    panic_error_0x22()\n                }\n            }\n\n            function array_storeLengthForEncoding_t_string_memory_ptr(pos, length) -> updated_pos {\n                mstore(pos, length)\n                updated_pos := add(pos, 0x20)\n            }\n\n            function array_dataslot_t_string_storage(ptr) -> data {\n                data := ptr\n\n                mstore(0, ptr)\n                data := keccak256(0, 0x20)\n\n            }\n\n            // string -> string\n            function abi_encode_t_string_storage_to_t_string_memory_ptr(value, pos) -> ret {\n                let slotValue := sload(value)\n                let length := extract_byte_array_length(slotValue)\n                pos := array_storeLengthForEncoding_t_string_memory_ptr(pos, length)\n                switch and(slotValue, 1)\n                case 0 {\n                    // short byte array\n                    mstore(pos, and(slotValue, not(0xff)))\n                    ret := add(pos, 0x20)\n                }\n                case 1 {\n                    // long byte array\n                    let dataPos := array_dataslot_t_string_storage(value)\n                    let i := 0\n                    for { } lt(i, length) { i := add(i, 0x20) } {\n                        mstore(add(pos, i), sload(dataPos))\n                        dataPos := add(dataPos, 1)\n                    }\n                    ret := add(pos, i)\n                }\n            }\n\n            function abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr(value0, pos) -> updatedPos {\n                updatedPos := abi_encode_t_string_storage_to_t_string_memory_ptr(value0, pos)\n            }\n\n            function panic_error_0x41() {\n                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n                mstore(4, 0x41)\n                revert(0, 0x24)\n            }\n\n            function finalize_allocation(memPtr, size) {\n                let newFreePtr := add(memPtr, round_up_to_mul_of_32(size))\n                // protect against overflow\n                if or(gt(newFreePtr, 0xffffffffffffffff), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n                mstore(64, newFreePtr)\n            }\n\n            function copy_array_from_storage_to_memory_t_string_storage(slot) -> memPtr {\n                memPtr := allocate_unbounded()\n                let end := abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr(slot, memPtr)\n                finalize_allocation(memPtr, sub(end, memPtr))\n            }\n\n            function convert_array_t_string_storage_to_t_string_memory_ptr(value) -> converted  {\n\n                // Copy the array to a free position in memory\n                converted :=\n\n                copy_array_from_storage_to_memory_t_string_storage(value)\n\n            }\n\n            /// @ast-id 54\n            /// @src 1:2146:2244  \"function name() public view virtual override returns (string memory) {...\"\n            function fun_name_54() -> var__49_mpos {\n                /// @src 1:2200:2213  \"string memory\"\n                let zero_t_string_memory_ptr_1_mpos := zero_value_for_split_t_string_memory_ptr()\n                var__49_mpos := zero_t_string_memory_ptr_1_mpos\n\n                /// @src 1:2232:2237  \"_name\"\n                let _2_slot := 0x03\n                let expr_51_slot := _2_slot\n                /// @src 1:2225:2237  \"return _name\"\n                var__49_mpos := convert_array_t_string_storage_to_t_string_memory_ptr(expr_51_slot)\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            /// @ast-id 64\n            /// @src 1:2357:2459  \"function symbol() public view virtual override returns (string memory) {...\"\n            function fun_symbol_64() -> var__59_mpos {\n                /// @src 1:2413:2426  \"string memory\"\n                let zero_t_string_memory_ptr_3_mpos := zero_value_for_split_t_string_memory_ptr()\n                var__59_mpos := zero_t_string_memory_ptr_3_mpos\n\n                /// @src 1:2445:2452  \"_symbol\"\n                let _4_slot := 0x04\n                let expr_61_slot := _4_slot\n                /// @src 1:2438:2452  \"return _symbol\"\n                var__59_mpos := convert_array_t_string_storage_to_t_string_memory_ptr(expr_61_slot)\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function zero_value_for_split_t_uint8() -> ret {\n                ret := 0\n            }\n\n            function cleanup_t_rational_18_by_1(value) -> cleaned {\n                cleaned := value\n            }\n\n            function identity(value) -> ret {\n                ret := value\n            }\n\n            function convert_t_rational_18_by_1_to_t_uint8(value) -> converted {\n                converted := cleanup_t_uint8(identity(cleanup_t_rational_18_by_1(value)))\n            }\n\n            /// @ast-id 74\n            /// @src 1:3083:3174  \"function decimals() public view virtual override returns (uint8) {...\"\n            function fun_decimals_74() -> var__69 {\n                /// @src 1:3141:3146  \"uint8\"\n                let zero_t_uint8_5 := zero_value_for_split_t_uint8()\n                var__69 := zero_t_uint8_5\n\n                /// @src 1:3165:3167  \"18\"\n                let expr_71 := 0x12\n                /// @src 1:3158:3167  \"return 18\"\n                var__69 := convert_t_rational_18_by_1_to_t_uint8(expr_71)\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function zero_value_for_split_t_uint256() -> ret {\n                ret := 0\n            }\n\n            function shift_right_0_unsigned(value) -> newValue {\n                newValue :=\n\n                shr(0, value)\n\n            }\n\n            function cleanup_from_storage_t_uint256(value) -> cleaned {\n                cleaned := value\n            }\n\n            function extract_from_storage_value_offset_0t_uint256(slot_value) -> value {\n                value := cleanup_from_storage_t_uint256(shift_right_0_unsigned(slot_value))\n            }\n\n            function read_from_storage_split_offset_0_t_uint256(slot) -> value {\n                value := extract_from_storage_value_offset_0t_uint256(sload(slot))\n\n            }\n\n            /// @ast-id 84\n            /// @src 1:3234:3340  \"function totalSupply() public view virtual override returns (uint256) {...\"\n            function fun_totalSupply_84() -> var__79 {\n                /// @src 1:3295:3302  \"uint256\"\n                let zero_t_uint256_6 := zero_value_for_split_t_uint256()\n                var__79 := zero_t_uint256_6\n\n                /// @src 1:3321:3333  \"_totalSupply\"\n                let _7 := read_from_storage_split_offset_0_t_uint256(0x02)\n                let expr_81 := _7\n                /// @src 1:3314:3333  \"return _totalSupply\"\n                var__79 := expr_81\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function convert_t_uint160_to_t_uint160(value) -> converted {\n                converted := cleanup_t_uint160(identity(cleanup_t_uint160(value)))\n            }\n\n            function convert_t_uint160_to_t_address(value) -> converted {\n                converted := convert_t_uint160_to_t_uint160(value)\n            }\n\n            function convert_t_address_to_t_address(value) -> converted {\n                converted := convert_t_uint160_to_t_address(value)\n            }\n\n            function mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(slot , key) -> dataSlot {\n                mstore(0, convert_t_address_to_t_address(key))\n                mstore(0x20, slot)\n                dataSlot := keccak256(0, 0x40)\n            }\n\n            /// @ast-id 98\n            /// @src 1:3398:3523  \"function balanceOf(address account) public view virtual override returns (uint256) {...\"\n            function fun_balanceOf_98(var_account_87) -> var__91 {\n                /// @src 1:3472:3479  \"uint256\"\n                let zero_t_uint256_8 := zero_value_for_split_t_uint256()\n                var__91 := zero_t_uint256_8\n\n                /// @src 1:3498:3507  \"_balances\"\n                let _9 := 0x00\n                let expr_93 := _9\n                /// @src 1:3508:3515  \"account\"\n                let _10 := var_account_87\n                let expr_94 := _10\n                /// @src 1:3498:3516  \"_balances[account]\"\n                let _11 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_93,expr_94)\n                let _12 := read_from_storage_split_offset_0_t_uint256(_11)\n                let expr_95 := _12\n                /// @src 1:3491:3516  \"return _balances[account]\"\n                var__91 := expr_95\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function zero_value_for_split_t_bool() -> ret {\n                ret := 0\n            }\n\n            /// @ast-id 123\n            /// @src 1:3719:3908  \"function transfer(address to, uint256 amount) public virtual override returns (bool) {...\"\n            function fun_transfer_123(var_to_101, var_amount_103) -> var__107 {\n                /// @src 1:3798:3802  \"bool\"\n                let zero_t_bool_13 := zero_value_for_split_t_bool()\n                var__107 := zero_t_bool_13\n\n                /// @src 1:3830:3842  \"_msgSender()\"\n                let expr_112 := fun__msgSender_599()\n                /// @src 1:3814:3842  \"address owner = _msgSender()\"\n                let var_owner_110 := expr_112\n                /// @src 1:3862:3867  \"owner\"\n                let _14 := var_owner_110\n                let expr_115 := _14\n                /// @src 1:3869:3871  \"to\"\n                let _15 := var_to_101\n                let expr_116 := _15\n                /// @src 1:3873:3879  \"amount\"\n                let _16 := var_amount_103\n                let expr_117 := _16\n                fun__transfer_348(expr_115, expr_116, expr_117)\n                /// @src 1:3897:3901  \"true\"\n                let expr_120 := 0x01\n                /// @src 1:3890:3901  \"return true\"\n                var__107 := expr_120\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(slot , key) -> dataSlot {\n                mstore(0, convert_t_address_to_t_address(key))\n                mstore(0x20, slot)\n                dataSlot := keccak256(0, 0x40)\n            }\n\n            /// @ast-id 141\n            /// @src 1:3966:4115  \"function allowance(address owner, address spender) public view virtual override returns (uint256) {...\"\n            function fun_allowance_141(var_owner_126, var_spender_128) -> var__132 {\n                /// @src 1:4055:4062  \"uint256\"\n                let zero_t_uint256_17 := zero_value_for_split_t_uint256()\n                var__132 := zero_t_uint256_17\n\n                /// @src 1:4081:4092  \"_allowances\"\n                let _18 := 0x01\n                let expr_134 := _18\n                /// @src 1:4093:4098  \"owner\"\n                let _19 := var_owner_126\n                let expr_135 := _19\n                /// @src 1:4081:4099  \"_allowances[owner]\"\n                let _20 := mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(expr_134,expr_135)\n                let _21 := _20\n                let expr_136 := _21\n                /// @src 1:4100:4107  \"spender\"\n                let _22 := var_spender_128\n                let expr_137 := _22\n                /// @src 1:4081:4108  \"_allowances[owner][spender]\"\n                let _23 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_136,expr_137)\n                let _24 := read_from_storage_split_offset_0_t_uint256(_23)\n                let expr_138 := _24\n                /// @src 1:4074:4108  \"return _allowances[owner][spender]\"\n                var__132 := expr_138\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            /// @ast-id 166\n            /// @src 1:4423:4620  \"function approve(address spender, uint256 amount) public virtual override returns (bool) {...\"\n            function fun_approve_166(var_spender_144, var_amount_146) -> var__150 {\n                /// @src 1:4506:4510  \"bool\"\n                let zero_t_bool_25 := zero_value_for_split_t_bool()\n                var__150 := zero_t_bool_25\n\n                /// @src 1:4538:4550  \"_msgSender()\"\n                let expr_155 := fun__msgSender_599()\n                /// @src 1:4522:4550  \"address owner = _msgSender()\"\n                let var_owner_153 := expr_155\n                /// @src 1:4569:4574  \"owner\"\n                let _26 := var_owner_153\n                let expr_158 := _26\n                /// @src 1:4576:4583  \"spender\"\n                let _27 := var_spender_144\n                let expr_159 := _27\n                /// @src 1:4585:4591  \"amount\"\n                let _28 := var_amount_146\n                let expr_160 := _28\n                fun__approve_521(expr_158, expr_159, expr_160)\n                /// @src 1:4609:4613  \"true\"\n                let expr_163 := 0x01\n                /// @src 1:4602:4613  \"return true\"\n                var__150 := expr_163\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            /// @ast-id 199\n            /// @src 1:5182:5468  \"function transferFrom(...\"\n            function fun_transferFrom_199(var_from_169, var_to_171, var_amount_173) -> var__177 {\n                /// @src 1:5309:5313  \"bool\"\n                let zero_t_bool_29 := zero_value_for_split_t_bool()\n                var__177 := zero_t_bool_29\n\n                /// @src 1:5343:5355  \"_msgSender()\"\n                let expr_182 := fun__msgSender_599()\n                /// @src 1:5325:5355  \"address spender = _msgSender()\"\n                let var_spender_180 := expr_182\n                /// @src 1:5381:5385  \"from\"\n                let _30 := var_from_169\n                let expr_185 := _30\n                /// @src 1:5387:5394  \"spender\"\n                let _31 := var_spender_180\n                let expr_186 := _31\n                /// @src 1:5396:5402  \"amount\"\n                let _32 := var_amount_173\n                let expr_187 := _32\n                fun__spendAllowance_564(expr_185, expr_186, expr_187)\n                /// @src 1:5423:5427  \"from\"\n                let _33 := var_from_169\n                let expr_191 := _33\n                /// @src 1:5429:5431  \"to\"\n                let _34 := var_to_171\n                let expr_192 := _34\n                /// @src 1:5433:5439  \"amount\"\n                let _35 := var_amount_173\n                let expr_193 := _35\n                fun__transfer_348(expr_191, expr_192, expr_193)\n                /// @src 1:5457:5461  \"true\"\n                let expr_196 := 0x01\n                /// @src 1:5450:5461  \"return true\"\n                var__177 := expr_196\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function panic_error_0x11() {\n                mstore(0, 35408467139433450592217433187231851964531694900788300625387963629091585785856)\n                mstore(4, 0x11)\n                revert(0, 0x24)\n            }\n\n            function checked_add_t_uint256(x, y) -> sum {\n                x := cleanup_t_uint256(x)\n                y := cleanup_t_uint256(y)\n\n                // overflow, if x > (maxValue - y)\n                if gt(x, sub(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, y)) { panic_error_0x11() }\n\n                sum := add(x, y)\n            }\n\n            /// @ast-id 229\n            /// @src 1:5863:6099  \"function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {...\"\n            function fun_increaseAllowance_229(var_spender_202, var_addedValue_204) -> var__207 {\n                /// @src 1:5951:5955  \"bool\"\n                let zero_t_bool_36 := zero_value_for_split_t_bool()\n                var__207 := zero_t_bool_36\n\n                /// @src 1:5983:5995  \"_msgSender()\"\n                let expr_212 := fun__msgSender_599()\n                /// @src 1:5967:5995  \"address owner = _msgSender()\"\n                let var_owner_210 := expr_212\n                /// @src 1:6014:6019  \"owner\"\n                let _37 := var_owner_210\n                let expr_215 := _37\n                /// @src 1:6021:6028  \"spender\"\n                let _38 := var_spender_202\n                let expr_216 := _38\n                /// @src 1:6030:6041  \"_allowances\"\n                let _39 := 0x01\n                let expr_217 := _39\n                /// @src 1:6042:6047  \"owner\"\n                let _40 := var_owner_210\n                let expr_218 := _40\n                /// @src 1:6030:6048  \"_allowances[owner]\"\n                let _41 := mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(expr_217,expr_218)\n                let _42 := _41\n                let expr_219 := _42\n                /// @src 1:6049:6056  \"spender\"\n                let _43 := var_spender_202\n                let expr_220 := _43\n                /// @src 1:6030:6057  \"_allowances[owner][spender]\"\n                let _44 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_219,expr_220)\n                let _45 := read_from_storage_split_offset_0_t_uint256(_44)\n                let expr_221 := _45\n                /// @src 1:6060:6070  \"addedValue\"\n                let _46 := var_addedValue_204\n                let expr_222 := _46\n                /// @src 1:6030:6070  \"_allowances[owner][spender] + addedValue\"\n                let expr_223 := checked_add_t_uint256(expr_221, expr_222)\n\n                fun__approve_521(expr_215, expr_216, expr_223)\n                /// @src 1:6088:6092  \"true\"\n                let expr_226 := 0x01\n                /// @src 1:6081:6092  \"return true\"\n                var__207 := expr_226\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: decreased allowance below\")\n\n                mstore(add(memPtr, 32), \" zero\")\n\n            }\n\n            function abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 37)\n                store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            function wrapping_sub_t_uint256(x, y) -> diff {\n                diff := cleanup_t_uint256(sub(x, y))\n            }\n\n            /// @ast-id 271\n            /// @src 1:6586:7015  \"function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {...\"\n            function fun_decreaseAllowance_271(var_spender_232, var_subtractedValue_234) -> var__237 {\n                /// @src 1:6679:6683  \"bool\"\n                let zero_t_bool_47 := zero_value_for_split_t_bool()\n                var__237 := zero_t_bool_47\n\n                /// @src 1:6711:6723  \"_msgSender()\"\n                let expr_242 := fun__msgSender_599()\n                /// @src 1:6695:6723  \"address owner = _msgSender()\"\n                let var_owner_240 := expr_242\n                /// @src 1:6760:6771  \"_allowances\"\n                let _48 := 0x01\n                let expr_246 := _48\n                /// @src 1:6772:6777  \"owner\"\n                let _49 := var_owner_240\n                let expr_247 := _49\n                /// @src 1:6760:6778  \"_allowances[owner]\"\n                let _50 := mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(expr_246,expr_247)\n                let _51 := _50\n                let expr_248 := _51\n                /// @src 1:6779:6786  \"spender\"\n                let _52 := var_spender_232\n                let expr_249 := _52\n                /// @src 1:6760:6787  \"_allowances[owner][spender]\"\n                let _53 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_248,expr_249)\n                let _54 := read_from_storage_split_offset_0_t_uint256(_53)\n                let expr_250 := _54\n                /// @src 1:6733:6787  \"uint256 currentAllowance = _allowances[owner][spender]\"\n                let var_currentAllowance_245 := expr_250\n                /// @src 1:6805:6821  \"currentAllowance\"\n                let _55 := var_currentAllowance_245\n                let expr_253 := _55\n                /// @src 1:6825:6840  \"subtractedValue\"\n                let _56 := var_subtractedValue_234\n                let expr_254 := _56\n                /// @src 1:6805:6840  \"currentAllowance >= subtractedValue\"\n                let expr_255 := iszero(lt(cleanup_t_uint256(expr_253), cleanup_t_uint256(expr_254)))\n                /// @src 1:6797:6882  \"require(currentAllowance >= subtractedValue, \\\"ERC20: decreased allowance below zero\\\")\"\n                require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8(expr_255)\n                /// @src 1:6925:6930  \"owner\"\n                let _57 := var_owner_240\n                let expr_260 := _57\n                /// @src 1:6932:6939  \"spender\"\n                let _58 := var_spender_232\n                let expr_261 := _58\n                /// @src 1:6941:6957  \"currentAllowance\"\n                let _59 := var_currentAllowance_245\n                let expr_262 := _59\n                /// @src 1:6960:6975  \"subtractedValue\"\n                let _60 := var_subtractedValue_234\n                let expr_263 := _60\n                /// @src 1:6941:6975  \"currentAllowance - subtractedValue\"\n                let expr_264 := wrapping_sub_t_uint256(expr_262, expr_263)\n\n                fun__approve_521(expr_260, expr_261, expr_264)\n                /// @src 1:7004:7008  \"true\"\n                let expr_268 := 0x01\n                /// @src 1:6997:7008  \"return true\"\n                var__237 := expr_268\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function cleanup_t_rational_0_by_1(value) -> cleaned {\n                cleaned := value\n            }\n\n            function convert_t_rational_0_by_1_to_t_uint160(value) -> converted {\n                converted := cleanup_t_uint160(identity(cleanup_t_rational_0_by_1(value)))\n            }\n\n            function convert_t_rational_0_by_1_to_t_address(value) -> converted {\n                converted := convert_t_rational_0_by_1_to_t_uint160(value)\n            }\n\n            function store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: transfer from the zero ad\")\n\n                mstore(add(memPtr, 32), \"dress\")\n\n            }\n\n            function abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 37)\n                store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            function store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: transfer to the zero addr\")\n\n                mstore(add(memPtr, 32), \"ess\")\n\n            }\n\n            function abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 35)\n                store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            function store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: transfer amount exceeds b\")\n\n                mstore(add(memPtr, 32), \"alance\")\n\n            }\n\n            function abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 38)\n                store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            function shift_left_0(value) -> newValue {\n                newValue :=\n\n                shl(0, value)\n\n            }\n\n            function update_byte_slice_32_shift_0(value, toInsert) -> result {\n                let mask := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n                toInsert := shift_left_0(toInsert)\n                value := and(value, not(mask))\n                result := or(value, and(toInsert, mask))\n            }\n\n            function convert_t_uint256_to_t_uint256(value) -> converted {\n                converted := cleanup_t_uint256(identity(cleanup_t_uint256(value)))\n            }\n\n            function prepare_store_t_uint256(value) -> ret {\n                ret := value\n            }\n\n            function update_storage_value_offset_0t_uint256_to_t_uint256(slot, value_0) {\n                let convertedValue_0 := convert_t_uint256_to_t_uint256(value_0)\n                sstore(slot, update_byte_slice_32_shift_0(sload(slot), prepare_store_t_uint256(convertedValue_0)))\n            }\n\n            /// @ast-id 348\n            /// @src 1:7478:8129  \"function _transfer(...\"\n            function fun__transfer_348(var_from_274, var_to_276, var_amount_278) {\n\n                /// @src 1:7604:7608  \"from\"\n                let _61 := var_from_274\n                let expr_282 := _61\n                /// @src 1:7620:7621  \"0\"\n                let expr_285 := 0x00\n                /// @src 1:7612:7622  \"address(0)\"\n                let expr_286 := convert_t_rational_0_by_1_to_t_address(expr_285)\n                /// @src 1:7604:7622  \"from != address(0)\"\n                let expr_287 := iszero(eq(cleanup_t_address(expr_282), cleanup_t_address(expr_286)))\n                /// @src 1:7596:7664  \"require(from != address(0), \\\"ERC20: transfer from the zero address\\\")\"\n                require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea(expr_287)\n                /// @src 1:7682:7684  \"to\"\n                let _62 := var_to_276\n                let expr_292 := _62\n                /// @src 1:7696:7697  \"0\"\n                let expr_295 := 0x00\n                /// @src 1:7688:7698  \"address(0)\"\n                let expr_296 := convert_t_rational_0_by_1_to_t_address(expr_295)\n                /// @src 1:7682:7698  \"to != address(0)\"\n                let expr_297 := iszero(eq(cleanup_t_address(expr_292), cleanup_t_address(expr_296)))\n                /// @src 1:7674:7738  \"require(to != address(0), \\\"ERC20: transfer to the zero address\\\")\"\n                require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f(expr_297)\n                /// @src 1:7770:7774  \"from\"\n                let _63 := var_from_274\n                let expr_302 := _63\n                /// @src 1:7776:7778  \"to\"\n                let _64 := var_to_276\n                let expr_303 := _64\n                /// @src 1:7780:7786  \"amount\"\n                let _65 := var_amount_278\n                let expr_304 := _65\n                fun__beforeTokenTransfer_575(expr_302, expr_303, expr_304)\n                /// @src 1:7820:7829  \"_balances\"\n                let _66 := 0x00\n                let expr_309 := _66\n                /// @src 1:7830:7834  \"from\"\n                let _67 := var_from_274\n                let expr_310 := _67\n                /// @src 1:7820:7835  \"_balances[from]\"\n                let _68 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_309,expr_310)\n                let _69 := read_from_storage_split_offset_0_t_uint256(_68)\n                let expr_311 := _69\n                /// @src 1:7798:7835  \"uint256 fromBalance = _balances[from]\"\n                let var_fromBalance_308 := expr_311\n                /// @src 1:7853:7864  \"fromBalance\"\n                let _70 := var_fromBalance_308\n                let expr_314 := _70\n                /// @src 1:7868:7874  \"amount\"\n                let _71 := var_amount_278\n                let expr_315 := _71\n                /// @src 1:7853:7874  \"fromBalance >= amount\"\n                let expr_316 := iszero(lt(cleanup_t_uint256(expr_314), cleanup_t_uint256(expr_315)))\n                /// @src 1:7845:7917  \"require(fromBalance >= amount, \\\"ERC20: transfer amount exceeds balance\\\")\"\n                require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6(expr_316)\n                /// @src 1:7969:7980  \"fromBalance\"\n                let _72 := var_fromBalance_308\n                let expr_323 := _72\n                /// @src 1:7983:7989  \"amount\"\n                let _73 := var_amount_278\n                let expr_324 := _73\n                /// @src 1:7969:7989  \"fromBalance - amount\"\n                let expr_325 := wrapping_sub_t_uint256(expr_323, expr_324)\n\n                /// @src 1:7951:7960  \"_balances\"\n                let _74 := 0x00\n                let expr_320 := _74\n                /// @src 1:7961:7965  \"from\"\n                let _75 := var_from_274\n                let expr_321 := _75\n                /// @src 1:7951:7966  \"_balances[from]\"\n                let _76 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_320,expr_321)\n                /// @src 1:7951:7989  \"_balances[from] = fromBalance - amount\"\n                update_storage_value_offset_0t_uint256_to_t_uint256(_76, expr_325)\n                let expr_326 := expr_325\n                /// @src 1:8026:8032  \"amount\"\n                let _77 := var_amount_278\n                let expr_332 := _77\n                /// @src 1:8009:8018  \"_balances\"\n                let _78 := 0x00\n                let expr_329 := _78\n                /// @src 1:8019:8021  \"to\"\n                let _79 := var_to_276\n                let expr_330 := _79\n                /// @src 1:8009:8022  \"_balances[to]\"\n                let _80 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_329,expr_330)\n                /// @src 1:8009:8032  \"_balances[to] += amount\"\n                let _81 := read_from_storage_split_offset_0_t_uint256(_80)\n                let expr_333 := checked_add_t_uint256(_81, expr_332)\n\n                update_storage_value_offset_0t_uint256_to_t_uint256(_80, expr_333)\n                /// @src 1:8057:8061  \"from\"\n                let _82 := var_from_274\n                let expr_336 := _82\n                /// @src 1:8063:8065  \"to\"\n                let _83 := var_to_276\n                let expr_337 := _83\n                /// @src 1:8067:8073  \"amount\"\n                let _84 := var_amount_278\n                let expr_338 := _84\n                /// @src 1:8048:8074  \"Transfer(from, to, amount)\"\n                let _85 := 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\n                let _86 := convert_t_address_to_t_address(expr_336)\n                let _87 := convert_t_address_to_t_address(expr_337)\n                {\n                    let _88 := allocate_unbounded()\n                    let _89 := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(_88 , expr_338)\n                    log3(_88, sub(_89, _88) , _85, _86, _87)\n                }/// @src 1:8105:8109  \"from\"\n                let _90 := var_from_274\n                let expr_342 := _90\n                /// @src 1:8111:8113  \"to\"\n                let _91 := var_to_276\n                let expr_343 := _91\n                /// @src 1:8115:8121  \"amount\"\n                let _92 := var_amount_278\n                let expr_344 := _92\n                fun__afterTokenTransfer_586(expr_342, expr_343, expr_344)\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: approve from the zero add\")\n\n                mstore(add(memPtr, 32), \"ress\")\n\n            }\n\n            function abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 36)\n                store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            function store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: approve to the zero addre\")\n\n                mstore(add(memPtr, 32), \"ss\")\n\n            }\n\n            function abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 34)\n                store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029(pos)\n                end := add(pos, 64)\n            }\n\n            function abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            /// @ast-id 521\n            /// @src 1:10113:10483  \"function _approve(...\"\n            function fun__approve_521(var_owner_479, var_spender_481, var_amount_483) {\n\n                /// @src 1:10244:10249  \"owner\"\n                let _93 := var_owner_479\n                let expr_487 := _93\n                /// @src 1:10261:10262  \"0\"\n                let expr_490 := 0x00\n                /// @src 1:10253:10263  \"address(0)\"\n                let expr_491 := convert_t_rational_0_by_1_to_t_address(expr_490)\n                /// @src 1:10244:10263  \"owner != address(0)\"\n                let expr_492 := iszero(eq(cleanup_t_address(expr_487), cleanup_t_address(expr_491)))\n                /// @src 1:10236:10304  \"require(owner != address(0), \\\"ERC20: approve from the zero address\\\")\"\n                require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208(expr_492)\n                /// @src 1:10322:10329  \"spender\"\n                let _94 := var_spender_481\n                let expr_497 := _94\n                /// @src 1:10341:10342  \"0\"\n                let expr_500 := 0x00\n                /// @src 1:10333:10343  \"address(0)\"\n                let expr_501 := convert_t_rational_0_by_1_to_t_address(expr_500)\n                /// @src 1:10322:10343  \"spender != address(0)\"\n                let expr_502 := iszero(eq(cleanup_t_address(expr_497), cleanup_t_address(expr_501)))\n                /// @src 1:10314:10382  \"require(spender != address(0), \\\"ERC20: approve to the zero address\\\")\"\n                require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029(expr_502)\n                /// @src 1:10423:10429  \"amount\"\n                let _95 := var_amount_483\n                let expr_511 := _95\n                /// @src 1:10393:10404  \"_allowances\"\n                let _96 := 0x01\n                let expr_506 := _96\n                /// @src 1:10405:10410  \"owner\"\n                let _97 := var_owner_479\n                let expr_507 := _97\n                /// @src 1:10393:10411  \"_allowances[owner]\"\n                let _98 := mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(expr_506,expr_507)\n                let _99 := _98\n                let expr_509 := _99\n                /// @src 1:10412:10419  \"spender\"\n                let _100 := var_spender_481\n                let expr_508 := _100\n                /// @src 1:10393:10420  \"_allowances[owner][spender]\"\n                let _101 := mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(expr_509,expr_508)\n                /// @src 1:10393:10429  \"_allowances[owner][spender] = amount\"\n                update_storage_value_offset_0t_uint256_to_t_uint256(_101, expr_511)\n                let expr_512 := expr_511\n                /// @src 1:10453:10458  \"owner\"\n                let _102 := var_owner_479\n                let expr_515 := _102\n                /// @src 1:10460:10467  \"spender\"\n                let _103 := var_spender_481\n                let expr_516 := _103\n                /// @src 1:10469:10475  \"amount\"\n                let _104 := var_amount_483\n                let expr_517 := _104\n                /// @src 1:10444:10476  \"Approval(owner, spender, amount)\"\n                let _105 := 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925\n                let _106 := convert_t_address_to_t_address(expr_515)\n                let _107 := convert_t_address_to_t_address(expr_516)\n                {\n                    let _108 := allocate_unbounded()\n                    let _109 := abi_encode_tuple_t_uint256__to_t_uint256__fromStack(_108 , expr_517)\n                    log3(_108, sub(_109, _108) , _105, _106, _107)\n                }\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe(memPtr) {\n\n                mstore(add(memPtr, 0), \"ERC20: insufficient allowance\")\n\n            }\n\n            function abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack(pos) -> end {\n                pos := array_storeLengthForEncoding_t_string_memory_ptr_fromStack(pos, 29)\n                store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe(pos)\n                end := add(pos, 32)\n            }\n\n            function abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack(headStart ) -> tail {\n                tail := add(headStart, 32)\n\n                mstore(add(headStart, 0), sub(tail, headStart))\n                tail := abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack( tail)\n\n            }\n\n            function require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe(condition ) {\n                if iszero(condition) {\n                    let memPtr := allocate_unbounded()\n                    mstore(memPtr, 0x08c379a000000000000000000000000000000000000000000000000000000000)\n                    let end := abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack(add(memPtr, 4) )\n                    revert(memPtr, sub(end, memPtr))\n                }\n            }\n\n            /// @ast-id 564\n            /// @src 1:10764:11205  \"function _spendAllowance(...\"\n            function fun__spendAllowance_564(var_owner_524, var_spender_526, var_amount_528) {\n\n                /// @src 1:10931:10936  \"owner\"\n                let _110 := var_owner_524\n                let expr_534 := _110\n                /// @src 1:10938:10945  \"spender\"\n                let _111 := var_spender_526\n                let expr_535 := _111\n                /// @src 1:10921:10946  \"allowance(owner, spender)\"\n                let expr_536 := fun_allowance_141(expr_534, expr_535)\n                /// @src 1:10894:10946  \"uint256 currentAllowance = allowance(owner, spender)\"\n                let var_currentAllowance_532 := expr_536\n                /// @src 1:10960:10976  \"currentAllowance\"\n                let _112 := var_currentAllowance_532\n                let expr_538 := _112\n                /// @src 1:10980:10997  \"type(uint256).max\"\n                let expr_543 := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n                /// @src 1:10960:10997  \"currentAllowance != type(uint256).max\"\n                let expr_544 := iszero(eq(cleanup_t_uint256(expr_538), cleanup_t_uint256(expr_543)))\n                /// @src 1:10956:11199  \"if (currentAllowance != type(uint256).max) {...\"\n                if expr_544 {\n                    /// @src 1:11021:11037  \"currentAllowance\"\n                    let _113 := var_currentAllowance_532\n                    let expr_546 := _113\n                    /// @src 1:11041:11047  \"amount\"\n                    let _114 := var_amount_528\n                    let expr_547 := _114\n                    /// @src 1:11021:11047  \"currentAllowance >= amount\"\n                    let expr_548 := iszero(lt(cleanup_t_uint256(expr_546), cleanup_t_uint256(expr_547)))\n                    /// @src 1:11013:11081  \"require(currentAllowance >= amount, \\\"ERC20: insufficient allowance\\\")\"\n                    require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe(expr_548)\n                    /// @src 1:11132:11137  \"owner\"\n                    let _115 := var_owner_524\n                    let expr_553 := _115\n                    /// @src 1:11139:11146  \"spender\"\n                    let _116 := var_spender_526\n                    let expr_554 := _116\n                    /// @src 1:11148:11164  \"currentAllowance\"\n                    let _117 := var_currentAllowance_532\n                    let expr_555 := _117\n                    /// @src 1:11167:11173  \"amount\"\n                    let _118 := var_amount_528\n                    let expr_556 := _118\n                    /// @src 1:11148:11173  \"currentAllowance - amount\"\n                    let expr_557 := wrapping_sub_t_uint256(expr_555, expr_556)\n\n                    fun__approve_521(expr_553, expr_554, expr_557)\n                    /// @src 1:10956:11199  \"if (currentAllowance != type(uint256).max) {...\"\n                }\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            /// @ast-id 575\n            /// @src 1:11789:11910  \"function _beforeTokenTransfer(...\"\n            function fun__beforeTokenTransfer_575(var_from_567, var_to_569, var_amount_571) {\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            /// @ast-id 586\n            /// @src 1:12498:12618  \"function _afterTokenTransfer(...\"\n            function fun__afterTokenTransfer_586(var_from_578, var_to_580, var_amount_582) {\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n            function zero_value_for_split_t_address() -> ret {\n                ret := 0\n            }\n\n            /// @ast-id 599\n            /// @src 0:640:736  \"function _msgSender() internal view virtual returns (address) {...\"\n            function fun__msgSender_599() -> var__593 {\n                /// @src 0:693:700  \"address\"\n                let zero_t_address_119 := zero_value_for_split_t_address()\n                var__593 := zero_t_address_119\n\n                /// @src 0:719:729  \"msg.sender\"\n                let expr_596 := caller()\n                /// @src 0:712:729  \"return msg.sender\"\n                var__593 := expr_596\n                leave\n\n            }\n            /// @src 1:1393:12620  \"contract ERC20 is Context, IERC20, IERC20Metadata {...\"\n\n        }\n\n        data \".metadata\" hex\"a3646970667358221220430c597f6f1345201b97d2e55b23aeca5dea2c07e4e779d17a3007aebac2d92c6c6578706572696d656e74616cf564736f6c637828302e382e31322d646576656c6f702e323032322e322e31322b636f6d6d69742e31323130633365360067\"\n    }\n\n}\n\n    \"###))"
+
+---
+AST
+├╼ var - object
+├╼ ERC20_587
+├╼ var - code
+├╼ mstore()
+│ ├╼ 64
+│ └╼ memoryguard()
+│   └╼ 128
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - _1
+│ └╼ copy_arguments_for_constructor_44_object_ERC20_587()
+├╼ constructor_ERC20_587()
+│ ├╼ var - _1
+│ └╼ var - _2
+├╼ declare - _3
+│ └╼ allocate_unbounded()
+├╼ codecopy()
+│ ├╼ var - _3
+│ ├╼ dataoffset()
+│ │ └╼ ERC20_587_deployed
+│ └╼ datasize()
+│   └╼ ERC20_587_deployed
+├╼ return()
+│ ├╼ var - _3
+│ └╼ datasize()
+│   └╼ ERC20_587_deployed
+├╼ function definition - allocate_unbounded
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ memPtr
+│ └╼ body
+│   └╼ assign - memPtr 
+│     └╼ mload()
+│       └╼ 64
+├╼ var - function
+├╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ function definition - round_up_to_mul_of_32
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   └╼ assign - result 
+│     └╼ and()
+│       ├╼ add()
+│       │ ├╼ var - value
+│       │ └╼ 31
+│       └╼ not()
+│         └╼ 31
+├╼ var - function
+├╼ panic_error_0x41()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - function
+├╼ finalize_allocation()
+│ ├╼ var - memPtr
+│ └╼ var - size
+├╼ declare - newFreePtr
+│ └╼ add()
+│   ├╼ var - memPtr
+│   └╼ round_up_to_mul_of_32()
+│     └╼ var - size
+├╼ if statement
+│ └╼ conditional
+│   ├╼ or()
+│   │ ├╼ gt()
+│   │ │ ├╼ var - newFreePtr
+│   │ │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ └╼ lt()
+│   │   ├╼ var - newFreePtr
+│   │   └╼ var - memPtr
+│   └╼ panic_error_0x41()
+├╼ mstore()
+│ ├╼ 64
+│ └╼ var - newFreePtr
+├╼ function definition - allocate_memory
+│ ├╼ params
+│ │ └╼ size
+│ ├╼ returns
+│ │ └╼ memPtr
+│ └╼ body
+│   ├╼ assign - memPtr 
+│   │ └╼ allocate_unbounded()
+│   └╼ finalize_allocation()
+│     ├╼ var - memPtr
+│     └╼ var - size
+├╼ var - function
+├╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ var - function
+├╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ var - function
+├╼ revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ var - function
+├╼ revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ function definition - array_allocation_size_t_string_memory_ptr
+│ ├╼ params
+│ │ └╼ length
+│ ├╼ returns
+│ │ └╼ size
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ gt()
+│   │   │ ├╼ var - length
+│   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │   └╼ panic_error_0x41()
+│   ├╼ assign - size 
+│   │ └╼ round_up_to_mul_of_32()
+│   │   └╼ var - length
+│   └╼ assign - size 
+│     └╼ add()
+│       ├╼ var - size
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - function
+├╼ copy_memory_to_memory()
+│ ├╼ var - src
+│ ├╼ var - dst
+│ └╼ var - length
+├╼ declare - i
+│ └╼ 0
+├╼ for loop
+│ ├╼ init block
+│ ├╼ conditional
+│ │ └╼ lt()
+│ │   ├╼ var - i
+│ │   └╼ var - length
+│ ├╼ after block
+│ │ └╼ assign - i 
+│ │   └╼ add()
+│ │     ├╼ var - i
+│ │     └╼ 32
+│ └╼ interior block
+│   └╼ mstore()
+│     ├╼ add()
+│     │ ├╼ var - dst
+│     │ └╼ var - i
+│     └╼ mload()
+│       └╼ add()
+│         ├╼ var - src
+│         └╼ var - i
+├╼ var - if
+├╼ gt()
+│ ├╼ var - i
+│ └╼ var - length
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - dst
+│ │ └╼ var - length
+│ └╼ 0
+├╼ function definition - abi_decode_available_length_t_string_memory_ptr_fromMemory
+│ ├╼ params
+│ │ ├╼ src
+│ │ ├╼ length
+│ │ └╼ end
+│ ├╼ returns
+│ │ └╼ array
+│ └╼ body
+│   ├╼ assign - array 
+│   │ └╼ allocate_memory()
+│   │   └╼ array_allocation_size_t_string_memory_ptr()
+│   │     └╼ var - length
+│   ├╼ mstore()
+│   │ ├╼ var - array
+│   │ └╼ var - length
+│   ├╼ declare - dst
+│   │ └╼ add()
+│   │   ├╼ var - array
+│   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ gt()
+│   │   │ ├╼ add()
+│   │   │ │ ├╼ var - src
+│   │   │ │ └╼ var - length
+│   │   │ └╼ var - end
+│   │   └╼ revert_error_987264b3b1d58a9c7f8255e93e81c77d86d6299019c33110a076957a3e06e2ae()
+│   └╼ copy_memory_to_memory()
+│     ├╼ var - src
+│     ├╼ var - dst
+│     └╼ var - length
+├╼ function definition - abi_decode_t_string_memory_ptr_fromMemory
+│ ├╼ params
+│ │ ├╼ offset
+│ │ └╼ end
+│ ├╼ returns
+│ │ └╼ array
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ iszero()
+│   │   │ └╼ slt()
+│   │   │   ├╼ add()
+│   │   │   │ ├╼ var - offset
+│   │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │   │   └╼ var - end
+│   │   └╼ revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d()
+│   ├╼ declare - length
+│   │ └╼ mload()
+│   │   └╼ var - offset
+│   └╼ assign - array 
+│     └╼ abi_decode_available_length_t_string_memory_ptr_fromMemory()
+│       ├╼ add()
+│       │ ├╼ var - offset
+│       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│       ├╼ var - length
+│       └╼ var - end
+├╼ function definition - abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ dataEnd
+│ ├╼ returns
+│ │ ├╼ value0
+│ │ └╼ value1
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ slt()
+│   │   │ ├╼ sub()
+│   │   │ │ ├╼ var - dataEnd
+│   │   │ │ └╼ var - headStart
+│   │   │ └╼ 64
+│   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+│   ├╼ declare - offset
+│   │ └╼ mload()
+│   │   └╼ add()
+│   │     ├╼ var - headStart
+│   │     └╼ 0
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ gt()
+│   │   │ ├╼ var - offset
+│   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │   └╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
+│   ├╼ assign - value0 
+│   │ └╼ abi_decode_t_string_memory_ptr_fromMemory()
+│   │   ├╼ add()
+│   │   │ ├╼ var - headStart
+│   │   │ └╼ var - offset
+│   │   └╼ var - dataEnd
+│   ├╼ declare - offset
+│   │ └╼ mload()
+│   │   └╼ add()
+│   │     ├╼ var - headStart
+│   │     └╼ 32
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ gt()
+│   │   │ ├╼ var - offset
+│   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │   └╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
+│   └╼ assign - value1 
+│     └╼ abi_decode_t_string_memory_ptr_fromMemory()
+│       ├╼ add()
+│       │ ├╼ var - headStart
+│       │ └╼ var - offset
+│       └╼ var - dataEnd
+├╼ function definition - copy_arguments_for_constructor_44_object_ERC20_587
+│ ├╼ params
+│ ├╼ returns
+│ │ ├╼ ret_param_0
+│ │ └╼ ret_param_1
+│ └╼ body
+│   ├╼ declare - programSize
+│   │ └╼ datasize()
+│   │   └╼ ERC20_587
+│   ├╼ declare - argSize
+│   │ └╼ sub()
+│   │   ├╼ codesize()
+│   │   └╼ var - programSize
+│   ├╼ declare - memoryDataOffset
+│   │ └╼ allocate_memory()
+│   │   └╼ var - argSize
+│   ├╼ codecopy()
+│   │ ├╼ var - memoryDataOffset
+│   │ ├╼ var - programSize
+│   │ └╼ var - argSize
+│   └╼ assign - ret_param_0, ret_param_1
+│     └╼ abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory()
+│       ├╼ var - memoryDataOffset
+│       └╼ add()
+│         ├╼ var - memoryDataOffset
+│         └╼ var - argSize
+├╼ var - function
+├╼ panic_error_0x00()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - array_length_t_string_memory_ptr
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ length
+│ └╼ body
+│   └╼ assign - length 
+│     └╼ mload()
+│       └╼ var - value
+├╼ var - function
+├╼ panic_error_0x22()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - extract_byte_array_length
+│ ├╼ params
+│ │ └╼ data
+│ ├╼ returns
+│ │ └╼ length
+│ └╼ body
+│   ├╼ assign - length 
+│   │ └╼ div()
+│   │   ├╼ var - data
+│   │   └╼ 2
+│   ├╼ declare - outOfPlaceEncoding
+│   │ └╼ and()
+│   │   ├╼ var - data
+│   │   └╼ 1
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ iszero()
+│   │   │ └╼ var - outOfPlaceEncoding
+│   │   └╼ assign - length 
+│   │     └╼ and()
+│   │       ├╼ var - length
+│   │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   └╼ if statement
+│     └╼ conditional
+│       ├╼ eq()
+│       │ ├╼ var - outOfPlaceEncoding
+│       │ └╼ lt()
+│       │   ├╼ var - length
+│       │   └╼ 32
+│       └╼ panic_error_0x22()
+├╼ function definition - array_dataslot_t_string_storage
+│ ├╼ params
+│ │ └╼ ptr
+│ ├╼ returns
+│ │ └╼ data
+│ └╼ body
+│   ├╼ assign - data 
+│   │ └╼ var - ptr
+│   ├╼ mstore()
+│   │ ├╼ 0
+│   │ └╼ var - ptr
+│   └╼ assign - data 
+│     └╼ keccak256()
+│       ├╼ 0
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - divide_by_32_ceil
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   └╼ assign - result 
+│     └╼ div()
+│       ├╼ add()
+│       │ ├╼ var - value
+│       │ └╼ 31
+│       └╼ 32
+├╼ function definition - shift_left_dynamic
+│ ├╼ params
+│ │ ├╼ bits
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ newValue
+│ └╼ body
+│   └╼ assign - newValue 
+│     └╼ shl()
+│       ├╼ var - bits
+│       └╼ var - value
+├╼ function definition - update_byte_slice_dynamic32
+│ ├╼ params
+│ │ ├╼ value
+│ │ ├╼ shiftBytes
+│ │ └╼ toInsert
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   ├╼ declare - shiftBits
+│   │ └╼ mul()
+│   │   ├╼ var - shiftBytes
+│   │   └╼ 8
+│   ├╼ declare - mask
+│   │ └╼ shift_left_dynamic()
+│   │   ├╼ var - shiftBits
+│   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - toInsert 
+│   │ └╼ shift_left_dynamic()
+│   │   ├╼ var - shiftBits
+│   │   └╼ var - toInsert
+│   ├╼ assign - value 
+│   │ └╼ and()
+│   │   ├╼ var - value
+│   │   └╼ not()
+│   │     └╼ var - mask
+│   └╼ assign - result 
+│     └╼ or()
+│       ├╼ var - value
+│       └╼ and()
+│         ├╼ var - toInsert
+│         └╼ var - mask
+├╼ function definition - cleanup_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ var - value
+├╼ function definition - identity
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ var - value
+├╼ function definition - convert_t_uint256_to_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ cleanup_t_uint256()
+│       └╼ identity()
+│         └╼ cleanup_t_uint256()
+│           └╼ var - value
+├╼ function definition - prepare_store_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ var - value
+├╼ var - function
+├╼ update_storage_value_t_uint256_to_t_uint256()
+│ ├╼ var - slot
+│ ├╼ var - offset
+│ └╼ var - value_0
+├╼ declare - convertedValue_0
+│ └╼ convert_t_uint256_to_t_uint256()
+│   └╼ var - value_0
+├╼ sstore()
+│ ├╼ var - slot
+│ └╼ update_byte_slice_dynamic32()
+│   ├╼ sload()
+│   │ └╼ var - slot
+│   ├╼ var - offset
+│   └╼ prepare_store_t_uint256()
+│     └╼ var - convertedValue_0
+├╼ function definition - zero_value_for_split_t_uint256
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 0
+├╼ var - function
+├╼ storage_set_to_zero_t_uint256()
+│ ├╼ var - slot
+│ └╼ var - offset
+├╼ declare - zero_0
+│ └╼ zero_value_for_split_t_uint256()
+├╼ update_storage_value_t_uint256_to_t_uint256()
+│ ├╼ var - slot
+│ ├╼ var - offset
+│ └╼ var - zero_0
+├╼ var - function
+├╼ clear_storage_range_t_bytes1()
+│ ├╼ var - start
+│ └╼ var - end
+├╼ for loop
+│ ├╼ init block
+│ ├╼ conditional
+│ │ └╼ lt()
+│ │   ├╼ var - start
+│ │   └╼ var - end
+│ ├╼ after block
+│ │ └╼ assign - start 
+│ │   └╼ add()
+│ │     ├╼ var - start
+│ │     └╼ 1
+│ └╼ interior block
+│   └╼ storage_set_to_zero_t_uint256()
+│     ├╼ var - start
+│     └╼ 0
+├╼ var - function
+├╼ clean_up_bytearray_end_slots_t_string_storage()
+│ ├╼ var - array
+│ ├╼ var - len
+│ └╼ var - startIndex
+├╼ if statement
+│ └╼ conditional
+│   ├╼ gt()
+│   │ ├╼ var - len
+│   │ └╼ 31
+│   ├╼ declare - dataArea
+│   │ └╼ array_dataslot_t_string_storage()
+│   │   └╼ var - array
+│   ├╼ declare - deleteStart
+│   │ └╼ add()
+│   │   ├╼ var - dataArea
+│   │   └╼ divide_by_32_ceil()
+│   │     └╼ var - startIndex
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ lt()
+│   │   │ ├╼ var - startIndex
+│   │   │ └╼ 32
+│   │   └╼ assign - deleteStart 
+│   │     └╼ var - dataArea
+│   └╼ clear_storage_range_t_bytes1()
+│     ├╼ var - deleteStart
+│     └╼ add()
+│       ├╼ var - dataArea
+│       └╼ divide_by_32_ceil()
+│         └╼ var - len
+├╼ function definition - shift_right_unsigned_dynamic
+│ ├╼ params
+│ │ ├╼ bits
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ newValue
+│ └╼ body
+│   └╼ assign - newValue 
+│     └╼ shr()
+│       ├╼ var - bits
+│       └╼ var - value
+├╼ function definition - mask_bytes_dynamic
+│ ├╼ params
+│ │ ├╼ data
+│ │ └╼ bytes
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   ├╼ declare - mask
+│   │ └╼ not()
+│   │   └╼ shift_right_unsigned_dynamic()
+│   │     ├╼ mul()
+│   │     │ ├╼ 8
+│   │     │ └╼ var - bytes
+│   │     └╼ not()
+│   │       └╼ 0
+│   └╼ assign - result 
+│     └╼ and()
+│       ├╼ var - data
+│       └╼ var - mask
+├╼ function definition - extract_used_part_and_set_length_of_short_byte_array
+│ ├╼ params
+│ │ ├╼ data
+│ │ └╼ len
+│ ├╼ returns
+│ │ └╼ used
+│ └╼ body
+│   ├╼ assign - data 
+│   │ └╼ mask_bytes_dynamic()
+│   │   ├╼ var - data
+│   │   └╼ var - len
+│   └╼ assign - used 
+│     └╼ or()
+│       ├╼ var - data
+│       └╼ mul()
+│         ├╼ 2
+│         └╼ var - len
+├╼ var - function
+├╼ copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage()
+│ ├╼ var - slot
+│ └╼ var - src
+├╼ declare - newLen
+│ └╼ array_length_t_string_memory_ptr()
+│   └╼ var - src
+├╼ if statement
+│ └╼ conditional
+│   ├╼ gt()
+│   │ ├╼ var - newLen
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   └╼ panic_error_0x41()
+├╼ declare - oldLen
+│ └╼ extract_byte_array_length()
+│   └╼ sload()
+│     └╼ var - slot
+├╼ clean_up_bytearray_end_slots_t_string_storage()
+│ ├╼ var - slot
+│ ├╼ var - oldLen
+│ └╼ var - newLen
+├╼ declare - srcOffset
+│ └╼ 0
+├╼ assign - srcOffset 
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - switch
+├╼ gt()
+│ ├╼ var - newLen
+│ └╼ 31
+├╼ var - case
+├╼ 1
+├╼ declare - loopEnd
+│ └╼ and()
+│   ├╼ var - newLen
+│   └╼ not()
+│     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - dstPtr
+│ └╼ array_dataslot_t_string_storage()
+│   └╼ var - slot
+├╼ declare - i
+│ └╼ 0
+├╼ for loop
+│ ├╼ init block
+│ ├╼ conditional
+│ │ └╼ lt()
+│ │   ├╼ var - i
+│ │   └╼ var - loopEnd
+│ ├╼ after block
+│ │ └╼ assign - i 
+│ │   └╼ add()
+│ │     ├╼ var - i
+│ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│ └╼ interior block
+│   ├╼ sstore()
+│   │ ├╼ var - dstPtr
+│   │ └╼ mload()
+│   │   └╼ add()
+│   │     ├╼ var - src
+│   │     └╼ var - srcOffset
+│   ├╼ assign - dstPtr 
+│   │ └╼ add()
+│   │   ├╼ var - dstPtr
+│   │   └╼ 1
+│   └╼ assign - srcOffset 
+│     └╼ add()
+│       ├╼ var - srcOffset
+│       └╼ 32
+├╼ if statement
+│ └╼ conditional
+│   ├╼ lt()
+│   │ ├╼ var - loopEnd
+│   │ └╼ var - newLen
+│   ├╼ declare - lastValue
+│   │ └╼ mload()
+│   │   └╼ add()
+│   │     ├╼ var - src
+│   │     └╼ var - srcOffset
+│   └╼ sstore()
+│     ├╼ var - dstPtr
+│     └╼ mask_bytes_dynamic()
+│       ├╼ var - lastValue
+│       └╼ and()
+│         ├╼ var - newLen
+│         └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ sstore()
+│ ├╼ var - slot
+│ └╼ add()
+│   ├╼ mul()
+│   │ ├╼ var - newLen
+│   │ └╼ 2
+│   └╼ 1
+├╼ var - default
+├╼ declare - value
+│ └╼ 0
+├╼ if statement
+│ └╼ conditional
+│   ├╼ var - newLen
+│   └╼ assign - value 
+│     └╼ mload()
+│       └╼ add()
+│         ├╼ var - src
+│         └╼ var - srcOffset
+├╼ sstore()
+│ ├╼ var - slot
+│ └╼ extract_used_part_and_set_length_of_short_byte_array()
+│   ├╼ var - value
+│   └╼ var - newLen
+├╼ var - function
+├╼ update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage()
+│ ├╼ var - slot
+│ └╼ var - value_0
+├╼ copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage()
+│ ├╼ var - slot
+│ └╼ var - value_0
+├╼ var - function
+├╼ constructor_ERC20_587()
+│ ├╼ var - var_name__30_mpos
+│ └╼ var - var_symbol__32_mpos
+├╼ constructor_IERC20Metadata_712()
+├╼ declare - _4_mpos
+│ └╼ var - var_name__30_mpos
+├╼ declare - expr_36_mpos
+│ └╼ var - _4_mpos
+├╼ update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage()
+│ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│ └╼ var - expr_36_mpos
+├╼ declare - _5_slot
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_37_slot
+│ └╼ var - _5_slot
+├╼ declare - _6_mpos
+│ └╼ var - var_symbol__32_mpos
+├╼ declare - expr_40_mpos
+│ └╼ var - _6_mpos
+├╼ update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage()
+│ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│ └╼ var - expr_40_mpos
+├╼ declare - _7_slot
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_41_slot
+│ └╼ var - _7_slot
+├╼ var - function
+├╼ constructor_IERC20Metadata_712()
+├╼ constructor_IERC20_687()
+├╼ var - function
+├╼ constructor_IERC20_687()
+├╼ constructor_Context_609()
+├╼ var - function
+├╼ constructor_Context_609()
+├╼ var - object
+├╼ ERC20_587_deployed
+├╼ var - code
+├╼ mstore()
+│ ├╼ 64
+│ └╼ memoryguard()
+│   └╼ 128
+├╼ var - if
+├╼ iszero()
+│ └╼ lt()
+│   ├╼ calldatasize()
+│   └╼ 4
+├╼ declare - selector
+│ └╼ shift_right_224_unsigned()
+│   └╼ calldataload()
+│     └╼ 0
+├╼ var - switch
+├╼ var - selector
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ abi_decode_tuple_()
+│ ├╼ 4
+│ └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_name_54()
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_uint256()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_approve_166()
+│   ├╼ var - param_0
+│   └╼ var - param_1
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ abi_decode_tuple_()
+│ ├╼ 4
+│ └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_totalSupply_84()
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_addresst_uint256()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_transferFrom_199()
+│   ├╼ var - param_0
+│   ├╼ var - param_1
+│   └╼ var - param_2
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ abi_decode_tuple_()
+│ ├╼ 4
+│ └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_decimals_74()
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_uint8__to_t_uint8__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_uint256()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_increaseAllowance_229()
+│   ├╼ var - param_0
+│   └╼ var - param_1
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_address()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_balanceOf_98()
+│   └╼ var - param_0
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ abi_decode_tuple_()
+│ ├╼ 4
+│ └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_symbol_64()
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_uint256()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_decreaseAllowance_271()
+│   ├╼ var - param_0
+│   └╼ var - param_1
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_uint256()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_transfer_123()
+│   ├╼ var - param_0
+│   └╼ var - param_1
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - case
+├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ if statement
+│ └╼ conditional
+│   ├╼ callvalue()
+│   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ declare - param_0
+│ └╼ abi_decode_tuple_t_addresst_address()
+│   ├╼ 4
+│   └╼ calldatasize()
+├╼ declare - ret_0
+│ └╼ fun_allowance_141()
+│   ├╼ var - param_0
+│   └╼ var - param_1
+├╼ declare - memPos
+│ └╼ allocate_unbounded()
+├╼ declare - memEnd
+│ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack()
+│   ├╼ var - memPos
+│   └╼ var - ret_0
+├╼ return()
+│ ├╼ var - memPos
+│ └╼ sub()
+│   ├╼ var - memEnd
+│   └╼ var - memPos
+├╼ var - default
+├╼ revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74()
+├╼ function definition - shift_right_224_unsigned
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ newValue
+│ └╼ body
+│   └╼ assign - newValue 
+│     └╼ shr()
+│       ├╼ 224
+│       └╼ var - value
+├╼ function definition - allocate_unbounded
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ memPtr
+│ └╼ body
+│   └╼ assign - memPtr 
+│     └╼ mload()
+│       └╼ 64
+├╼ var - function
+├╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ var - function
+├╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ var - function
+├╼ abi_decode_tuple_()
+│ ├╼ var - headStart
+│ └╼ var - dataEnd
+├╼ if statement
+│ └╼ conditional
+│   ├╼ slt()
+│   │ ├╼ sub()
+│   │ │ ├╼ var - dataEnd
+│   │ │ └╼ var - headStart
+│   │ └╼ 0
+│   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+├╼ function definition - array_length_t_string_memory_ptr
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ length
+│ └╼ body
+│   └╼ assign - length 
+│     └╼ mload()
+│       └╼ var - value
+├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ ├╼ pos
+│ │ └╼ length
+│ ├╼ returns
+│ │ └╼ updated_pos
+│ └╼ body
+│   ├╼ mstore()
+│   │ ├╼ var - pos
+│   │ └╼ var - length
+│   └╼ assign - updated_pos 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - function
+├╼ copy_memory_to_memory()
+│ ├╼ var - src
+│ ├╼ var - dst
+│ └╼ var - length
+├╼ declare - i
+│ └╼ 0
+├╼ for loop
+│ ├╼ init block
+│ ├╼ conditional
+│ │ └╼ lt()
+│ │   ├╼ var - i
+│ │   └╼ var - length
+│ ├╼ after block
+│ │ └╼ assign - i 
+│ │   └╼ add()
+│ │     ├╼ var - i
+│ │     └╼ 32
+│ └╼ interior block
+│   └╼ mstore()
+│     ├╼ add()
+│     │ ├╼ var - dst
+│     │ └╼ var - i
+│     └╼ mload()
+│       └╼ add()
+│         ├╼ var - src
+│         └╼ var - i
+├╼ var - if
+├╼ gt()
+│ ├╼ var - i
+│ └╼ var - length
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - dst
+│ │ └╼ var - length
+│ └╼ 0
+├╼ function definition - round_up_to_mul_of_32
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   └╼ assign - result 
+│     └╼ and()
+│       ├╼ add()
+│       │ ├╼ var - value
+│       │ └╼ 31
+│       └╼ not()
+│         └╼ 31
+├╼ function definition - abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ ├╼ value
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ declare - length
+│   │ └╼ array_length_t_string_memory_ptr()
+│   │   └╼ var - value
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ var - length
+│   ├╼ copy_memory_to_memory()
+│   │ ├╼ add()
+│   │ │ ├╼ var - value
+│   │ │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ ├╼ var - pos
+│   │ └╼ var - length
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ round_up_to_mul_of_32()
+│         └╼ var - length
+├╼ function definition - abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ value0
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack()
+│       ├╼ var - value0
+│       └╼ var - tail
+├╼ var - function
+├╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ function definition - cleanup_t_uint160
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ and()
+│       ├╼ var - value
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - cleanup_t_address
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ cleanup_t_uint160()
+│       └╼ var - value
+├╼ var - function
+├╼ validator_revert_t_address()
+│ └╼ var - value
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ eq()
+│   │   ├╼ var - value
+│   │   └╼ cleanup_t_address()
+│   │     └╼ var - value
+│   └╼ revert()
+│     ├╼ 0
+│     └╼ 0
+├╼ function definition - abi_decode_t_address
+│ ├╼ params
+│ │ ├╼ offset
+│ │ └╼ end
+│ ├╼ returns
+│ │ └╼ value
+│ └╼ body
+│   ├╼ assign - value 
+│   │ └╼ calldataload()
+│   │   └╼ var - offset
+│   └╼ validator_revert_t_address()
+│     └╼ var - value
+├╼ function definition - cleanup_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ var - value
+├╼ var - function
+├╼ validator_revert_t_uint256()
+│ └╼ var - value
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ eq()
+│   │   ├╼ var - value
+│   │   └╼ cleanup_t_uint256()
+│   │     └╼ var - value
+│   └╼ revert()
+│     ├╼ 0
+│     └╼ 0
+├╼ function definition - abi_decode_t_uint256
+│ ├╼ params
+│ │ ├╼ offset
+│ │ └╼ end
+│ ├╼ returns
+│ │ └╼ value
+│ └╼ body
+│   ├╼ assign - value 
+│   │ └╼ calldataload()
+│   │   └╼ var - offset
+│   └╼ validator_revert_t_uint256()
+│     └╼ var - value
+├╼ function definition - abi_decode_tuple_t_addresst_uint256
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ dataEnd
+│ ├╼ returns
+│ │ ├╼ value0
+│ │ └╼ value1
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ slt()
+│   │   │ ├╼ sub()
+│   │   │ │ ├╼ var - dataEnd
+│   │   │ │ └╼ var - headStart
+│   │   │ └╼ 64
+│   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+│   ├╼ declare - offset
+│   │ └╼ 0
+│   ├╼ assign - value0 
+│   │ └╼ abi_decode_t_address()
+│   │   ├╼ add()
+│   │   │ ├╼ var - headStart
+│   │   │ └╼ var - offset
+│   │   └╼ var - dataEnd
+│   ├╼ declare - offset
+│   │ └╼ 32
+│   └╼ assign - value1 
+│     └╼ abi_decode_t_uint256()
+│       ├╼ add()
+│       │ ├╼ var - headStart
+│       │ └╼ var - offset
+│       └╼ var - dataEnd
+├╼ function definition - cleanup_t_bool
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ iszero()
+│       └╼ iszero()
+│         └╼ var - value
+├╼ var - function
+├╼ abi_encode_t_bool_to_t_bool_fromStack()
+│ ├╼ var - value
+│ └╼ var - pos
+├╼ mstore()
+│ ├╼ var - pos
+│ └╼ cleanup_t_bool()
+│   └╼ var - value
+├╼ function definition - abi_encode_tuple_t_bool__to_t_bool__fromStack
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ value0
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   └╼ abi_encode_t_bool_to_t_bool_fromStack()
+│     ├╼ var - value0
+│     └╼ add()
+│       ├╼ var - headStart
+│       └╼ 0
+├╼ var - function
+├╼ abi_encode_t_uint256_to_t_uint256_fromStack()
+│ ├╼ var - value
+│ └╼ var - pos
+├╼ mstore()
+│ ├╼ var - pos
+│ └╼ cleanup_t_uint256()
+│   └╼ var - value
+├╼ function definition - abi_encode_tuple_t_uint256__to_t_uint256__fromStack
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ value0
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   └╼ abi_encode_t_uint256_to_t_uint256_fromStack()
+│     ├╼ var - value0
+│     └╼ add()
+│       ├╼ var - headStart
+│       └╼ 0
+├╼ function definition - abi_decode_tuple_t_addresst_addresst_uint256
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ dataEnd
+│ ├╼ returns
+│ │ ├╼ value0
+│ │ ├╼ value1
+│ │ └╼ value2
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ slt()
+│   │   │ ├╼ sub()
+│   │   │ │ ├╼ var - dataEnd
+│   │   │ │ └╼ var - headStart
+│   │   │ └╼ 96
+│   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+│   ├╼ declare - offset
+│   │ └╼ 0
+│   ├╼ assign - value0 
+│   │ └╼ abi_decode_t_address()
+│   │   ├╼ add()
+│   │   │ ├╼ var - headStart
+│   │   │ └╼ var - offset
+│   │   └╼ var - dataEnd
+│   ├╼ declare - offset
+│   │ └╼ 32
+│   ├╼ assign - value1 
+│   │ └╼ abi_decode_t_address()
+│   │   ├╼ add()
+│   │   │ ├╼ var - headStart
+│   │   │ └╼ var - offset
+│   │   └╼ var - dataEnd
+│   ├╼ declare - offset
+│   │ └╼ 64
+│   └╼ assign - value2 
+│     └╼ abi_decode_t_uint256()
+│       ├╼ add()
+│       │ ├╼ var - headStart
+│       │ └╼ var - offset
+│       └╼ var - dataEnd
+├╼ function definition - cleanup_t_uint8
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ and()
+│       ├╼ var - value
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - function
+├╼ abi_encode_t_uint8_to_t_uint8_fromStack()
+│ ├╼ var - value
+│ └╼ var - pos
+├╼ mstore()
+│ ├╼ var - pos
+│ └╼ cleanup_t_uint8()
+│   └╼ var - value
+├╼ function definition - abi_encode_tuple_t_uint8__to_t_uint8__fromStack
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ value0
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   └╼ abi_encode_t_uint8_to_t_uint8_fromStack()
+│     ├╼ var - value0
+│     └╼ add()
+│       ├╼ var - headStart
+│       └╼ 0
+├╼ function definition - abi_decode_tuple_t_address
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ dataEnd
+│ ├╼ returns
+│ │ └╼ value0
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ slt()
+│   │   │ ├╼ sub()
+│   │   │ │ ├╼ var - dataEnd
+│   │   │ │ └╼ var - headStart
+│   │   │ └╼ 32
+│   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+│   ├╼ declare - offset
+│   │ └╼ 0
+│   └╼ assign - value0 
+│     └╼ abi_decode_t_address()
+│       ├╼ add()
+│       │ ├╼ var - headStart
+│       │ └╼ var - offset
+│       └╼ var - dataEnd
+├╼ function definition - abi_decode_tuple_t_addresst_address
+│ ├╼ params
+│ │ ├╼ headStart
+│ │ └╼ dataEnd
+│ ├╼ returns
+│ │ ├╼ value0
+│ │ └╼ value1
+│ └╼ body
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ slt()
+│   │   │ ├╼ sub()
+│   │   │ │ ├╼ var - dataEnd
+│   │   │ │ └╼ var - headStart
+│   │   │ └╼ 64
+│   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
+│   ├╼ declare - offset
+│   │ └╼ 0
+│   ├╼ assign - value0 
+│   │ └╼ abi_decode_t_address()
+│   │   ├╼ add()
+│   │   │ ├╼ var - headStart
+│   │   │ └╼ var - offset
+│   │   └╼ var - dataEnd
+│   ├╼ declare - offset
+│   │ └╼ 32
+│   └╼ assign - value1 
+│     └╼ abi_decode_t_address()
+│       ├╼ add()
+│       │ ├╼ var - headStart
+│       │ └╼ var - offset
+│       └╼ var - dataEnd
+├╼ var - function
+├╼ revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74()
+├╼ revert()
+│ ├╼ 0
+│ └╼ 0
+├╼ function definition - zero_value_for_split_t_string_memory_ptr
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 96
+├╼ var - function
+├╼ panic_error_0x22()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - extract_byte_array_length
+│ ├╼ params
+│ │ └╼ data
+│ ├╼ returns
+│ │ └╼ length
+│ └╼ body
+│   ├╼ assign - length 
+│   │ └╼ div()
+│   │   ├╼ var - data
+│   │   └╼ 2
+│   ├╼ declare - outOfPlaceEncoding
+│   │ └╼ and()
+│   │   ├╼ var - data
+│   │   └╼ 1
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ iszero()
+│   │   │ └╼ var - outOfPlaceEncoding
+│   │   └╼ assign - length 
+│   │     └╼ and()
+│   │       ├╼ var - length
+│   │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   └╼ if statement
+│     └╼ conditional
+│       ├╼ eq()
+│       │ ├╼ var - outOfPlaceEncoding
+│       │ └╼ lt()
+│       │   ├╼ var - length
+│       │   └╼ 32
+│       └╼ panic_error_0x22()
+├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr
+│ ├╼ params
+│ │ ├╼ pos
+│ │ └╼ length
+│ ├╼ returns
+│ │ └╼ updated_pos
+│ └╼ body
+│   ├╼ mstore()
+│   │ ├╼ var - pos
+│   │ └╼ var - length
+│   └╼ assign - updated_pos 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - array_dataslot_t_string_storage
+│ ├╼ params
+│ │ └╼ ptr
+│ ├╼ returns
+│ │ └╼ data
+│ └╼ body
+│   ├╼ assign - data 
+│   │ └╼ var - ptr
+│   ├╼ mstore()
+│   │ ├╼ 0
+│   │ └╼ var - ptr
+│   └╼ assign - data 
+│     └╼ keccak256()
+│       ├╼ 0
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - abi_encode_t_string_storage_to_t_string_memory_ptr
+│ ├╼ params
+│ │ ├╼ value
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   ├╼ declare - slotValue
+│   │ └╼ sload()
+│   │   └╼ var - value
+│   ├╼ declare - length
+│   │ └╼ extract_byte_array_length()
+│   │   └╼ var - slotValue
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr()
+│   │   ├╼ var - pos
+│   │   └╼ var - length
+│   ├╼ var - switch
+│   ├╼ and()
+│   │ ├╼ var - slotValue
+│   │ └╼ 1
+│   ├╼ var - case
+│   ├╼ 0
+│   ├╼ mstore()
+│   │ ├╼ var - pos
+│   │ └╼ and()
+│   │   ├╼ var - slotValue
+│   │   └╼ not()
+│   │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - ret 
+│   │ └╼ add()
+│   │   ├╼ var - pos
+│   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ var - case
+│   ├╼ 1
+│   ├╼ declare - dataPos
+│   │ └╼ array_dataslot_t_string_storage()
+│   │   └╼ var - value
+│   ├╼ declare - i
+│   │ └╼ 0
+│   ├╼ for loop
+│   │ ├╼ init block
+│   │ ├╼ conditional
+│   │ │ └╼ lt()
+│   │ │   ├╼ var - i
+│   │ │   └╼ var - length
+│   │ ├╼ after block
+│   │ │ └╼ assign - i 
+│   │ │   └╼ add()
+│   │ │     ├╼ var - i
+│   │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ └╼ interior block
+│   │   ├╼ mstore()
+│   │   │ ├╼ add()
+│   │   │ │ ├╼ var - pos
+│   │   │ │ └╼ var - i
+│   │   │ └╼ sload()
+│   │   │   └╼ var - dataPos
+│   │   └╼ assign - dataPos 
+│   │     └╼ add()
+│   │       ├╼ var - dataPos
+│   │       └╼ 1
+│   └╼ assign - ret 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ var - i
+├╼ function definition - abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr
+│ ├╼ params
+│ │ ├╼ value0
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ updatedPos
+│ └╼ body
+│   └╼ assign - updatedPos 
+│     └╼ abi_encode_t_string_storage_to_t_string_memory_ptr()
+│       ├╼ var - value0
+│       └╼ var - pos
+├╼ var - function
+├╼ panic_error_0x41()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ var - function
+├╼ finalize_allocation()
+│ ├╼ var - memPtr
+│ └╼ var - size
+├╼ declare - newFreePtr
+│ └╼ add()
+│   ├╼ var - memPtr
+│   └╼ round_up_to_mul_of_32()
+│     └╼ var - size
+├╼ if statement
+│ └╼ conditional
+│   ├╼ or()
+│   │ ├╼ gt()
+│   │ │ ├╼ var - newFreePtr
+│   │ │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ └╼ lt()
+│   │   ├╼ var - newFreePtr
+│   │   └╼ var - memPtr
+│   └╼ panic_error_0x41()
+├╼ mstore()
+│ ├╼ 64
+│ └╼ var - newFreePtr
+├╼ function definition - copy_array_from_storage_to_memory_t_string_storage
+│ ├╼ params
+│ │ └╼ slot
+│ ├╼ returns
+│ │ └╼ memPtr
+│ └╼ body
+│   ├╼ assign - memPtr 
+│   │ └╼ allocate_unbounded()
+│   ├╼ declare - end
+│   │ └╼ abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr()
+│   │   ├╼ var - slot
+│   │   └╼ var - memPtr
+│   └╼ finalize_allocation()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ function definition - convert_array_t_string_storage_to_t_string_memory_ptr
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ copy_array_from_storage_to_memory_t_string_storage()
+│       └╼ var - value
+├╼ function definition - fun_name_54
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ var__49_mpos
+│ └╼ body
+│   ├╼ declare - zero_t_string_memory_ptr_1_mpos
+│   │ └╼ zero_value_for_split_t_string_memory_ptr()
+│   ├╼ assign - var__49_mpos 
+│   │ └╼ var - zero_t_string_memory_ptr_1_mpos
+│   ├╼ declare - _2_slot
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_51_slot
+│   │ └╼ var - _2_slot
+│   ├╼ assign - var__49_mpos 
+│   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr()
+│   │   └╼ var - expr_51_slot
+│   └╼ leave
+├╼ function definition - fun_symbol_64
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ var__59_mpos
+│ └╼ body
+│   ├╼ declare - zero_t_string_memory_ptr_3_mpos
+│   │ └╼ zero_value_for_split_t_string_memory_ptr()
+│   ├╼ assign - var__59_mpos 
+│   │ └╼ var - zero_t_string_memory_ptr_3_mpos
+│   ├╼ declare - _4_slot
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_61_slot
+│   │ └╼ var - _4_slot
+│   ├╼ assign - var__59_mpos 
+│   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr()
+│   │   └╼ var - expr_61_slot
+│   └╼ leave
+├╼ function definition - zero_value_for_split_t_uint8
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 0
+├╼ function definition - cleanup_t_rational_18_by_1
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ var - value
+├╼ function definition - identity
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ var - value
+├╼ function definition - convert_t_rational_18_by_1_to_t_uint8
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ cleanup_t_uint8()
+│       └╼ identity()
+│         └╼ cleanup_t_rational_18_by_1()
+│           └╼ var - value
+├╼ function definition - fun_decimals_74
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ var__69
+│ └╼ body
+│   ├╼ declare - zero_t_uint8_5
+│   │ └╼ zero_value_for_split_t_uint8()
+│   ├╼ assign - var__69 
+│   │ └╼ var - zero_t_uint8_5
+│   ├╼ declare - expr_71
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__69 
+│   │ └╼ convert_t_rational_18_by_1_to_t_uint8()
+│   │   └╼ var - expr_71
+│   └╼ leave
+├╼ function definition - zero_value_for_split_t_uint256
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 0
+├╼ function definition - shift_right_0_unsigned
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ newValue
+│ └╼ body
+│   └╼ assign - newValue 
+│     └╼ shr()
+│       ├╼ 0
+│       └╼ var - value
+├╼ function definition - cleanup_from_storage_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ var - value
+├╼ function definition - extract_from_storage_value_offset_0t_uint256
+│ ├╼ params
+│ │ └╼ slot_value
+│ ├╼ returns
+│ │ └╼ value
+│ └╼ body
+│   └╼ assign - value 
+│     └╼ cleanup_from_storage_t_uint256()
+│       └╼ shift_right_0_unsigned()
+│         └╼ var - slot_value
+├╼ function definition - read_from_storage_split_offset_0_t_uint256
+│ ├╼ params
+│ │ └╼ slot
+│ ├╼ returns
+│ │ └╼ value
+│ └╼ body
+│   └╼ assign - value 
+│     └╼ extract_from_storage_value_offset_0t_uint256()
+│       └╼ sload()
+│         └╼ var - slot
+├╼ function definition - fun_totalSupply_84
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ var__79
+│ └╼ body
+│   ├╼ declare - zero_t_uint256_6
+│   │ └╼ zero_value_for_split_t_uint256()
+│   ├╼ assign - var__79 
+│   │ └╼ var - zero_t_uint256_6
+│   ├╼ declare - _7
+│   │ └╼ read_from_storage_split_offset_0_t_uint256()
+│   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_81
+│   │ └╼ var - _7
+│   ├╼ assign - var__79 
+│   │ └╼ var - expr_81
+│   └╼ leave
+├╼ function definition - convert_t_uint160_to_t_uint160
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ cleanup_t_uint160()
+│       └╼ identity()
+│         └╼ cleanup_t_uint160()
+│           └╼ var - value
+├╼ function definition - convert_t_uint160_to_t_address
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ convert_t_uint160_to_t_uint160()
+│       └╼ var - value
+├╼ function definition - convert_t_address_to_t_address
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ convert_t_uint160_to_t_address()
+│       └╼ var - value
+├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address
+│ ├╼ params
+│ │ ├╼ slot
+│ │ └╼ key
+│ ├╼ returns
+│ │ └╼ dataSlot
+│ └╼ body
+│   ├╼ mstore()
+│   │ ├╼ 0
+│   │ └╼ convert_t_address_to_t_address()
+│   │   └╼ var - key
+│   ├╼ mstore()
+│   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ └╼ var - slot
+│   └╼ assign - dataSlot 
+│     └╼ keccak256()
+│       ├╼ 0
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - fun_balanceOf_98
+│ ├╼ params
+│ │ └╼ var_account_87
+│ ├╼ returns
+│ │ └╼ var__91
+│ └╼ body
+│   ├╼ declare - zero_t_uint256_8
+│   │ └╼ zero_value_for_split_t_uint256()
+│   ├╼ assign - var__91 
+│   │ └╼ var - zero_t_uint256_8
+│   ├╼ declare - _9
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_93
+│   │ └╼ var - _9
+│   ├╼ declare - _10
+│   │ └╼ var - var_account_87
+│   ├╼ declare - expr_94
+│   │ └╼ var - _10
+│   ├╼ declare - _11
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   │   ├╼ var - expr_93
+│   │   └╼ var - expr_94
+│   ├╼ declare - _12
+│   │ └╼ read_from_storage_split_offset_0_t_uint256()
+│   │   └╼ var - _11
+│   ├╼ declare - expr_95
+│   │ └╼ var - _12
+│   ├╼ assign - var__91 
+│   │ └╼ var - expr_95
+│   └╼ leave
+├╼ function definition - zero_value_for_split_t_bool
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 0
+├╼ function definition - fun_transfer_123
+│ ├╼ params
+│ │ ├╼ var_to_101
+│ │ └╼ var_amount_103
+│ ├╼ returns
+│ │ └╼ var__107
+│ └╼ body
+│   ├╼ declare - zero_t_bool_13
+│   │ └╼ zero_value_for_split_t_bool()
+│   ├╼ assign - var__107 
+│   │ └╼ var - zero_t_bool_13
+│   ├╼ declare - expr_112
+│   │ └╼ fun__msgSender_599()
+│   ├╼ declare - var_owner_110
+│   │ └╼ var - expr_112
+│   ├╼ declare - _14
+│   │ └╼ var - var_owner_110
+│   ├╼ declare - expr_115
+│   │ └╼ var - _14
+│   ├╼ declare - _15
+│   │ └╼ var - var_to_101
+│   ├╼ declare - expr_116
+│   │ └╼ var - _15
+│   ├╼ declare - _16
+│   │ └╼ var - var_amount_103
+│   ├╼ declare - expr_117
+│   │ └╼ var - _16
+│   ├╼ fun__transfer_348()
+│   │ ├╼ var - expr_115
+│   │ ├╼ var - expr_116
+│   │ └╼ var - expr_117
+│   ├╼ declare - expr_120
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__107 
+│   │ └╼ var - expr_120
+│   └╼ leave
+├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address
+│ ├╼ params
+│ │ ├╼ slot
+│ │ └╼ key
+│ ├╼ returns
+│ │ └╼ dataSlot
+│ └╼ body
+│   ├╼ mstore()
+│   │ ├╼ 0
+│   │ └╼ convert_t_address_to_t_address()
+│   │   └╼ var - key
+│   ├╼ mstore()
+│   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │ └╼ var - slot
+│   └╼ assign - dataSlot 
+│     └╼ keccak256()
+│       ├╼ 0
+│       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - fun_allowance_141
+│ ├╼ params
+│ │ ├╼ var_owner_126
+│ │ └╼ var_spender_128
+│ ├╼ returns
+│ │ └╼ var__132
+│ └╼ body
+│   ├╼ declare - zero_t_uint256_17
+│   │ └╼ zero_value_for_split_t_uint256()
+│   ├╼ assign - var__132 
+│   │ └╼ var - zero_t_uint256_17
+│   ├╼ declare - _18
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_134
+│   │ └╼ var - _18
+│   ├╼ declare - _19
+│   │ └╼ var - var_owner_126
+│   ├╼ declare - expr_135
+│   │ └╼ var - _19
+│   ├╼ declare - _20
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address()
+│   │   ├╼ var - expr_134
+│   │   └╼ var - expr_135
+│   ├╼ declare - _21
+│   │ └╼ var - _20
+│   ├╼ declare - expr_136
+│   │ └╼ var - _21
+│   ├╼ declare - _22
+│   │ └╼ var - var_spender_128
+│   ├╼ declare - expr_137
+│   │ └╼ var - _22
+│   ├╼ declare - _23
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   │   ├╼ var - expr_136
+│   │   └╼ var - expr_137
+│   ├╼ declare - _24
+│   │ └╼ read_from_storage_split_offset_0_t_uint256()
+│   │   └╼ var - _23
+│   ├╼ declare - expr_138
+│   │ └╼ var - _24
+│   ├╼ assign - var__132 
+│   │ └╼ var - expr_138
+│   └╼ leave
+├╼ function definition - fun_approve_166
+│ ├╼ params
+│ │ ├╼ var_spender_144
+│ │ └╼ var_amount_146
+│ ├╼ returns
+│ │ └╼ var__150
+│ └╼ body
+│   ├╼ declare - zero_t_bool_25
+│   │ └╼ zero_value_for_split_t_bool()
+│   ├╼ assign - var__150 
+│   │ └╼ var - zero_t_bool_25
+│   ├╼ declare - expr_155
+│   │ └╼ fun__msgSender_599()
+│   ├╼ declare - var_owner_153
+│   │ └╼ var - expr_155
+│   ├╼ declare - _26
+│   │ └╼ var - var_owner_153
+│   ├╼ declare - expr_158
+│   │ └╼ var - _26
+│   ├╼ declare - _27
+│   │ └╼ var - var_spender_144
+│   ├╼ declare - expr_159
+│   │ └╼ var - _27
+│   ├╼ declare - _28
+│   │ └╼ var - var_amount_146
+│   ├╼ declare - expr_160
+│   │ └╼ var - _28
+│   ├╼ fun__approve_521()
+│   │ ├╼ var - expr_158
+│   │ ├╼ var - expr_159
+│   │ └╼ var - expr_160
+│   ├╼ declare - expr_163
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__150 
+│   │ └╼ var - expr_163
+│   └╼ leave
+├╼ function definition - fun_transferFrom_199
+│ ├╼ params
+│ │ ├╼ var_from_169
+│ │ ├╼ var_to_171
+│ │ └╼ var_amount_173
+│ ├╼ returns
+│ │ └╼ var__177
+│ └╼ body
+│   ├╼ declare - zero_t_bool_29
+│   │ └╼ zero_value_for_split_t_bool()
+│   ├╼ assign - var__177 
+│   │ └╼ var - zero_t_bool_29
+│   ├╼ declare - expr_182
+│   │ └╼ fun__msgSender_599()
+│   ├╼ declare - var_spender_180
+│   │ └╼ var - expr_182
+│   ├╼ declare - _30
+│   │ └╼ var - var_from_169
+│   ├╼ declare - expr_185
+│   │ └╼ var - _30
+│   ├╼ declare - _31
+│   │ └╼ var - var_spender_180
+│   ├╼ declare - expr_186
+│   │ └╼ var - _31
+│   ├╼ declare - _32
+│   │ └╼ var - var_amount_173
+│   ├╼ declare - expr_187
+│   │ └╼ var - _32
+│   ├╼ fun__spendAllowance_564()
+│   │ ├╼ var - expr_185
+│   │ ├╼ var - expr_186
+│   │ └╼ var - expr_187
+│   ├╼ declare - _33
+│   │ └╼ var - var_from_169
+│   ├╼ declare - expr_191
+│   │ └╼ var - _33
+│   ├╼ declare - _34
+│   │ └╼ var - var_to_171
+│   ├╼ declare - expr_192
+│   │ └╼ var - _34
+│   ├╼ declare - _35
+│   │ └╼ var - var_amount_173
+│   ├╼ declare - expr_193
+│   │ └╼ var - _35
+│   ├╼ fun__transfer_348()
+│   │ ├╼ var - expr_191
+│   │ ├╼ var - expr_192
+│   │ └╼ var - expr_193
+│   ├╼ declare - expr_196
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__177 
+│   │ └╼ var - expr_196
+│   └╼ leave
+├╼ var - function
+├╼ panic_error_0x11()
+├╼ mstore()
+│ ├╼ 0
+│ └╼ 35408467139433450592217433187231851964531694900788300625387963629091585785856
+├╼ mstore()
+│ ├╼ 4
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ revert()
+│ ├╼ 0
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ function definition - checked_add_t_uint256
+│ ├╼ params
+│ │ ├╼ x
+│ │ └╼ y
+│ ├╼ returns
+│ │ └╼ sum
+│ └╼ body
+│   ├╼ assign - x 
+│   │ └╼ cleanup_t_uint256()
+│   │   └╼ var - x
+│   ├╼ assign - y 
+│   │ └╼ cleanup_t_uint256()
+│   │   └╼ var - y
+│   ├╼ if statement
+│   │ └╼ conditional
+│   │   ├╼ gt()
+│   │   │ ├╼ var - x
+│   │   │ └╼ sub()
+│   │   │   ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   │   │   └╼ var - y
+│   │   └╼ panic_error_0x11()
+│   └╼ assign - sum 
+│     └╼ add()
+│       ├╼ var - x
+│       └╼ var - y
+├╼ function definition - fun_increaseAllowance_229
+│ ├╼ params
+│ │ ├╼ var_spender_202
+│ │ └╼ var_addedValue_204
+│ ├╼ returns
+│ │ └╼ var__207
+│ └╼ body
+│   ├╼ declare - zero_t_bool_36
+│   │ └╼ zero_value_for_split_t_bool()
+│   ├╼ assign - var__207 
+│   │ └╼ var - zero_t_bool_36
+│   ├╼ declare - expr_212
+│   │ └╼ fun__msgSender_599()
+│   ├╼ declare - var_owner_210
+│   │ └╼ var - expr_212
+│   ├╼ declare - _37
+│   │ └╼ var - var_owner_210
+│   ├╼ declare - expr_215
+│   │ └╼ var - _37
+│   ├╼ declare - _38
+│   │ └╼ var - var_spender_202
+│   ├╼ declare - expr_216
+│   │ └╼ var - _38
+│   ├╼ declare - _39
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_217
+│   │ └╼ var - _39
+│   ├╼ declare - _40
+│   │ └╼ var - var_owner_210
+│   ├╼ declare - expr_218
+│   │ └╼ var - _40
+│   ├╼ declare - _41
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address()
+│   │   ├╼ var - expr_217
+│   │   └╼ var - expr_218
+│   ├╼ declare - _42
+│   │ └╼ var - _41
+│   ├╼ declare - expr_219
+│   │ └╼ var - _42
+│   ├╼ declare - _43
+│   │ └╼ var - var_spender_202
+│   ├╼ declare - expr_220
+│   │ └╼ var - _43
+│   ├╼ declare - _44
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   │   ├╼ var - expr_219
+│   │   └╼ var - expr_220
+│   ├╼ declare - _45
+│   │ └╼ read_from_storage_split_offset_0_t_uint256()
+│   │   └╼ var - _44
+│   ├╼ declare - expr_221
+│   │ └╼ var - _45
+│   ├╼ declare - _46
+│   │ └╼ var - var_addedValue_204
+│   ├╼ declare - expr_222
+│   │ └╼ var - _46
+│   ├╼ declare - expr_223
+│   │ └╼ checked_add_t_uint256()
+│   │   ├╼ var - expr_221
+│   │   └╼ var - expr_222
+│   ├╼ fun__approve_521()
+│   │ ├╼ var - expr_215
+│   │ ├╼ var - expr_216
+│   │ └╼ var - expr_223
+│   ├╼ declare - expr_226
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__207 
+│   │ └╼ var - expr_226
+│   └╼ leave
+├╼ var - function
+├╼ store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: decreased allowance below
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼  zero
+├╼ function definition - abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 37
+│   ├╼ store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ function definition - wrapping_sub_t_uint256
+│ ├╼ params
+│ │ ├╼ x
+│ │ └╼ y
+│ ├╼ returns
+│ │ └╼ diff
+│ └╼ body
+│   └╼ assign - diff 
+│     └╼ cleanup_t_uint256()
+│       └╼ sub()
+│         ├╼ var - x
+│         └╼ var - y
+├╼ function definition - fun_decreaseAllowance_271
+│ ├╼ params
+│ │ ├╼ var_spender_232
+│ │ └╼ var_subtractedValue_234
+│ ├╼ returns
+│ │ └╼ var__237
+│ └╼ body
+│   ├╼ declare - zero_t_bool_47
+│   │ └╼ zero_value_for_split_t_bool()
+│   ├╼ assign - var__237 
+│   │ └╼ var - zero_t_bool_47
+│   ├╼ declare - expr_242
+│   │ └╼ fun__msgSender_599()
+│   ├╼ declare - var_owner_240
+│   │ └╼ var - expr_242
+│   ├╼ declare - _48
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - expr_246
+│   │ └╼ var - _48
+│   ├╼ declare - _49
+│   │ └╼ var - var_owner_240
+│   ├╼ declare - expr_247
+│   │ └╼ var - _49
+│   ├╼ declare - _50
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address()
+│   │   ├╼ var - expr_246
+│   │   └╼ var - expr_247
+│   ├╼ declare - _51
+│   │ └╼ var - _50
+│   ├╼ declare - expr_248
+│   │ └╼ var - _51
+│   ├╼ declare - _52
+│   │ └╼ var - var_spender_232
+│   ├╼ declare - expr_249
+│   │ └╼ var - _52
+│   ├╼ declare - _53
+│   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   │   ├╼ var - expr_248
+│   │   └╼ var - expr_249
+│   ├╼ declare - _54
+│   │ └╼ read_from_storage_split_offset_0_t_uint256()
+│   │   └╼ var - _53
+│   ├╼ declare - expr_250
+│   │ └╼ var - _54
+│   ├╼ declare - var_currentAllowance_245
+│   │ └╼ var - expr_250
+│   ├╼ declare - _55
+│   │ └╼ var - var_currentAllowance_245
+│   ├╼ declare - expr_253
+│   │ └╼ var - _55
+│   ├╼ declare - _56
+│   │ └╼ var - var_subtractedValue_234
+│   ├╼ declare - expr_254
+│   │ └╼ var - _56
+│   ├╼ declare - expr_255
+│   │ └╼ iszero()
+│   │   └╼ lt()
+│   │     ├╼ cleanup_t_uint256()
+│   │     │ └╼ var - expr_253
+│   │     └╼ cleanup_t_uint256()
+│   │       └╼ var - expr_254
+│   ├╼ require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8()
+│   │ └╼ var - expr_255
+│   ├╼ declare - _57
+│   │ └╼ var - var_owner_240
+│   ├╼ declare - expr_260
+│   │ └╼ var - _57
+│   ├╼ declare - _58
+│   │ └╼ var - var_spender_232
+│   ├╼ declare - expr_261
+│   │ └╼ var - _58
+│   ├╼ declare - _59
+│   │ └╼ var - var_currentAllowance_245
+│   ├╼ declare - expr_262
+│   │ └╼ var - _59
+│   ├╼ declare - _60
+│   │ └╼ var - var_subtractedValue_234
+│   ├╼ declare - expr_263
+│   │ └╼ var - _60
+│   ├╼ declare - expr_264
+│   │ └╼ wrapping_sub_t_uint256()
+│   │   ├╼ var - expr_262
+│   │   └╼ var - expr_263
+│   ├╼ fun__approve_521()
+│   │ ├╼ var - expr_260
+│   │ ├╼ var - expr_261
+│   │ └╼ var - expr_264
+│   ├╼ declare - expr_268
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - var__237 
+│   │ └╼ var - expr_268
+│   └╼ leave
+├╼ function definition - cleanup_t_rational_0_by_1
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ cleaned
+│ └╼ body
+│   └╼ assign - cleaned 
+│     └╼ var - value
+├╼ function definition - convert_t_rational_0_by_1_to_t_uint160
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ cleanup_t_uint160()
+│       └╼ identity()
+│         └╼ cleanup_t_rational_0_by_1()
+│           └╼ var - value
+├╼ function definition - convert_t_rational_0_by_1_to_t_address
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ convert_t_rational_0_by_1_to_t_uint160()
+│       └╼ var - value
+├╼ var - function
+├╼ store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: transfer from the zero ad
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼ dress
+├╼ function definition - abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 37
+│   ├╼ store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ var - function
+├╼ store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: transfer to the zero addr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼ ess
+├╼ function definition - abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 35
+│   ├╼ store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ var - function
+├╼ store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: transfer amount exceeds b
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼ alance
+├╼ function definition - abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 38
+│   ├╼ store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ function definition - shift_left_0
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ newValue
+│ └╼ body
+│   └╼ assign - newValue 
+│     └╼ shl()
+│       ├╼ 0
+│       └╼ var - value
+├╼ function definition - update_byte_slice_32_shift_0
+│ ├╼ params
+│ │ ├╼ value
+│ │ └╼ toInsert
+│ ├╼ returns
+│ │ └╼ result
+│ └╼ body
+│   ├╼ declare - mask
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ assign - toInsert 
+│   │ └╼ shift_left_0()
+│   │   └╼ var - toInsert
+│   ├╼ assign - value 
+│   │ └╼ and()
+│   │   ├╼ var - value
+│   │   └╼ not()
+│   │     └╼ var - mask
+│   └╼ assign - result 
+│     └╼ or()
+│       ├╼ var - value
+│       └╼ and()
+│         ├╼ var - toInsert
+│         └╼ var - mask
+├╼ function definition - convert_t_uint256_to_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ converted
+│ └╼ body
+│   └╼ assign - converted 
+│     └╼ cleanup_t_uint256()
+│       └╼ identity()
+│         └╼ cleanup_t_uint256()
+│           └╼ var - value
+├╼ function definition - prepare_store_t_uint256
+│ ├╼ params
+│ │ └╼ value
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ var - value
+├╼ var - function
+├╼ update_storage_value_offset_0t_uint256_to_t_uint256()
+│ ├╼ var - slot
+│ └╼ var - value_0
+├╼ declare - convertedValue_0
+│ └╼ convert_t_uint256_to_t_uint256()
+│   └╼ var - value_0
+├╼ sstore()
+│ ├╼ var - slot
+│ └╼ update_byte_slice_32_shift_0()
+│   ├╼ sload()
+│   │ └╼ var - slot
+│   └╼ prepare_store_t_uint256()
+│     └╼ var - convertedValue_0
+├╼ var - function
+├╼ fun__transfer_348()
+│ ├╼ var - var_from_274
+│ ├╼ var - var_to_276
+│ └╼ var - var_amount_278
+├╼ declare - _61
+│ └╼ var - var_from_274
+├╼ declare - expr_282
+│ └╼ var - _61
+├╼ declare - expr_285
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_286
+│ └╼ convert_t_rational_0_by_1_to_t_address()
+│   └╼ var - expr_285
+├╼ declare - expr_287
+│ └╼ iszero()
+│   └╼ eq()
+│     ├╼ cleanup_t_address()
+│     │ └╼ var - expr_282
+│     └╼ cleanup_t_address()
+│       └╼ var - expr_286
+├╼ require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea()
+│ └╼ var - expr_287
+├╼ declare - _62
+│ └╼ var - var_to_276
+├╼ declare - expr_292
+│ └╼ var - _62
+├╼ declare - expr_295
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_296
+│ └╼ convert_t_rational_0_by_1_to_t_address()
+│   └╼ var - expr_295
+├╼ declare - expr_297
+│ └╼ iszero()
+│   └╼ eq()
+│     ├╼ cleanup_t_address()
+│     │ └╼ var - expr_292
+│     └╼ cleanup_t_address()
+│       └╼ var - expr_296
+├╼ require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f()
+│ └╼ var - expr_297
+├╼ declare - _63
+│ └╼ var - var_from_274
+├╼ declare - expr_302
+│ └╼ var - _63
+├╼ declare - _64
+│ └╼ var - var_to_276
+├╼ declare - expr_303
+│ └╼ var - _64
+├╼ declare - _65
+│ └╼ var - var_amount_278
+├╼ declare - expr_304
+│ └╼ var - _65
+├╼ fun__beforeTokenTransfer_575()
+│ ├╼ var - expr_302
+│ ├╼ var - expr_303
+│ └╼ var - expr_304
+├╼ declare - _66
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_309
+│ └╼ var - _66
+├╼ declare - _67
+│ └╼ var - var_from_274
+├╼ declare - expr_310
+│ └╼ var - _67
+├╼ declare - _68
+│ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   ├╼ var - expr_309
+│   └╼ var - expr_310
+├╼ declare - _69
+│ └╼ read_from_storage_split_offset_0_t_uint256()
+│   └╼ var - _68
+├╼ declare - expr_311
+│ └╼ var - _69
+├╼ declare - var_fromBalance_308
+│ └╼ var - expr_311
+├╼ declare - _70
+│ └╼ var - var_fromBalance_308
+├╼ declare - expr_314
+│ └╼ var - _70
+├╼ declare - _71
+│ └╼ var - var_amount_278
+├╼ declare - expr_315
+│ └╼ var - _71
+├╼ declare - expr_316
+│ └╼ iszero()
+│   └╼ lt()
+│     ├╼ cleanup_t_uint256()
+│     │ └╼ var - expr_314
+│     └╼ cleanup_t_uint256()
+│       └╼ var - expr_315
+├╼ require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6()
+│ └╼ var - expr_316
+├╼ declare - _72
+│ └╼ var - var_fromBalance_308
+├╼ declare - expr_323
+│ └╼ var - _72
+├╼ declare - _73
+│ └╼ var - var_amount_278
+├╼ declare - expr_324
+│ └╼ var - _73
+├╼ declare - expr_325
+│ └╼ wrapping_sub_t_uint256()
+│   ├╼ var - expr_323
+│   └╼ var - expr_324
+├╼ declare - _74
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_320
+│ └╼ var - _74
+├╼ declare - _75
+│ └╼ var - var_from_274
+├╼ declare - expr_321
+│ └╼ var - _75
+├╼ declare - _76
+│ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   ├╼ var - expr_320
+│   └╼ var - expr_321
+├╼ update_storage_value_offset_0t_uint256_to_t_uint256()
+│ ├╼ var - _76
+│ └╼ var - expr_325
+├╼ declare - expr_326
+│ └╼ var - expr_325
+├╼ declare - _77
+│ └╼ var - var_amount_278
+├╼ declare - expr_332
+│ └╼ var - _77
+├╼ declare - _78
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_329
+│ └╼ var - _78
+├╼ declare - _79
+│ └╼ var - var_to_276
+├╼ declare - expr_330
+│ └╼ var - _79
+├╼ declare - _80
+│ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   ├╼ var - expr_329
+│   └╼ var - expr_330
+├╼ declare - _81
+│ └╼ read_from_storage_split_offset_0_t_uint256()
+│   └╼ var - _80
+├╼ declare - expr_333
+│ └╼ checked_add_t_uint256()
+│   ├╼ var - _81
+│   └╼ var - expr_332
+├╼ update_storage_value_offset_0t_uint256_to_t_uint256()
+│ ├╼ var - _80
+│ └╼ var - expr_333
+├╼ declare - _82
+│ └╼ var - var_from_274
+├╼ declare - expr_336
+│ └╼ var - _82
+├╼ declare - _83
+│ └╼ var - var_to_276
+├╼ declare - expr_337
+│ └╼ var - _83
+├╼ declare - _84
+│ └╼ var - var_amount_278
+├╼ declare - expr_338
+│ └╼ var - _84
+├╼ declare - _85
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - _86
+│ └╼ convert_t_address_to_t_address()
+│   └╼ var - expr_336
+├╼ declare - _87
+│ └╼ convert_t_address_to_t_address()
+│   └╼ var - expr_337
+├╼ declare - _88
+│ └╼ allocate_unbounded()
+├╼ declare - _89
+│ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack()
+│   ├╼ var - _88
+│   └╼ var - expr_338
+├╼ log3()
+│ ├╼ var - _88
+│ ├╼ sub()
+│ │ ├╼ var - _89
+│ │ └╼ var - _88
+│ ├╼ var - _85
+│ ├╼ var - _86
+│ └╼ var - _87
+├╼ declare - _90
+│ └╼ var - var_from_274
+├╼ declare - expr_342
+│ └╼ var - _90
+├╼ declare - _91
+│ └╼ var - var_to_276
+├╼ declare - expr_343
+│ └╼ var - _91
+├╼ declare - _92
+│ └╼ var - var_amount_278
+├╼ declare - expr_344
+│ └╼ var - _92
+├╼ fun__afterTokenTransfer_586()
+│ ├╼ var - expr_342
+│ ├╼ var - expr_343
+│ └╼ var - expr_344
+├╼ var - function
+├╼ store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: approve from the zero add
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼ ress
+├╼ function definition - abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 36
+│   ├╼ store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ var - function
+├╼ store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: approve to the zero addre
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 32
+│ └╼ ss
+├╼ function definition - abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 34
+│   ├╼ store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 64
+├╼ function definition - abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ var - function
+├╼ fun__approve_521()
+│ ├╼ var - var_owner_479
+│ ├╼ var - var_spender_481
+│ └╼ var - var_amount_483
+├╼ declare - _93
+│ └╼ var - var_owner_479
+├╼ declare - expr_487
+│ └╼ var - _93
+├╼ declare - expr_490
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_491
+│ └╼ convert_t_rational_0_by_1_to_t_address()
+│   └╼ var - expr_490
+├╼ declare - expr_492
+│ └╼ iszero()
+│   └╼ eq()
+│     ├╼ cleanup_t_address()
+│     │ └╼ var - expr_487
+│     └╼ cleanup_t_address()
+│       └╼ var - expr_491
+├╼ require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208()
+│ └╼ var - expr_492
+├╼ declare - _94
+│ └╼ var - var_spender_481
+├╼ declare - expr_497
+│ └╼ var - _94
+├╼ declare - expr_500
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_501
+│ └╼ convert_t_rational_0_by_1_to_t_address()
+│   └╼ var - expr_500
+├╼ declare - expr_502
+│ └╼ iszero()
+│   └╼ eq()
+│     ├╼ cleanup_t_address()
+│     │ └╼ var - expr_497
+│     └╼ cleanup_t_address()
+│       └╼ var - expr_501
+├╼ require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029()
+│ └╼ var - expr_502
+├╼ declare - _95
+│ └╼ var - var_amount_483
+├╼ declare - expr_511
+│ └╼ var - _95
+├╼ declare - _96
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_506
+│ └╼ var - _96
+├╼ declare - _97
+│ └╼ var - var_owner_479
+├╼ declare - expr_507
+│ └╼ var - _97
+├╼ declare - _98
+│ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address()
+│   ├╼ var - expr_506
+│   └╼ var - expr_507
+├╼ declare - _99
+│ └╼ var - _98
+├╼ declare - expr_509
+│ └╼ var - _99
+├╼ declare - _100
+│ └╼ var - var_spender_481
+├╼ declare - expr_508
+│ └╼ var - _100
+├╼ declare - _101
+│ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address()
+│   ├╼ var - expr_509
+│   └╼ var - expr_508
+├╼ update_storage_value_offset_0t_uint256_to_t_uint256()
+│ ├╼ var - _101
+│ └╼ var - expr_511
+├╼ declare - expr_512
+│ └╼ var - expr_511
+├╼ declare - _102
+│ └╼ var - var_owner_479
+├╼ declare - expr_515
+│ └╼ var - _102
+├╼ declare - _103
+│ └╼ var - var_spender_481
+├╼ declare - expr_516
+│ └╼ var - _103
+├╼ declare - _104
+│ └╼ var - var_amount_483
+├╼ declare - expr_517
+│ └╼ var - _104
+├╼ declare - _105
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - _106
+│ └╼ convert_t_address_to_t_address()
+│   └╼ var - expr_515
+├╼ declare - _107
+│ └╼ convert_t_address_to_t_address()
+│   └╼ var - expr_516
+├╼ declare - _108
+│ └╼ allocate_unbounded()
+├╼ declare - _109
+│ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack()
+│   ├╼ var - _108
+│   └╼ var - expr_517
+├╼ log3()
+│ ├╼ var - _108
+│ ├╼ sub()
+│ │ ├╼ var - _109
+│ │ └╼ var - _108
+│ ├╼ var - _105
+│ ├╼ var - _106
+│ └╼ var - _107
+├╼ var - function
+├╼ store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe()
+│ └╼ var - memPtr
+├╼ mstore()
+│ ├╼ add()
+│ │ ├╼ var - memPtr
+│ │ └╼ 0
+│ └╼ ERC20: insufficient allowance
+├╼ function definition - abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack
+│ ├╼ params
+│ │ └╼ pos
+│ ├╼ returns
+│ │ └╼ end
+│ └╼ body
+│   ├╼ assign - pos 
+│   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
+│   │   ├╼ var - pos
+│   │   └╼ 29
+│   ├╼ store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe()
+│   │ └╼ var - pos
+│   └╼ assign - end 
+│     └╼ add()
+│       ├╼ var - pos
+│       └╼ 32
+├╼ function definition - abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack
+│ ├╼ params
+│ │ └╼ headStart
+│ ├╼ returns
+│ │ └╼ tail
+│ └╼ body
+│   ├╼ assign - tail 
+│   │ └╼ add()
+│   │   ├╼ var - headStart
+│   │   └╼ 32
+│   ├╼ mstore()
+│   │ ├╼ add()
+│   │ │ ├╼ var - headStart
+│   │ │ └╼ 0
+│   │ └╼ sub()
+│   │   ├╼ var - tail
+│   │   └╼ var - headStart
+│   └╼ assign - tail 
+│     └╼ abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack()
+│       └╼ var - tail
+├╼ var - function
+├╼ require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe()
+│ └╼ var - condition
+├╼ if statement
+│ └╼ conditional
+│   ├╼ iszero()
+│   │ └╼ var - condition
+│   ├╼ declare - memPtr
+│   │ └╼ allocate_unbounded()
+│   ├╼ mstore()
+│   │ ├╼ var - memPtr
+│   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+│   ├╼ declare - end
+│   │ └╼ abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack()
+│   │   └╼ add()
+│   │     ├╼ var - memPtr
+│   │     └╼ 4
+│   └╼ revert()
+│     ├╼ var - memPtr
+│     └╼ sub()
+│       ├╼ var - end
+│       └╼ var - memPtr
+├╼ var - function
+├╼ fun__spendAllowance_564()
+│ ├╼ var - var_owner_524
+│ ├╼ var - var_spender_526
+│ └╼ var - var_amount_528
+├╼ declare - _110
+│ └╼ var - var_owner_524
+├╼ declare - expr_534
+│ └╼ var - _110
+├╼ declare - _111
+│ └╼ var - var_spender_526
+├╼ declare - expr_535
+│ └╼ var - _111
+├╼ declare - expr_536
+│ └╼ fun_allowance_141()
+│   ├╼ var - expr_534
+│   └╼ var - expr_535
+├╼ declare - var_currentAllowance_532
+│ └╼ var - expr_536
+├╼ declare - _112
+│ └╼ var - var_currentAllowance_532
+├╼ declare - expr_538
+│ └╼ var - _112
+├╼ declare - expr_543
+│ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
+├╼ declare - expr_544
+│ └╼ iszero()
+│   └╼ eq()
+│     ├╼ cleanup_t_uint256()
+│     │ └╼ var - expr_538
+│     └╼ cleanup_t_uint256()
+│       └╼ var - expr_543
+├╼ if statement
+│ └╼ conditional
+│   ├╼ var - expr_544
+│   ├╼ declare - _113
+│   │ └╼ var - var_currentAllowance_532
+│   ├╼ declare - expr_546
+│   │ └╼ var - _113
+│   ├╼ declare - _114
+│   │ └╼ var - var_amount_528
+│   ├╼ declare - expr_547
+│   │ └╼ var - _114
+│   ├╼ declare - expr_548
+│   │ └╼ iszero()
+│   │   └╼ lt()
+│   │     ├╼ cleanup_t_uint256()
+│   │     │ └╼ var - expr_546
+│   │     └╼ cleanup_t_uint256()
+│   │       └╼ var - expr_547
+│   ├╼ require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe()
+│   │ └╼ var - expr_548
+│   ├╼ declare - _115
+│   │ └╼ var - var_owner_524
+│   ├╼ declare - expr_553
+│   │ └╼ var - _115
+│   ├╼ declare - _116
+│   │ └╼ var - var_spender_526
+│   ├╼ declare - expr_554
+│   │ └╼ var - _116
+│   ├╼ declare - _117
+│   │ └╼ var - var_currentAllowance_532
+│   ├╼ declare - expr_555
+│   │ └╼ var - _117
+│   ├╼ declare - _118
+│   │ └╼ var - var_amount_528
+│   ├╼ declare - expr_556
+│   │ └╼ var - _118
+│   ├╼ declare - expr_557
+│   │ └╼ wrapping_sub_t_uint256()
+│   │   ├╼ var - expr_555
+│   │   └╼ var - expr_556
+│   └╼ fun__approve_521()
+│     ├╼ var - expr_553
+│     ├╼ var - expr_554
+│     └╼ var - expr_557
+├╼ var - function
+├╼ fun__beforeTokenTransfer_575()
+│ ├╼ var - var_from_567
+│ ├╼ var - var_to_569
+│ └╼ var - var_amount_571
+├╼ var - function
+├╼ fun__afterTokenTransfer_586()
+│ ├╼ var - var_from_578
+│ ├╼ var - var_to_580
+│ └╼ var - var_amount_582
+├╼ function definition - zero_value_for_split_t_address
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ ret
+│ └╼ body
+│   └╼ assign - ret 
+│     └╼ 0
+├╼ function definition - fun__msgSender_599
+│ ├╼ params
+│ ├╼ returns
+│ │ └╼ var__593
+│ └╼ body
+│   ├╼ declare - zero_t_address_119
+│   │ └╼ zero_value_for_split_t_address()
+│   ├╼ assign - var__593 
+│   │ └╼ var - zero_t_address_119
+│   ├╼ declare - expr_596
+│   │ └╼ caller()
+│   ├╼ assign - var__593 
+│   │ └╼ var - expr_596
+│   └╼ leave
+├╼ var - data
+├╼ .metadata
+└╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935

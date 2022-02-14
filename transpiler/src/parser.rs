@@ -365,7 +365,9 @@ mod tests {
     fn parse_if() {
         insta::assert_snapshot!(parse_to_tree(
             "
-        if callvalue() { revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb() }
+            if lt(i, 2) {
+               mstore(i, 1)
+            }
             "
         ));
     }
