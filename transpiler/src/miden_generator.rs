@@ -89,6 +89,22 @@ impl Transpiler {
         }
     }
 
+    fn drop_after(&mut self, n: usize) {
+        let stack_size = self.stack.0.len();
+        for n in (0..n) {
+            let shift = stack_size - 1;
+            if shift == 1 {
+                self.add_line(&format!("swap"));
+            } else {
+                self.add_line(&format!("movdn.{}", shift));
+            }
+        }
+        for n in (n..stack_size).rev() {
+            self.stack.0.remove(n);
+            self.add_line(&format!("drop"));
+        }
+    }
+
     fn top_is_var(&mut self, identifier: &str) {
         let idents = self.stack.0.get_mut(0).unwrap();
         idents.clear();
@@ -222,6 +238,7 @@ impl Transpiler {
         for return_ident in &op.returns {
             self.push_ref_to_top(&return_ident);
         }
+        self.drop_after(op.returns.len());
         self.indentation -= 4;
         self.add_line("end");
     }
