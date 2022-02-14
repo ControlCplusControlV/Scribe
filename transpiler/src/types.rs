@@ -23,6 +23,7 @@ pub enum Expr {
 pub enum ExprLiteral {
     Number(U256),
     String(String),
+    Bool(bool),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -101,6 +102,7 @@ impl Expr {
             Expr::Literal(literal) => match literal {
                 ExprLiteral::Number(x) => tree.add_leaf(&x.to_string()),
                 ExprLiteral::String(x) => tree.add_leaf(&x),
+                ExprLiteral::Bool(x) => tree.add_leaf(&x),
             },
 
             //is function call

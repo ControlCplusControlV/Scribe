@@ -203,12 +203,13 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let content = expression.into_inner().next().unwrap();
             Expr::Literal(ExprLiteral::String(content.as_str().to_string()))
         }
-        Rule::false_literal => {
-            todo!()
-        }
-        Rule::true_literal => {
-            todo!()
-        }
+
+        //rule is a false literal
+        Rule::false_literal => Expr::Literal(ExprLiteral::Bool(false)),
+
+        //rule is a true literal
+        Rule::true_literal => Expr::Literal(ExprLiteral::Bool(true)),
+
         //if the matched rule is an identifier
         Rule::identifier => parse_identifier(expression),
 
