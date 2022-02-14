@@ -103,25 +103,16 @@ mod tests {
         run_example(
             "
             function foo() -> b {
-                let b := 5
+                let b := 7
             }
-            add(foo(), 1)
-            ",
-            vec![6],
-        );
-    }
-
-    #[test]
-    fn integration_function_stack_management() {
-        run_example(
-            "
-            function foo() -> b {
-                let b := 5
-                let a := 3
+            function bar() -> f {
+                let a := 2
+                let b := 3
+                let f := add(a, b)
             }
-            mul(foo(), 3)
+            mul(foo(), bar())
             ",
-            vec![15],
+            vec![35],
         );
     }
 

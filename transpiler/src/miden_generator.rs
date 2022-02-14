@@ -11,7 +11,7 @@ struct Transpiler {
     next_open_memory_address: u32,
     stack: Stack,
     program: String,
-    user_functions: HashSet<String>,
+    user_functions: HashMap<String, Stack>,
 }
 
 type StackValue = HashSet<String>;
@@ -37,8 +37,6 @@ impl Transpiler {
     }
 
     fn target_stack(&mut self, target_stack: Stack) {
-        dbg!(&self.stack);
-        dbg!(&target_stack);
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
             self.push_refs_to_top(v);
@@ -52,7 +50,6 @@ impl Transpiler {
     fn push_ref_to_top(&mut self, identifier: &str) {
         let mut identifiers = HashSet::new();
         identifiers.insert(identifier.to_string());
-        dbg!(&self.stack);
         let location = self
             .stack
             .0
@@ -64,7 +61,6 @@ impl Transpiler {
     }
 
     fn push_refs_to_top(&mut self, identifiers: &HashSet<String>) {
-        dbg!(&identifiers);
         // TODO: need to figure out what to do when we're targeting a stack that has stack values
         // w/ multiple references, there are probably cases that fail currently, where variables
         // are equal to each other before a for loop but not after
@@ -98,17 +94,26 @@ impl Transpiler {
             } else {
                 self.add_line(&format!("movdn.{}", shift));
             }
+            self.stack.0.swap(n, stack_size - 1);
         }
-        for n in (n..stack_size).rev() {
-            self.stack.0.remove(n);
+        for i in (n..stack_size).rev() {
+            self.stack.0.remove(0);
             self.add_line(&format!("drop"));
         }
+        println!("Stack after dropping stuff {:?}", self.stack);
     }
 
     fn top_is_var(&mut self, identifier: &str) {
         let idents = self.stack.0.get_mut(0).unwrap();
         idents.clear();
         idents.insert(identifier.to_string());
+    }
+
+    fn add_function_stack(&mut self, function_stack: &Stack) {
+        let mut new_stack = Stack::default();
+        new_stack.0.append(&mut self.stack.0.clone());
+        new_stack.0.append(&mut function_stack.0.clone());
+        self.stack = new_stack;
     }
 }
 
@@ -124,14 +129,12 @@ impl Transpiler {
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
-        dbg!(&op);
         // TODO: in the future we should be able to just mark that two variables share the same
         // stack address, but I can't quite figure it out for the fibonacci example currently
         if let Expr::Variable(ExprVariableReference {
             identifier: target_ident,
         }) = &*op.rhs
         {
-            dbg!(&op.identifier);
             self.equate_reference(&op.identifier.clone(), target_ident);
         } else {
             self.transpile_op(&op.rhs);
@@ -173,8 +176,9 @@ impl Transpiler {
     }
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
-        if self.user_functions.contains(&op.function_name) {
+        if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
             self.add_line(&format!("exec.{}", op.function_name));
+            self.add_function_stack(function_stack);
             return;
         }
         // TODO: All functions are assumed to consume 2 stack elements and add one, for now
@@ -230,7 +234,6 @@ impl Transpiler {
     //TODO: stack management not quite working
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
         // let stack_target = self.stack.clone();
-        self.user_functions.insert(op.function_name.clone());
         self.add_line(&format!("proc.{}", op.function_name));
         self.indentation += 4;
         self.transpile_block(&op.block);
@@ -239,8 +242,12 @@ impl Transpiler {
             self.push_ref_to_top(&return_ident);
         }
         self.drop_after(op.returns.len());
+        let function_stack = self.stack.clone();
+        self.stack = Stack::default();
         self.indentation -= 4;
         self.add_line("end");
+        self.user_functions
+            .insert(op.function_name.clone(), function_stack);
     }
 
     //TODO: update placeholder
@@ -304,7 +311,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         indentation: 0,
         stack: Stack::default(),
         program: "".to_string(),
-        user_functions: HashSet::default(),
+        user_functions: HashMap::default(),
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {
