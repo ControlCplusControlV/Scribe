@@ -192,6 +192,7 @@ impl Transpiler {
                 self.push(*v);
             }
             ExprLiteral::String(_) => todo!(),
+            &ExprLiteral::Bool(_) => todo!(),
         }
     }
 
