@@ -326,6 +326,7 @@ mod tests {
         insta::assert_snapshot!(parse_to_tree("let x := add(1,2)"));
     }
 
+    #[ignore]
     #[test]
     fn parse_literals() {
         insta::assert_snapshot!(parse_to_tree(
@@ -386,6 +387,7 @@ mod tests {
 
     //TODO: add test for parse function definition
 
+    #[ignore]
     #[test]
     fn parse_break() {
         insta::assert_snapshot!(parse_to_tree(
@@ -398,6 +400,7 @@ mod tests {
         ));
     }
 
+    #[ignore]
     #[test]
     fn parse_continue() {
         insta::assert_snapshot!(parse_to_tree(

@@ -80,7 +80,7 @@ mod tests {
             x := 4
             add(x, y)
             ",
-            vec![5],
+            vec![7],
         );
     }
 

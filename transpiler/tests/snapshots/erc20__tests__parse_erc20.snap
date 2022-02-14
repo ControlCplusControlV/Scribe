@@ -36,9 +36,9 @@ AST
 ├╼ function definition - allocate_unbounded
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ memPtr
+│ │ └╼ var - memPtr
 │ └╼ body
-│   └╼ assign - memPtr 
+│   └╼ assign - memPtr
 │     └╼ mload()
 │       └╼ 64
 ├╼ var - function
@@ -48,11 +48,11 @@ AST
 │ └╼ 0
 ├╼ function definition - round_up_to_mul_of_32
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ and()
 │       ├╼ add()
 │       │ ├╼ var - value
@@ -94,11 +94,11 @@ AST
 │ └╼ var - newFreePtr
 ├╼ function definition - allocate_memory
 │ ├╼ params
-│ │ └╼ size
+│ │ └╼ var - size
 │ ├╼ returns
-│ │ └╼ memPtr
+│ │ └╼ var - memPtr
 │ └╼ body
-│   ├╼ assign - memPtr 
+│   ├╼ assign - memPtr
 │   │ └╼ allocate_unbounded()
 │   └╼ finalize_allocation()
 │     ├╼ var - memPtr
@@ -125,9 +125,9 @@ AST
 │ └╼ 0
 ├╼ function definition - array_allocation_size_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ length
+│ │ └╼ var - length
 │ ├╼ returns
-│ │ └╼ size
+│ │ └╼ var - size
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -135,10 +135,10 @@ AST
 │   │   │ ├╼ var - length
 │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │   └╼ panic_error_0x41()
-│   ├╼ assign - size 
+│   ├╼ assign - size
 │   │ └╼ round_up_to_mul_of_32()
 │   │   └╼ var - length
-│   └╼ assign - size 
+│   └╼ assign - size
 │     └╼ add()
 │       ├╼ var - size
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -156,7 +156,7 @@ AST
 │ │   ├╼ var - i
 │ │   └╼ var - length
 │ ├╼ after block
-│ │ └╼ assign - i 
+│ │ └╼ assign - i
 │ │   └╼ add()
 │ │     ├╼ var - i
 │ │     └╼ 32
@@ -180,13 +180,13 @@ AST
 │ └╼ 0
 ├╼ function definition - abi_decode_available_length_t_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ src
-│ │ ├╼ length
-│ │ └╼ end
+│ │ ├╼ var - src
+│ │ ├╼ var - length
+│ │ └╼ var - end
 │ ├╼ returns
-│ │ └╼ array
+│ │ └╼ var - array
 │ └╼ body
-│   ├╼ assign - array 
+│   ├╼ assign - array
 │   │ └╼ allocate_memory()
 │   │   └╼ array_allocation_size_t_string_memory_ptr()
 │   │     └╼ var - length
@@ -211,10 +211,10 @@ AST
 │     └╼ var - length
 ├╼ function definition - abi_decode_t_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ offset
-│ │ └╼ end
+│ │ ├╼ var - offset
+│ │ └╼ var - end
 │ ├╼ returns
-│ │ └╼ array
+│ │ └╼ var - array
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -228,7 +228,7 @@ AST
 │   ├╼ declare - length
 │   │ └╼ mload()
 │   │   └╼ var - offset
-│   └╼ assign - array 
+│   └╼ assign - array
 │     └╼ abi_decode_available_length_t_string_memory_ptr_fromMemory()
 │       ├╼ add()
 │       │ ├╼ var - offset
@@ -237,11 +237,11 @@ AST
 │       └╼ var - end
 ├╼ function definition - abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ dataEnd
+│ │ ├╼ var - headStart
+│ │ └╼ var - dataEnd
 │ ├╼ returns
-│ │ ├╼ value0
-│ │ └╼ value1
+│ │ ├╼ var - value0
+│ │ └╼ var - value1
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -262,7 +262,7 @@ AST
 │   │   │ ├╼ var - offset
 │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │   └╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
-│   ├╼ assign - value0 
+│   ├╼ assign - value0
 │   │ └╼ abi_decode_t_string_memory_ptr_fromMemory()
 │   │   ├╼ add()
 │   │   │ ├╼ var - headStart
@@ -279,7 +279,7 @@ AST
 │   │   │ ├╼ var - offset
 │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │   └╼ revert_error_c1322bf8034eace5e0b5c7295db60986aa89aae5e0ea0873e4689e076861a5db()
-│   └╼ assign - value1 
+│   └╼ assign - value1
 │     └╼ abi_decode_t_string_memory_ptr_fromMemory()
 │       ├╼ add()
 │       │ ├╼ var - headStart
@@ -288,8 +288,8 @@ AST
 ├╼ function definition - copy_arguments_for_constructor_44_object_ERC20_587
 │ ├╼ params
 │ ├╼ returns
-│ │ ├╼ ret_param_0
-│ │ └╼ ret_param_1
+│ │ ├╼ var - ret_param_0
+│ │ └╼ var - ret_param_1
 │ └╼ body
 │   ├╼ declare - programSize
 │   │ └╼ datasize()
@@ -305,7 +305,7 @@ AST
 │   │ ├╼ var - memoryDataOffset
 │   │ ├╼ var - programSize
 │   │ └╼ var - argSize
-│   └╼ assign - ret_param_0, ret_param_1
+│   └╼ assign - ret_param_0
 │     └╼ abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory()
 │       ├╼ var - memoryDataOffset
 │       └╼ add()
@@ -324,11 +324,11 @@ AST
 │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - array_length_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ length
+│ │ └╼ var - length
 │ └╼ body
-│   └╼ assign - length 
+│   └╼ assign - length
 │     └╼ mload()
 │       └╼ var - value
 ├╼ var - function
@@ -344,11 +344,11 @@ AST
 │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - extract_byte_array_length
 │ ├╼ params
-│ │ └╼ data
+│ │ └╼ var - data
 │ ├╼ returns
-│ │ └╼ length
+│ │ └╼ var - length
 │ └╼ body
-│   ├╼ assign - length 
+│   ├╼ assign - length
 │   │ └╼ div()
 │   │   ├╼ var - data
 │   │   └╼ 2
@@ -360,7 +360,7 @@ AST
 │   │ └╼ conditional
 │   │   ├╼ iszero()
 │   │   │ └╼ var - outOfPlaceEncoding
-│   │   └╼ assign - length 
+│   │   └╼ assign - length
 │   │     └╼ and()
 │   │       ├╼ var - length
 │   │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -374,26 +374,26 @@ AST
 │       └╼ panic_error_0x22()
 ├╼ function definition - array_dataslot_t_string_storage
 │ ├╼ params
-│ │ └╼ ptr
+│ │ └╼ var - ptr
 │ ├╼ returns
-│ │ └╼ data
+│ │ └╼ var - data
 │ └╼ body
-│   ├╼ assign - data 
+│   ├╼ assign - data
 │   │ └╼ var - ptr
 │   ├╼ mstore()
 │   │ ├╼ 0
 │   │ └╼ var - ptr
-│   └╼ assign - data 
+│   └╼ assign - data
 │     └╼ keccak256()
 │       ├╼ 0
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - divide_by_32_ceil
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ div()
 │       ├╼ add()
 │       │ ├╼ var - value
@@ -401,22 +401,22 @@ AST
 │       └╼ 32
 ├╼ function definition - shift_left_dynamic
 │ ├╼ params
-│ │ ├╼ bits
-│ │ └╼ value
+│ │ ├╼ var - bits
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ newValue
+│ │ └╼ var - newValue
 │ └╼ body
-│   └╼ assign - newValue 
+│   └╼ assign - newValue
 │     └╼ shl()
 │       ├╼ var - bits
 │       └╼ var - value
 ├╼ function definition - update_byte_slice_dynamic32
 │ ├╼ params
-│ │ ├╼ value
-│ │ ├╼ shiftBytes
-│ │ └╼ toInsert
+│ │ ├╼ var - value
+│ │ ├╼ var - shiftBytes
+│ │ └╼ var - toInsert
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
 │   ├╼ declare - shiftBits
 │   │ └╼ mul()
@@ -426,16 +426,16 @@ AST
 │   │ └╼ shift_left_dynamic()
 │   │   ├╼ var - shiftBits
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - toInsert 
+│   ├╼ assign - toInsert
 │   │ └╼ shift_left_dynamic()
 │   │   ├╼ var - shiftBits
 │   │   └╼ var - toInsert
-│   ├╼ assign - value 
+│   ├╼ assign - value
 │   │ └╼ and()
 │   │   ├╼ var - value
 │   │   └╼ not()
 │   │     └╼ var - mask
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ or()
 │       ├╼ var - value
 │       └╼ and()
@@ -443,38 +443,38 @@ AST
 │         └╼ var - mask
 ├╼ function definition - cleanup_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ var - value
 ├╼ function definition - identity
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ var - value
 ├╼ function definition - convert_t_uint256_to_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ cleanup_t_uint256()
 │       └╼ identity()
 │         └╼ cleanup_t_uint256()
 │           └╼ var - value
 ├╼ function definition - prepare_store_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ var - value
 ├╼ var - function
 ├╼ update_storage_value_t_uint256_to_t_uint256()
@@ -495,9 +495,9 @@ AST
 ├╼ function definition - zero_value_for_split_t_uint256
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 0
 ├╼ var - function
 ├╼ storage_set_to_zero_t_uint256()
@@ -520,7 +520,7 @@ AST
 │ │   ├╼ var - start
 │ │   └╼ var - end
 │ ├╼ after block
-│ │ └╼ assign - start 
+│ │ └╼ assign - start
 │ │   └╼ add()
 │ │     ├╼ var - start
 │ │     └╼ 1
@@ -551,7 +551,7 @@ AST
 │   │   ├╼ lt()
 │   │   │ ├╼ var - startIndex
 │   │   │ └╼ 32
-│   │   └╼ assign - deleteStart 
+│   │   └╼ assign - deleteStart
 │   │     └╼ var - dataArea
 │   └╼ clear_storage_range_t_bytes1()
 │     ├╼ var - deleteStart
@@ -561,21 +561,21 @@ AST
 │         └╼ var - len
 ├╼ function definition - shift_right_unsigned_dynamic
 │ ├╼ params
-│ │ ├╼ bits
-│ │ └╼ value
+│ │ ├╼ var - bits
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ newValue
+│ │ └╼ var - newValue
 │ └╼ body
-│   └╼ assign - newValue 
+│   └╼ assign - newValue
 │     └╼ shr()
 │       ├╼ var - bits
 │       └╼ var - value
 ├╼ function definition - mask_bytes_dynamic
 │ ├╼ params
-│ │ ├╼ data
-│ │ └╼ bytes
+│ │ ├╼ var - data
+│ │ └╼ var - bytes
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
 │   ├╼ declare - mask
 │   │ └╼ not()
@@ -585,22 +585,22 @@ AST
 │   │     │ └╼ var - bytes
 │   │     └╼ not()
 │   │       └╼ 0
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ and()
 │       ├╼ var - data
 │       └╼ var - mask
 ├╼ function definition - extract_used_part_and_set_length_of_short_byte_array
 │ ├╼ params
-│ │ ├╼ data
-│ │ └╼ len
+│ │ ├╼ var - data
+│ │ └╼ var - len
 │ ├╼ returns
-│ │ └╼ used
+│ │ └╼ var - used
 │ └╼ body
-│   ├╼ assign - data 
+│   ├╼ assign - data
 │   │ └╼ mask_bytes_dynamic()
 │   │   ├╼ var - data
 │   │   └╼ var - len
-│   └╼ assign - used 
+│   └╼ assign - used
 │     └╼ or()
 │       ├╼ var - data
 │       └╼ mul()
@@ -629,7 +629,7 @@ AST
 │ └╼ var - newLen
 ├╼ declare - srcOffset
 │ └╼ 0
-├╼ assign - srcOffset 
+├╼ assign - srcOffset
 │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ var - switch
 ├╼ gt()
@@ -654,7 +654,7 @@ AST
 │ │   ├╼ var - i
 │ │   └╼ var - loopEnd
 │ ├╼ after block
-│ │ └╼ assign - i 
+│ │ └╼ assign - i
 │ │   └╼ add()
 │ │     ├╼ var - i
 │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -665,11 +665,11 @@ AST
 │   │   └╼ add()
 │   │     ├╼ var - src
 │   │     └╼ var - srcOffset
-│   ├╼ assign - dstPtr 
+│   ├╼ assign - dstPtr
 │   │ └╼ add()
 │   │   ├╼ var - dstPtr
 │   │   └╼ 1
-│   └╼ assign - srcOffset 
+│   └╼ assign - srcOffset
 │     └╼ add()
 │       ├╼ var - srcOffset
 │       └╼ 32
@@ -703,7 +703,7 @@ AST
 ├╼ if statement
 │ └╼ conditional
 │   ├╼ var - newLen
-│   └╼ assign - value 
+│   └╼ assign - value
 │     └╼ mload()
 │       └╼ add()
 │         ├╼ var - src
@@ -1040,20 +1040,20 @@ AST
 ├╼ revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74()
 ├╼ function definition - shift_right_224_unsigned
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ newValue
+│ │ └╼ var - newValue
 │ └╼ body
-│   └╼ assign - newValue 
+│   └╼ assign - newValue
 │     └╼ shr()
 │       ├╼ 224
 │       └╼ var - value
 ├╼ function definition - allocate_unbounded
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ memPtr
+│ │ └╼ var - memPtr
 │ └╼ body
-│   └╼ assign - memPtr 
+│   └╼ assign - memPtr
 │     └╼ mload()
 │       └╼ 64
 ├╼ var - function
@@ -1080,24 +1080,24 @@ AST
 │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
 ├╼ function definition - array_length_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ length
+│ │ └╼ var - length
 │ └╼ body
-│   └╼ assign - length 
+│   └╼ assign - length
 │     └╼ mload()
 │       └╼ var - value
 ├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ ├╼ pos
-│ │ └╼ length
+│ │ ├╼ var - pos
+│ │ └╼ var - length
 │ ├╼ returns
-│ │ └╼ updated_pos
+│ │ └╼ var - updated_pos
 │ └╼ body
 │   ├╼ mstore()
 │   │ ├╼ var - pos
 │   │ └╼ var - length
-│   └╼ assign - updated_pos 
+│   └╼ assign - updated_pos
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1115,7 +1115,7 @@ AST
 │ │   ├╼ var - i
 │ │   └╼ var - length
 │ ├╼ after block
-│ │ └╼ assign - i 
+│ │ └╼ assign - i
 │ │   └╼ add()
 │ │     ├╼ var - i
 │ │     └╼ 32
@@ -1139,11 +1139,11 @@ AST
 │ └╼ 0
 ├╼ function definition - round_up_to_mul_of_32
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ and()
 │       ├╼ add()
 │       │ ├╼ var - value
@@ -1152,15 +1152,15 @@ AST
 │         └╼ 31
 ├╼ function definition - abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ ├╼ value
-│ │ └╼ pos
+│ │ ├╼ var - value
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
 │   ├╼ declare - length
 │   │ └╼ array_length_t_string_memory_ptr()
 │   │   └╼ var - value
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ var - length
@@ -1170,19 +1170,19 @@ AST
 │   │ │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │ ├╼ var - pos
 │   │ └╼ var - length
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ round_up_to_mul_of_32()
 │         └╼ var - length
 ├╼ function definition - abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ value0
+│ │ ├╼ var - headStart
+│ │ └╼ var - value0
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -1193,7 +1193,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack()
 │       ├╼ var - value0
 │       └╼ var - tail
@@ -1204,21 +1204,21 @@ AST
 │ └╼ 0
 ├╼ function definition - cleanup_t_uint160
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ and()
 │       ├╼ var - value
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - cleanup_t_address
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ cleanup_t_uint160()
 │       └╼ var - value
 ├╼ var - function
@@ -1236,23 +1236,23 @@ AST
 │     └╼ 0
 ├╼ function definition - abi_decode_t_address
 │ ├╼ params
-│ │ ├╼ offset
-│ │ └╼ end
+│ │ ├╼ var - offset
+│ │ └╼ var - end
 │ ├╼ returns
-│ │ └╼ value
+│ │ └╼ var - value
 │ └╼ body
-│   ├╼ assign - value 
+│   ├╼ assign - value
 │   │ └╼ calldataload()
 │   │   └╼ var - offset
 │   └╼ validator_revert_t_address()
 │     └╼ var - value
 ├╼ function definition - cleanup_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ var - value
 ├╼ var - function
 ├╼ validator_revert_t_uint256()
@@ -1269,23 +1269,23 @@ AST
 │     └╼ 0
 ├╼ function definition - abi_decode_t_uint256
 │ ├╼ params
-│ │ ├╼ offset
-│ │ └╼ end
+│ │ ├╼ var - offset
+│ │ └╼ var - end
 │ ├╼ returns
-│ │ └╼ value
+│ │ └╼ var - value
 │ └╼ body
-│   ├╼ assign - value 
+│   ├╼ assign - value
 │   │ └╼ calldataload()
 │   │   └╼ var - offset
 │   └╼ validator_revert_t_uint256()
 │     └╼ var - value
 ├╼ function definition - abi_decode_tuple_t_addresst_uint256
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ dataEnd
+│ │ ├╼ var - headStart
+│ │ └╼ var - dataEnd
 │ ├╼ returns
-│ │ ├╼ value0
-│ │ └╼ value1
+│ │ ├╼ var - value0
+│ │ └╼ var - value1
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1297,7 +1297,7 @@ AST
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
 │   ├╼ declare - offset
 │   │ └╼ 0
-│   ├╼ assign - value0 
+│   ├╼ assign - value0
 │   │ └╼ abi_decode_t_address()
 │   │   ├╼ add()
 │   │   │ ├╼ var - headStart
@@ -1305,7 +1305,7 @@ AST
 │   │   └╼ var - dataEnd
 │   ├╼ declare - offset
 │   │ └╼ 32
-│   └╼ assign - value1 
+│   └╼ assign - value1
 │     └╼ abi_decode_t_uint256()
 │       ├╼ add()
 │       │ ├╼ var - headStart
@@ -1313,11 +1313,11 @@ AST
 │       └╼ var - dataEnd
 ├╼ function definition - cleanup_t_bool
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ iszero()
 │       └╼ iszero()
 │         └╼ var - value
@@ -1331,12 +1331,12 @@ AST
 │   └╼ var - value
 ├╼ function definition - abi_encode_tuple_t_bool__to_t_bool__fromStack
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ value0
+│ │ ├╼ var - headStart
+│ │ └╼ var - value0
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -1355,12 +1355,12 @@ AST
 │   └╼ var - value
 ├╼ function definition - abi_encode_tuple_t_uint256__to_t_uint256__fromStack
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ value0
+│ │ ├╼ var - headStart
+│ │ └╼ var - value0
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -1371,12 +1371,12 @@ AST
 │       └╼ 0
 ├╼ function definition - abi_decode_tuple_t_addresst_addresst_uint256
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ dataEnd
+│ │ ├╼ var - headStart
+│ │ └╼ var - dataEnd
 │ ├╼ returns
-│ │ ├╼ value0
-│ │ ├╼ value1
-│ │ └╼ value2
+│ │ ├╼ var - value0
+│ │ ├╼ var - value1
+│ │ └╼ var - value2
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1388,7 +1388,7 @@ AST
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
 │   ├╼ declare - offset
 │   │ └╼ 0
-│   ├╼ assign - value0 
+│   ├╼ assign - value0
 │   │ └╼ abi_decode_t_address()
 │   │   ├╼ add()
 │   │   │ ├╼ var - headStart
@@ -1396,7 +1396,7 @@ AST
 │   │   └╼ var - dataEnd
 │   ├╼ declare - offset
 │   │ └╼ 32
-│   ├╼ assign - value1 
+│   ├╼ assign - value1
 │   │ └╼ abi_decode_t_address()
 │   │   ├╼ add()
 │   │   │ ├╼ var - headStart
@@ -1404,7 +1404,7 @@ AST
 │   │   └╼ var - dataEnd
 │   ├╼ declare - offset
 │   │ └╼ 64
-│   └╼ assign - value2 
+│   └╼ assign - value2
 │     └╼ abi_decode_t_uint256()
 │       ├╼ add()
 │       │ ├╼ var - headStart
@@ -1412,11 +1412,11 @@ AST
 │       └╼ var - dataEnd
 ├╼ function definition - cleanup_t_uint8
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ and()
 │       ├╼ var - value
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1430,12 +1430,12 @@ AST
 │   └╼ var - value
 ├╼ function definition - abi_encode_tuple_t_uint8__to_t_uint8__fromStack
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ value0
+│ │ ├╼ var - headStart
+│ │ └╼ var - value0
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -1446,10 +1446,10 @@ AST
 │       └╼ 0
 ├╼ function definition - abi_decode_tuple_t_address
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ dataEnd
+│ │ ├╼ var - headStart
+│ │ └╼ var - dataEnd
 │ ├╼ returns
-│ │ └╼ value0
+│ │ └╼ var - value0
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1461,7 +1461,7 @@ AST
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
 │   ├╼ declare - offset
 │   │ └╼ 0
-│   └╼ assign - value0 
+│   └╼ assign - value0
 │     └╼ abi_decode_t_address()
 │       ├╼ add()
 │       │ ├╼ var - headStart
@@ -1469,11 +1469,11 @@ AST
 │       └╼ var - dataEnd
 ├╼ function definition - abi_decode_tuple_t_addresst_address
 │ ├╼ params
-│ │ ├╼ headStart
-│ │ └╼ dataEnd
+│ │ ├╼ var - headStart
+│ │ └╼ var - dataEnd
 │ ├╼ returns
-│ │ ├╼ value0
-│ │ └╼ value1
+│ │ ├╼ var - value0
+│ │ └╼ var - value1
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1485,7 +1485,7 @@ AST
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b()
 │   ├╼ declare - offset
 │   │ └╼ 0
-│   ├╼ assign - value0 
+│   ├╼ assign - value0
 │   │ └╼ abi_decode_t_address()
 │   │   ├╼ add()
 │   │   │ ├╼ var - headStart
@@ -1493,7 +1493,7 @@ AST
 │   │   └╼ var - dataEnd
 │   ├╼ declare - offset
 │   │ └╼ 32
-│   └╼ assign - value1 
+│   └╼ assign - value1
 │     └╼ abi_decode_t_address()
 │       ├╼ add()
 │       │ ├╼ var - headStart
@@ -1507,9 +1507,9 @@ AST
 ├╼ function definition - zero_value_for_split_t_string_memory_ptr
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 96
 ├╼ var - function
 ├╼ panic_error_0x22()
@@ -1524,11 +1524,11 @@ AST
 │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - extract_byte_array_length
 │ ├╼ params
-│ │ └╼ data
+│ │ └╼ var - data
 │ ├╼ returns
-│ │ └╼ length
+│ │ └╼ var - length
 │ └╼ body
-│   ├╼ assign - length 
+│   ├╼ assign - length
 │   │ └╼ div()
 │   │   ├╼ var - data
 │   │   └╼ 2
@@ -1540,7 +1540,7 @@ AST
 │   │ └╼ conditional
 │   │   ├╼ iszero()
 │   │   │ └╼ var - outOfPlaceEncoding
-│   │   └╼ assign - length 
+│   │   └╼ assign - length
 │   │     └╼ and()
 │   │       ├╼ var - length
 │   │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1554,39 +1554,39 @@ AST
 │       └╼ panic_error_0x22()
 ├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ pos
-│ │ └╼ length
+│ │ ├╼ var - pos
+│ │ └╼ var - length
 │ ├╼ returns
-│ │ └╼ updated_pos
+│ │ └╼ var - updated_pos
 │ └╼ body
 │   ├╼ mstore()
 │   │ ├╼ var - pos
 │   │ └╼ var - length
-│   └╼ assign - updated_pos 
+│   └╼ assign - updated_pos
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - array_dataslot_t_string_storage
 │ ├╼ params
-│ │ └╼ ptr
+│ │ └╼ var - ptr
 │ ├╼ returns
-│ │ └╼ data
+│ │ └╼ var - data
 │ └╼ body
-│   ├╼ assign - data 
+│   ├╼ assign - data
 │   │ └╼ var - ptr
 │   ├╼ mstore()
 │   │ ├╼ 0
 │   │ └╼ var - ptr
-│   └╼ assign - data 
+│   └╼ assign - data
 │     └╼ keccak256()
 │       ├╼ 0
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - abi_encode_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ value
-│ │ └╼ pos
+│ │ ├╼ var - value
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
 │   ├╼ declare - slotValue
 │   │ └╼ sload()
@@ -1594,7 +1594,7 @@ AST
 │   ├╼ declare - length
 │   │ └╼ extract_byte_array_length()
 │   │   └╼ var - slotValue
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr()
 │   │   ├╼ var - pos
 │   │   └╼ var - length
@@ -1610,7 +1610,7 @@ AST
 │   │   ├╼ var - slotValue
 │   │   └╼ not()
 │   │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - ret 
+│   ├╼ assign - ret
 │   │ └╼ add()
 │   │   ├╼ var - pos
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1628,7 +1628,7 @@ AST
 │   │ │   ├╼ var - i
 │   │ │   └╼ var - length
 │   │ ├╼ after block
-│   │ │ └╼ assign - i 
+│   │ │ └╼ assign - i
 │   │ │   └╼ add()
 │   │ │     ├╼ var - i
 │   │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1639,22 +1639,22 @@ AST
 │   │   │ │ └╼ var - i
 │   │   │ └╼ sload()
 │   │   │   └╼ var - dataPos
-│   │   └╼ assign - dataPos 
+│   │   └╼ assign - dataPos
 │   │     └╼ add()
 │   │       ├╼ var - dataPos
 │   │       └╼ 1
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ var - i
 ├╼ function definition - abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ value0
-│ │ └╼ pos
+│ │ ├╼ var - value0
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ updatedPos
+│ │ └╼ var - updatedPos
 │ └╼ body
-│   └╼ assign - updatedPos 
+│   └╼ assign - updatedPos
 │     └╼ abi_encode_t_string_storage_to_t_string_memory_ptr()
 │       ├╼ var - value0
 │       └╼ var - pos
@@ -1693,11 +1693,11 @@ AST
 │ └╼ var - newFreePtr
 ├╼ function definition - copy_array_from_storage_to_memory_t_string_storage
 │ ├╼ params
-│ │ └╼ slot
+│ │ └╼ var - slot
 │ ├╼ returns
-│ │ └╼ memPtr
+│ │ └╼ var - memPtr
 │ └╼ body
-│   ├╼ assign - memPtr 
+│   ├╼ assign - memPtr
 │   │ └╼ allocate_unbounded()
 │   ├╼ declare - end
 │   │ └╼ abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr()
@@ -1710,77 +1710,77 @@ AST
 │       └╼ var - memPtr
 ├╼ function definition - convert_array_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ copy_array_from_storage_to_memory_t_string_storage()
 │       └╼ var - value
 ├╼ function definition - fun_name_54
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__49_mpos
+│ │ └╼ var - var__49_mpos
 │ └╼ body
 │   ├╼ declare - zero_t_string_memory_ptr_1_mpos
 │   │ └╼ zero_value_for_split_t_string_memory_ptr()
-│   ├╼ assign - var__49_mpos 
+│   ├╼ assign - var__49_mpos
 │   │ └╼ var - zero_t_string_memory_ptr_1_mpos
 │   ├╼ declare - _2_slot
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   ├╼ declare - expr_51_slot
 │   │ └╼ var - _2_slot
-│   ├╼ assign - var__49_mpos 
+│   ├╼ assign - var__49_mpos
 │   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr()
 │   │   └╼ var - expr_51_slot
 │   └╼ leave
 ├╼ function definition - fun_symbol_64
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__59_mpos
+│ │ └╼ var - var__59_mpos
 │ └╼ body
 │   ├╼ declare - zero_t_string_memory_ptr_3_mpos
 │   │ └╼ zero_value_for_split_t_string_memory_ptr()
-│   ├╼ assign - var__59_mpos 
+│   ├╼ assign - var__59_mpos
 │   │ └╼ var - zero_t_string_memory_ptr_3_mpos
 │   ├╼ declare - _4_slot
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   ├╼ declare - expr_61_slot
 │   │ └╼ var - _4_slot
-│   ├╼ assign - var__59_mpos 
+│   ├╼ assign - var__59_mpos
 │   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr()
 │   │   └╼ var - expr_61_slot
 │   └╼ leave
 ├╼ function definition - zero_value_for_split_t_uint8
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 0
 ├╼ function definition - cleanup_t_rational_18_by_1
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ var - value
 ├╼ function definition - identity
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ var - value
 ├╼ function definition - convert_t_rational_18_by_1_to_t_uint8
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ cleanup_t_uint8()
 │       └╼ identity()
 │         └╼ cleanup_t_rational_18_by_1()
@@ -1788,115 +1788,115 @@ AST
 ├╼ function definition - fun_decimals_74
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__69
+│ │ └╼ var - var__69
 │ └╼ body
 │   ├╼ declare - zero_t_uint8_5
 │   │ └╼ zero_value_for_split_t_uint8()
-│   ├╼ assign - var__69 
+│   ├╼ assign - var__69
 │   │ └╼ var - zero_t_uint8_5
 │   ├╼ declare - expr_71
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__69 
+│   ├╼ assign - var__69
 │   │ └╼ convert_t_rational_18_by_1_to_t_uint8()
 │   │   └╼ var - expr_71
 │   └╼ leave
 ├╼ function definition - zero_value_for_split_t_uint256
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 0
 ├╼ function definition - shift_right_0_unsigned
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ newValue
+│ │ └╼ var - newValue
 │ └╼ body
-│   └╼ assign - newValue 
+│   └╼ assign - newValue
 │     └╼ shr()
 │       ├╼ 0
 │       └╼ var - value
 ├╼ function definition - cleanup_from_storage_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ var - value
 ├╼ function definition - extract_from_storage_value_offset_0t_uint256
 │ ├╼ params
-│ │ └╼ slot_value
+│ │ └╼ var - slot_value
 │ ├╼ returns
-│ │ └╼ value
+│ │ └╼ var - value
 │ └╼ body
-│   └╼ assign - value 
+│   └╼ assign - value
 │     └╼ cleanup_from_storage_t_uint256()
 │       └╼ shift_right_0_unsigned()
 │         └╼ var - slot_value
 ├╼ function definition - read_from_storage_split_offset_0_t_uint256
 │ ├╼ params
-│ │ └╼ slot
+│ │ └╼ var - slot
 │ ├╼ returns
-│ │ └╼ value
+│ │ └╼ var - value
 │ └╼ body
-│   └╼ assign - value 
+│   └╼ assign - value
 │     └╼ extract_from_storage_value_offset_0t_uint256()
 │       └╼ sload()
 │         └╼ var - slot
 ├╼ function definition - fun_totalSupply_84
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__79
+│ │ └╼ var - var__79
 │ └╼ body
 │   ├╼ declare - zero_t_uint256_6
 │   │ └╼ zero_value_for_split_t_uint256()
-│   ├╼ assign - var__79 
+│   ├╼ assign - var__79
 │   │ └╼ var - zero_t_uint256_6
 │   ├╼ declare - _7
 │   │ └╼ read_from_storage_split_offset_0_t_uint256()
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   ├╼ declare - expr_81
 │   │ └╼ var - _7
-│   ├╼ assign - var__79 
+│   ├╼ assign - var__79
 │   │ └╼ var - expr_81
 │   └╼ leave
 ├╼ function definition - convert_t_uint160_to_t_uint160
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ cleanup_t_uint160()
 │       └╼ identity()
 │         └╼ cleanup_t_uint160()
 │           └╼ var - value
 ├╼ function definition - convert_t_uint160_to_t_address
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ convert_t_uint160_to_t_uint160()
 │       └╼ var - value
 ├╼ function definition - convert_t_address_to_t_address
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ convert_t_uint160_to_t_address()
 │       └╼ var - value
 ├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address
 │ ├╼ params
-│ │ ├╼ slot
-│ │ └╼ key
+│ │ ├╼ var - slot
+│ │ └╼ var - key
 │ ├╼ returns
-│ │ └╼ dataSlot
+│ │ └╼ var - dataSlot
 │ └╼ body
 │   ├╼ mstore()
 │   │ ├╼ 0
@@ -1905,19 +1905,19 @@ AST
 │   ├╼ mstore()
 │   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │ └╼ var - slot
-│   └╼ assign - dataSlot 
+│   └╼ assign - dataSlot
 │     └╼ keccak256()
 │       ├╼ 0
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - fun_balanceOf_98
 │ ├╼ params
-│ │ └╼ var_account_87
+│ │ └╼ var - var_account_87
 │ ├╼ returns
-│ │ └╼ var__91
+│ │ └╼ var - var__91
 │ └╼ body
 │   ├╼ declare - zero_t_uint256_8
 │   │ └╼ zero_value_for_split_t_uint256()
-│   ├╼ assign - var__91 
+│   ├╼ assign - var__91
 │   │ └╼ var - zero_t_uint256_8
 │   ├╼ declare - _9
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -1936,26 +1936,26 @@ AST
 │   │   └╼ var - _11
 │   ├╼ declare - expr_95
 │   │ └╼ var - _12
-│   ├╼ assign - var__91 
+│   ├╼ assign - var__91
 │   │ └╼ var - expr_95
 │   └╼ leave
 ├╼ function definition - zero_value_for_split_t_bool
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 0
 ├╼ function definition - fun_transfer_123
 │ ├╼ params
-│ │ ├╼ var_to_101
-│ │ └╼ var_amount_103
+│ │ ├╼ var - var_to_101
+│ │ └╼ var - var_amount_103
 │ ├╼ returns
-│ │ └╼ var__107
+│ │ └╼ var - var__107
 │ └╼ body
 │   ├╼ declare - zero_t_bool_13
 │   │ └╼ zero_value_for_split_t_bool()
-│   ├╼ assign - var__107 
+│   ├╼ assign - var__107
 │   │ └╼ var - zero_t_bool_13
 │   ├╼ declare - expr_112
 │   │ └╼ fun__msgSender_599()
@@ -1979,15 +1979,15 @@ AST
 │   │ └╼ var - expr_117
 │   ├╼ declare - expr_120
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__107 
+│   ├╼ assign - var__107
 │   │ └╼ var - expr_120
 │   └╼ leave
 ├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address
 │ ├╼ params
-│ │ ├╼ slot
-│ │ └╼ key
+│ │ ├╼ var - slot
+│ │ └╼ var - key
 │ ├╼ returns
-│ │ └╼ dataSlot
+│ │ └╼ var - dataSlot
 │ └╼ body
 │   ├╼ mstore()
 │   │ ├╼ 0
@@ -1996,20 +1996,20 @@ AST
 │   ├╼ mstore()
 │   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │ └╼ var - slot
-│   └╼ assign - dataSlot 
+│   └╼ assign - dataSlot
 │     └╼ keccak256()
 │       ├╼ 0
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - fun_allowance_141
 │ ├╼ params
-│ │ ├╼ var_owner_126
-│ │ └╼ var_spender_128
+│ │ ├╼ var - var_owner_126
+│ │ └╼ var - var_spender_128
 │ ├╼ returns
-│ │ └╼ var__132
+│ │ └╼ var - var__132
 │ └╼ body
 │   ├╼ declare - zero_t_uint256_17
 │   │ └╼ zero_value_for_split_t_uint256()
-│   ├╼ assign - var__132 
+│   ├╼ assign - var__132
 │   │ └╼ var - zero_t_uint256_17
 │   ├╼ declare - _18
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
@@ -2040,19 +2040,19 @@ AST
 │   │   └╼ var - _23
 │   ├╼ declare - expr_138
 │   │ └╼ var - _24
-│   ├╼ assign - var__132 
+│   ├╼ assign - var__132
 │   │ └╼ var - expr_138
 │   └╼ leave
 ├╼ function definition - fun_approve_166
 │ ├╼ params
-│ │ ├╼ var_spender_144
-│ │ └╼ var_amount_146
+│ │ ├╼ var - var_spender_144
+│ │ └╼ var - var_amount_146
 │ ├╼ returns
-│ │ └╼ var__150
+│ │ └╼ var - var__150
 │ └╼ body
 │   ├╼ declare - zero_t_bool_25
 │   │ └╼ zero_value_for_split_t_bool()
-│   ├╼ assign - var__150 
+│   ├╼ assign - var__150
 │   │ └╼ var - zero_t_bool_25
 │   ├╼ declare - expr_155
 │   │ └╼ fun__msgSender_599()
@@ -2076,20 +2076,20 @@ AST
 │   │ └╼ var - expr_160
 │   ├╼ declare - expr_163
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__150 
+│   ├╼ assign - var__150
 │   │ └╼ var - expr_163
 │   └╼ leave
 ├╼ function definition - fun_transferFrom_199
 │ ├╼ params
-│ │ ├╼ var_from_169
-│ │ ├╼ var_to_171
-│ │ └╼ var_amount_173
+│ │ ├╼ var - var_from_169
+│ │ ├╼ var - var_to_171
+│ │ └╼ var - var_amount_173
 │ ├╼ returns
-│ │ └╼ var__177
+│ │ └╼ var - var__177
 │ └╼ body
 │   ├╼ declare - zero_t_bool_29
 │   │ └╼ zero_value_for_split_t_bool()
-│   ├╼ assign - var__177 
+│   ├╼ assign - var__177
 │   │ └╼ var - zero_t_bool_29
 │   ├╼ declare - expr_182
 │   │ └╼ fun__msgSender_599()
@@ -2129,7 +2129,7 @@ AST
 │   │ └╼ var - expr_193
 │   ├╼ declare - expr_196
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__177 
+│   ├╼ assign - var__177
 │   │ └╼ var - expr_196
 │   └╼ leave
 ├╼ var - function
@@ -2145,15 +2145,15 @@ AST
 │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 ├╼ function definition - checked_add_t_uint256
 │ ├╼ params
-│ │ ├╼ x
-│ │ └╼ y
+│ │ ├╼ var - x
+│ │ └╼ var - y
 │ ├╼ returns
-│ │ └╼ sum
+│ │ └╼ var - sum
 │ └╼ body
-│   ├╼ assign - x 
+│   ├╼ assign - x
 │   │ └╼ cleanup_t_uint256()
 │   │   └╼ var - x
-│   ├╼ assign - y 
+│   ├╼ assign - y
 │   │ └╼ cleanup_t_uint256()
 │   │   └╼ var - y
 │   ├╼ if statement
@@ -2164,20 +2164,20 @@ AST
 │   │   │   ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
 │   │   │   └╼ var - y
 │   │   └╼ panic_error_0x11()
-│   └╼ assign - sum 
+│   └╼ assign - sum
 │     └╼ add()
 │       ├╼ var - x
 │       └╼ var - y
 ├╼ function definition - fun_increaseAllowance_229
 │ ├╼ params
-│ │ ├╼ var_spender_202
-│ │ └╼ var_addedValue_204
+│ │ ├╼ var - var_spender_202
+│ │ └╼ var - var_addedValue_204
 │ ├╼ returns
-│ │ └╼ var__207
+│ │ └╼ var - var__207
 │ └╼ body
 │   ├╼ declare - zero_t_bool_36
 │   │ └╼ zero_value_for_split_t_bool()
-│   ├╼ assign - var__207 
+│   ├╼ assign - var__207
 │   │ └╼ var - zero_t_bool_36
 │   ├╼ declare - expr_212
 │   │ └╼ fun__msgSender_599()
@@ -2234,7 +2234,7 @@ AST
 │   │ └╼ var - expr_223
 │   ├╼ declare - expr_226
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__207 
+│   ├╼ assign - var__207
 │   │ └╼ var - expr_226
 │   └╼ leave
 ├╼ var - function
@@ -2252,27 +2252,27 @@ AST
 │ └╼  zero
 ├╼ function definition - abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 37
 │   ├╼ store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -2283,7 +2283,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -2310,26 +2310,26 @@ AST
 │       └╼ var - memPtr
 ├╼ function definition - wrapping_sub_t_uint256
 │ ├╼ params
-│ │ ├╼ x
-│ │ └╼ y
+│ │ ├╼ var - x
+│ │ └╼ var - y
 │ ├╼ returns
-│ │ └╼ diff
+│ │ └╼ var - diff
 │ └╼ body
-│   └╼ assign - diff 
+│   └╼ assign - diff
 │     └╼ cleanup_t_uint256()
 │       └╼ sub()
 │         ├╼ var - x
 │         └╼ var - y
 ├╼ function definition - fun_decreaseAllowance_271
 │ ├╼ params
-│ │ ├╼ var_spender_232
-│ │ └╼ var_subtractedValue_234
+│ │ ├╼ var - var_spender_232
+│ │ └╼ var - var_subtractedValue_234
 │ ├╼ returns
-│ │ └╼ var__237
+│ │ └╼ var - var__237
 │ └╼ body
 │   ├╼ declare - zero_t_bool_47
 │   │ └╼ zero_value_for_split_t_bool()
-│   ├╼ assign - var__237 
+│   ├╼ assign - var__237
 │   │ └╼ var - zero_t_bool_47
 │   ├╼ declare - expr_242
 │   │ └╼ fun__msgSender_599()
@@ -2409,35 +2409,35 @@ AST
 │   │ └╼ var - expr_264
 │   ├╼ declare - expr_268
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - var__237 
+│   ├╼ assign - var__237
 │   │ └╼ var - expr_268
 │   └╼ leave
 ├╼ function definition - cleanup_t_rational_0_by_1
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ cleaned
+│ │ └╼ var - cleaned
 │ └╼ body
-│   └╼ assign - cleaned 
+│   └╼ assign - cleaned
 │     └╼ var - value
 ├╼ function definition - convert_t_rational_0_by_1_to_t_uint160
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ cleanup_t_uint160()
 │       └╼ identity()
 │         └╼ cleanup_t_rational_0_by_1()
 │           └╼ var - value
 ├╼ function definition - convert_t_rational_0_by_1_to_t_address
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ convert_t_rational_0_by_1_to_t_uint160()
 │       └╼ var - value
 ├╼ var - function
@@ -2455,27 +2455,27 @@ AST
 │ └╼ dress
 ├╼ function definition - abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 37
 │   ├╼ store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -2486,7 +2486,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -2526,27 +2526,27 @@ AST
 │ └╼ ess
 ├╼ function definition - abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 35
 │   ├╼ store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -2557,7 +2557,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -2597,27 +2597,27 @@ AST
 │ └╼ alance
 ├╼ function definition - abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 38
 │   ├╼ store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -2628,7 +2628,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -2655,32 +2655,32 @@ AST
 │       └╼ var - memPtr
 ├╼ function definition - shift_left_0
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ newValue
+│ │ └╼ var - newValue
 │ └╼ body
-│   └╼ assign - newValue 
+│   └╼ assign - newValue
 │     └╼ shl()
 │       ├╼ 0
 │       └╼ var - value
 ├╼ function definition - update_byte_slice_32_shift_0
 │ ├╼ params
-│ │ ├╼ value
-│ │ └╼ toInsert
+│ │ ├╼ var - value
+│ │ └╼ var - toInsert
 │ ├╼ returns
-│ │ └╼ result
+│ │ └╼ var - result
 │ └╼ body
 │   ├╼ declare - mask
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935
-│   ├╼ assign - toInsert 
+│   ├╼ assign - toInsert
 │   │ └╼ shift_left_0()
 │   │   └╼ var - toInsert
-│   ├╼ assign - value 
+│   ├╼ assign - value
 │   │ └╼ and()
 │   │   ├╼ var - value
 │   │   └╼ not()
 │   │     └╼ var - mask
-│   └╼ assign - result 
+│   └╼ assign - result
 │     └╼ or()
 │       ├╼ var - value
 │       └╼ and()
@@ -2688,22 +2688,22 @@ AST
 │         └╼ var - mask
 ├╼ function definition - convert_t_uint256_to_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ converted
+│ │ └╼ var - converted
 │ └╼ body
-│   └╼ assign - converted 
+│   └╼ assign - converted
 │     └╼ cleanup_t_uint256()
 │       └╼ identity()
 │         └╼ cleanup_t_uint256()
 │           └╼ var - value
 ├╼ function definition - prepare_store_t_uint256
 │ ├╼ params
-│ │ └╼ value
+│ │ └╼ var - value
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ var - value
 ├╼ var - function
 ├╼ update_storage_value_offset_0t_uint256_to_t_uint256()
@@ -2932,27 +2932,27 @@ AST
 │ └╼ ress
 ├╼ function definition - abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 36
 │   ├╼ store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -2963,7 +2963,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -3003,27 +3003,27 @@ AST
 │ └╼ ss
 ├╼ function definition - abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 34
 │   ├╼ store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 64
 ├╼ function definition - abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -3034,7 +3034,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -3177,27 +3177,27 @@ AST
 │ └╼ ERC20: insufficient allowance
 ├╼ function definition - abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos
+│ │ └╼ var - pos
 │ ├╼ returns
-│ │ └╼ end
+│ │ └╼ var - end
 │ └╼ body
-│   ├╼ assign - pos 
+│   ├╼ assign - pos
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack()
 │   │   ├╼ var - pos
 │   │   └╼ 29
 │   ├╼ store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe()
 │   │ └╼ var - pos
-│   └╼ assign - end 
+│   └╼ assign - end
 │     └╼ add()
 │       ├╼ var - pos
 │       └╼ 32
 ├╼ function definition - abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart
+│ │ └╼ var - headStart
 │ ├╼ returns
-│ │ └╼ tail
+│ │ └╼ var - tail
 │ └╼ body
-│   ├╼ assign - tail 
+│   ├╼ assign - tail
 │   │ └╼ add()
 │   │   ├╼ var - headStart
 │   │   └╼ 32
@@ -3208,7 +3208,7 @@ AST
 │   │ └╼ sub()
 │   │   ├╼ var - tail
 │   │   └╼ var - headStart
-│   └╼ assign - tail 
+│   └╼ assign - tail
 │     └╼ abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack()
 │       └╼ var - tail
 ├╼ var - function
@@ -3322,22 +3322,22 @@ AST
 ├╼ function definition - zero_value_for_split_t_address
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret
+│ │ └╼ var - ret
 │ └╼ body
-│   └╼ assign - ret 
+│   └╼ assign - ret
 │     └╼ 0
 ├╼ function definition - fun__msgSender_599
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__593
+│ │ └╼ var - var__593
 │ └╼ body
 │   ├╼ declare - zero_t_address_119
 │   │ └╼ zero_value_for_split_t_address()
-│   ├╼ assign - var__593 
+│   ├╼ assign - var__593
 │   │ └╼ var - zero_t_address_119
 │   ├╼ declare - expr_596
 │   │ └╼ caller()
-│   ├╼ assign - var__593 
+│   ├╼ assign - var__593
 │   │ └╼ var - expr_596
 │   └╼ leave
 ├╼ var - data
