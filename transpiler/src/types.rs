@@ -10,7 +10,7 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
-    Case(ExprCase),
+    // Case(ExprCase),
     Default(ExprDefault),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
@@ -18,6 +18,10 @@ pub enum Expr {
     Break,
     Continue,
     Leave,
+    // //literals
+    // Number(U256),
+    // String(String),
+    // Bool(bool),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -32,11 +36,11 @@ pub struct ExprVariableReference {
     pub identifier: String,
 }
 
-pub struct ExprCase {
-    literal: ExprLiteral,
-    block: ExprBlock,
-}
-
+// #[derive(Clone, PartialEq, Eq, Debug)]
+// pub struct ExprCase {
+//     literal: Box<Expr>,
+//     block: ExprBlock,
+// }
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDefault {
     pub block: ExprBlock,
@@ -108,7 +112,7 @@ impl Expr {
             Expr::Literal(literal) => match literal {
                 ExprLiteral::Number(x) => tree.add_leaf(&x.to_string()),
                 ExprLiteral::String(x) => tree.add_leaf(&x),
-                ExprLiteral::Bool(x) => tree.add_leaf(&x),
+                ExprLiteral::Bool(x) => tree.add_leaf(&x.to_string()),
             },
 
             //is function call
@@ -148,9 +152,9 @@ impl Expr {
                 }
             }
 
-            //TODO: Add case to tree
-            //is case
-            Expr::Case(ExprCase { literal, block }) => {}
+            // //TODO: Add case to tree
+            // //is case
+            // Expr::Case(ExprCase { literal, block }) => {}
 
             //is repeat
             Expr::Repeat(ExprRepeat {

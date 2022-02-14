@@ -107,17 +107,17 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 
         //rule is switch
 
-        // rule is case
-        Rule::case => {
-            let mut parts = inner.into_inner();
-            let literal = parts.next().unwrap();
-            let block = parts.next().unwrap();
+        // // rule is case
+        // Rule::case => {
+        //     let mut parts = inner.into_inner();
+        //     let literal = parts.next().unwrap();
+        //     let block = parts.next().unwrap();
 
-            Expr::Case(ExprCase {
-                literal: parse_expression(literal),
-                block: parse_block(block),
-            })
-        }
+        //     Expr::Case(ExprCase {
+        //         literal: Box::new(parse_expression(literal)),
+        //         block: parse_block(block),
+        //     })
+        // }
 
         //rule is default
         Rule::default => {
@@ -214,11 +214,11 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             Expr::Literal(ExprLiteral::String(content.as_str().to_string()))
         }
 
-        //rule is a false literal
-        Rule::false_literal => Expr::Literal(ExprLiteral::Bool(false)),
+        // //rule is a false literal
+        // Rule::false_literal => Expr::Bool(false),
 
-        //rule is a true literal
-        Rule::true_literal => Expr::Literal(ExprLiteral::Bool(true)),
+        // //rule is a true literal
+        // Rule::true_literal => Expr::Bool(true),
 
         //if the matched rule is an identifier
         Rule::identifier => parse_identifier(expression),
