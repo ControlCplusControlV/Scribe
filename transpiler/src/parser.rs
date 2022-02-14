@@ -69,24 +69,24 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let function_name = parts.next().unwrap().as_str();
 
             //get the typed identifiers from the function and parse each expression
-            let mut params: Vec<Expr> = vec![];
+            let mut params: Vec<String> = vec![];
             for identifier in parts.next().unwrap().into_inner() {
-                params.push(parse_identifier(identifier));
+                params.push(identifier.as_str().to_string());
             }
 
             //get the return typed identifiers from the function and parse each expression
-            let mut returns: Vec<Expr> = vec![];
+            let mut returns: Vec<String> = vec![];
             for identifier in parts.next().unwrap().into_inner() {
                 // todo!()
-                returns.push(parse_identifier(identifier));
+                returns.push(identifier.as_str().to_string());
             }
 
             let block = parts.next().unwrap();
 
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name: function_name.to_string(),
-                typed_identifier_list: params,
-                return_typed_identifier_list: returns,
+                params,
+                returns,
                 block: parse_block(block),
             })
         }

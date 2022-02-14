@@ -11,6 +11,7 @@ struct Transpiler {
     next_open_memory_address: u32,
     stack: Stack,
     program: String,
+    user_functions: HashSet<String>,
 }
 
 type StackValue = HashSet<String>;
@@ -156,6 +157,10 @@ impl Transpiler {
     }
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
+        if self.user_functions.contains(&op.function_name) {
+            self.add_line(&format!("exec.{}", op.function_name));
+            return;
+        }
         // TODO: All functions are assumed to consume 2 stack elements and add one, for now
         // I how Rust handles strings, why are &str and String different? Just to torment me?
         let miden_function_name = match op.function_name.as_str() {
@@ -171,7 +176,7 @@ impl Transpiler {
             "eq" => "eq",
             "and" => "and",
             "or" => "or",
-
+            // TODO: check whether we've actually generated a function for this call
             _ => todo!("Need to implement {} function in miden", op.function_name),
         };
         for expr in op.exprs.clone().into_iter() {
@@ -206,8 +211,20 @@ impl Transpiler {
         self.push_ref_to_top(&op.identifier);
     }
 
-    //TODO: update placeholder
-    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {}
+    //TODO: stack management not quite working
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
+        // let stack_target = self.stack.clone();
+        self.user_functions.insert(op.function_name.clone());
+        self.add_line(&format!("proc.{}", op.function_name));
+        self.indentation += 4;
+        self.transpile_block(&op.block);
+        // self.target_stack(stack_target);
+        for return_ident in &op.returns {
+            self.push_ref_to_top(&return_ident);
+        }
+        self.indentation -= 4;
+        self.add_line("end");
+    }
 
     //TODO: update placeholder
     fn transpile_break(&mut self) {}
@@ -239,6 +256,7 @@ impl Transpiler {
         }
     }
 
+    // TODO: re-order AST to have all functions first
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -250,7 +268,8 @@ impl Transpiler {
             Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
-            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            // We've already compiled the functions
+            Expr::FunctionDefinition(op) => (),
             Expr::Break => self.transpile_break(),
             Expr::Continue => self.transpile_continue(),
             Expr::Leave => self.transpile_leave(),
@@ -265,11 +284,20 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     let mut transpiler = Transpiler {
         variables: HashMap::new(),
         next_open_memory_address: 0,
-        indentation: 4,
+        indentation: 0,
         stack: Stack::default(),
-        program: "begin".to_string(),
+        program: "".to_string(),
+        user_functions: HashSet::default(),
     };
     let ast = optimize_ast(expressions);
+    for expr in &ast {
+        match expr {
+            Expr::FunctionDefinition(op) => transpiler.transpile_function_declaration(&op),
+            _ => (),
+        }
+    }
+    transpiler.add_line("begin");
+    transpiler.indentation += 4;
     for expr in ast {
         transpiler.transpile_op(&expr);
     }

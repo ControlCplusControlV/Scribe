@@ -99,6 +99,33 @@ mod tests {
     }
 
     #[test]
+    fn integration_function() {
+        run_example(
+            "
+            function foo() -> b {
+                let b := 5
+            }
+            add(foo(), 1)
+            ",
+            vec![6],
+        );
+    }
+
+    #[ignore]
+    #[test]
+    fn integration_function_stack_management() {
+        run_example(
+            "
+            function foo() -> b {
+                let b := 5
+            }
+            add(1, foo())
+            ",
+            vec![6],
+        );
+    }
+
+    #[test]
     fn integration_for() {
         run_example(
             "

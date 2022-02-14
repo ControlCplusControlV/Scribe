@@ -50,8 +50,8 @@ pub struct ExprDefault {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionDefinition {
     pub function_name: String,
-    pub typed_identifier_list: Vec<Expr>,
-    pub return_typed_identifier_list: Vec<Expr>,
+    pub params: Vec<String>,
+    pub returns: Vec<String>,
     pub block: ExprBlock,
 }
 
@@ -216,21 +216,21 @@ impl Expr {
             //TODO: Add function Definition to tree
             Expr::FunctionDefinition(ExprFunctionDefinition {
                 function_name,
-                typed_identifier_list,
-                return_typed_identifier_list,
+                params: typed_identifier_list,
+                returns: return_typed_identifier_list,
                 block,
             }) => {
                 let _branch = tree.add_branch(&format!("function definition - {}", function_name));
                 {
                     let _params_branch = tree.add_branch(&format!("params"));
                     for param in typed_identifier_list {
-                        param.add_to_tree(tree);
+                        tree.add_leaf(param);
                     }
                 }
                 {
                     let _params_branch = tree.add_branch(&format!("returns"));
                     for param in return_typed_identifier_list {
-                        param.add_to_tree(tree);
+                        tree.add_leaf(param);
                     }
                 }
                 let _branch = tree.add_branch(&format!("body"));
