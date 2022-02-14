@@ -187,7 +187,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
 }
 
 fn parse_literal(literal: Pair<Rule>) -> ExprLiteral {
-    todo!()
+    match parse_expression(literal.clone()) {
+        Expr::Literal(literal) => literal,
+        _ => unreachable!("This should only parse literals {:?}", &literal),
+    }
 }
 
 //Function to parse grammar within an expression rule
