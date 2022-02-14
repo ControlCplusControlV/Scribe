@@ -100,7 +100,6 @@ impl Transpiler {
             self.stack.0.remove(0);
             self.add_line(&format!("drop"));
         }
-        println!("Stack after dropping stuff {:?}", self.stack);
     }
 
     fn top_is_var(&mut self, identifier: &str) {
