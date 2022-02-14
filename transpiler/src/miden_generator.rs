@@ -36,9 +36,11 @@ impl Transpiler {
     }
 
     fn target_stack(&mut self, target_stack: Stack) {
+        dbg!(&self.stack);
+        dbg!(&target_stack);
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            &mut self.push_refs_to_top(v);
+            self.push_refs_to_top(v);
         }
     }
 
@@ -46,9 +48,10 @@ impl Transpiler {
         self.stack.0.insert(0, HashSet::new());
     }
 
-    fn push_ref_to_top(&mut self, identifier: &str) -> Vec<MidenInstruction> {
+    fn push_ref_to_top(&mut self, identifier: &str) {
         let mut identifiers = HashSet::new();
         identifiers.insert(identifier.to_string());
+        dbg!(&self.stack);
         let location = self
             .stack
             .0
@@ -56,10 +59,11 @@ impl Transpiler {
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, identifiers);
-        return vec![format!("dup.{}", location)];
+        self.add_line(&format!("dup.{}", location));
     }
 
-    fn push_refs_to_top(&mut self, identifiers: &HashSet<String>) -> Vec<MidenInstruction> {
+    fn push_refs_to_top(&mut self, identifiers: &HashSet<String>) {
+        dbg!(&identifiers);
         // TODO: need to figure out what to do when we're targeting a stack that has stack values
         // w/ multiple references, there are probably cases that fail currently, where variables
         // are equal to each other before a for loop but not after
@@ -70,7 +74,7 @@ impl Transpiler {
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, identifiers.clone());
-        return vec![format!("dup.{}", location)];
+        self.add_line(&format!("dup.{}", location))
     }
 
     fn push(&mut self, value: U256) {
@@ -103,12 +107,14 @@ impl Transpiler {
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
+        dbg!(&op);
         // TODO: in the future we should be able to just mark that two variables share the same
         // stack address, but I can't quite figure it out for the fibonacci example currently
         if let Expr::Variable(ExprVariableReference {
             identifier: target_ident,
         }) = &*op.rhs
         {
+            dbg!(&op.identifier);
             self.equate_reference(&op.identifier.clone(), target_ident);
         } else {
             self.transpile_op(&op.rhs);
@@ -197,8 +203,7 @@ impl Transpiler {
     }
 
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
-        let instructions = self.push_ref_to_top(&op.identifier);
-        self.add_lines(instructions);
+        self.push_ref_to_top(&op.identifier);
     }
 
     //TODO: update placeholder

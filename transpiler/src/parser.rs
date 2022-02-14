@@ -94,11 +94,11 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is assignment
         Rule::assignment => {
             let mut parts = inner.into_inner();
-            let identifier = parts.next().unwrap().as_str();
+            let identifiers = parse_identifier_list(parts.next().unwrap());
             let rhs = parts.next().unwrap();
             let rhs_expr = parse_expression(rhs);
             Expr::Assignment(ExprAssignment {
-                identifier: identifier.to_string(),
+                identifier: identifiers.first().unwrap().to_string(),
                 rhs: Box::new(rhs_expr),
             })
         }
@@ -184,6 +184,14 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             panic!("Unreachable rule: {:?}", r);
         }
     }
+}
+
+fn parse_identifier_list(rule: Pair<Rule>) -> Vec<String> {
+    let mut identifiers = Vec::new();
+    for part in rule.into_inner() {
+        identifiers.push(part.as_str().to_string());
+    }
+    identifiers
 }
 
 fn parse_literal(literal: Pair<Rule>) -> ExprLiteral {
