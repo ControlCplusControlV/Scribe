@@ -108,6 +108,16 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is switch
 
         // rule is case
+        Rule::case => {
+            let mut parts = inner.into_inner();
+            let literal = parts.next().unwrap();
+            let block = parts.next().unwrap();
+
+            Expr::Case(ExprCase {
+                literal: parse_expression(literal),
+                block: parse_block(block),
+            })
+        }
 
         //rule is default
         Rule::default => {

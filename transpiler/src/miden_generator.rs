@@ -207,6 +207,7 @@ impl Transpiler {
     //TODO: update placeholder
     fn transpile_break(&mut self) {}
 
+    //TODO: update placeholder
     fn transpile_leave(&mut self) {}
 
     //TODO: update placeholder
@@ -214,6 +215,9 @@ impl Transpiler {
 
     //TODO: update placeholder
     fn transpile_default(&mut self, op: &ExprDefault) {}
+
+    //TODO: update placeholder
+    fn transpile_case(&mut self, op: &ExprDefault) {}
 
     fn add_line(&mut self, line: &str) {
         self.program = format!(
@@ -246,6 +250,7 @@ impl Transpiler {
             Expr::Continue => self.transpile_continue(),
             Expr::Leave => self.transpile_leave(),
             Expr::Default(op) => self.transpile_default(op),
+            Expr::Case(op) => self.transpile_case(op),
         }
     }
 }

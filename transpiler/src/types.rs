@@ -10,6 +10,7 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
+    Case(ExprCase),
     Default(ExprDefault),
     Variable(ExprVariableReference),
     // Intermediate-AST-only expressions
@@ -29,6 +30,11 @@ pub enum ExprLiteral {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprVariableReference {
     pub identifier: String,
+}
+
+pub struct ExprCase {
+    literal: ExprLiteral,
+    block: ExprBlock,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -141,6 +147,10 @@ impl Expr {
                     rhs.add_to_tree(tree);
                 }
             }
+
+            //TODO: Add case to tree
+            //is case
+            Expr::Case(ExprCase { literal, block }) => {}
 
             //is repeat
             Expr::Repeat(ExprRepeat {
