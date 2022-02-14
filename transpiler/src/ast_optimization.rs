@@ -3,12 +3,14 @@ use std::{collections::HashMap, vec};
 use crate::types::*;
 
 pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
-    let mut assignment_visitor = VariableAssignmentVisitor::default();
-    let ast = walk_ast(ast, &mut assignment_visitor);
-    let const_variables = assignment_visitor.get_const_variables();
-    let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
+    // let mut assignment_visitor = VariableAssignmentVisitor::default();
+    // let ast = walk_ast(ast, &mut assignment_visitor);
+    // let const_variables = assignment_visitor.get_const_variables();
+    // let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
 
-    walk_ast(ast, &mut ForLoopToRepeatVisitor {})
+    // walk_ast(ast, &mut ForLoopToRepeatVisitor {})
+    // TODO: fix optimizations
+    ast
 }
 
 fn walk_ast<V: ExpressionVisitor>(ast: Vec<Expr>, visitor: &mut V) -> Vec<Expr> {
