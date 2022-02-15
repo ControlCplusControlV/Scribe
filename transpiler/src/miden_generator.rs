@@ -222,6 +222,12 @@ impl Transpiler {
             self.add_function_stack(function_stack);
             return;
         }
+        if op.function_name == "iszero" {
+            // inlen iszero thing
+            self.add_line("___");
+            self.add_line("___");
+            self.consume(1);
+        }
         // TODO: All functions are assumed to consume 2 stack elements and add one, for now
         // I how Rust handles strings, why are &str and String different? Just to torment me?
         let miden_function_name = match op.function_name.as_str() {
