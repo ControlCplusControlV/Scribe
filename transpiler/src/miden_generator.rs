@@ -214,10 +214,10 @@ impl Transpiler {
     }
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
+        for expr in op.exprs.clone().into_iter() {
+            self.transpile_op(&expr);
+        }
         if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
-            for expr in op.exprs.clone().into_iter() {
-                self.transpile_op(&expr);
-            }
             self.add_line(&format!("exec.{}", op.function_name));
             self.add_function_stack(function_stack);
             return;
@@ -246,9 +246,6 @@ impl Transpiler {
             // TODO: check whether we've actually generated a function for this call
             _ => todo!("Need to implement {} function in miden", op.function_name),
         };
-        for expr in op.exprs.clone().into_iter() {
-            self.transpile_op(&expr);
-        }
         // If there is a first param and we've inferred it to be of type u256
         if op.inferred_param_types.first() == Some(&Some(YulType::U256))
             && op.function_name == "add"
