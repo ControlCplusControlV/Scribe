@@ -269,8 +269,11 @@ impl Transpiler {
                 value,
                 inferred_type,
             }) => {
-                // TODO: check size
-                self.push(*value);
+                if inferred_type == &Some(YulType::U256) {
+                    todo!("Need to implement u256 number literals");
+                } else {
+                    self.push(*value);
+                }
             }
             ExprLiteral::String(_) => todo!(),
             &ExprLiteral::Bool(_) => todo!(),
