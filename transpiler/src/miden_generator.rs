@@ -12,9 +12,10 @@ struct Transpiler {
     stack: Stack,
     program: String,
     user_functions: HashMap<String, Stack>,
+    scoped_identifiers: HashMap<String, TypedIdentifier>,
 }
 
-type StackValue = HashSet<String>;
+type StackValue = HashSet<TypedIdentifier>;
 
 #[derive(Default, Clone)]
 struct Stack(Vec<StackValue>);
@@ -31,9 +32,12 @@ impl std::fmt::Debug for Stack {
 type MidenInstruction = String;
 
 impl Transpiler {
-    fn equate_reference(&mut self, x: &str, y: &str) {
-        let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(y)).unwrap();
-        stack_value.insert(x.to_string());
+    fn equate_reference(&mut self, x: TypedIdentifier, y: TypedIdentifier) {
+        if (x.yul_type != y.yul_type) {
+            panic!("Should never be assigning a {:?} to a {:?}", x, y);
+        }
+        let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(&y)).unwrap();
+        stack_value.insert(x);
     }
 
     fn target_stack(&mut self, target_stack: Stack) {
@@ -47,20 +51,20 @@ impl Transpiler {
         self.stack.0.insert(0, HashSet::new());
     }
 
-    fn push_ref_to_top(&mut self, identifier: &str) {
-        let mut identifiers = HashSet::new();
-        identifiers.insert(identifier.to_string());
+    fn push_ref_to_top(&mut self, variable: TypedIdentifier) {
+        let mut variables = HashSet::new();
+        variables.insert(variable);
         let location = self
             .stack
             .0
             .iter()
-            .position(|sv| identifiers.is_subset(sv))
+            .position(|sv| variables.is_subset(sv))
             .unwrap();
-        self.stack.0.insert(0, identifiers);
+        self.stack.0.insert(0, variables);
         self.add_line(&format!("dup.{}", location));
     }
 
-    fn push_refs_to_top(&mut self, identifiers: &HashSet<String>) {
+    fn push_refs_to_top(&mut self, identifiers: &HashSet<TypedIdentifier>) {
         // TODO: need to figure out what to do when we're targeting a stack that has stack values
         // w/ multiple references, there are probably cases that fail currently, where variables
         // are equal to each other before a for loop but not after
@@ -102,10 +106,10 @@ impl Transpiler {
         }
     }
 
-    fn top_is_var(&mut self, identifier: &str) {
+    fn top_is_var(&mut self, typed_identifier: TypedIdentifier) {
         let idents = self.stack.0.get_mut(0).unwrap();
         idents.clear();
-        idents.insert(identifier.to_string());
+        idents.insert(typed_identifier);
     }
 
     fn add_function_stack(&mut self, function_stack: &Stack) {
@@ -114,30 +118,41 @@ impl Transpiler {
         new_stack.0.append(&mut function_stack.0.clone());
         self.stack = new_stack;
     }
+
+    fn get_typed_identifier(&self, identifier: &str) -> &TypedIdentifier {
+        self.scoped_identifiers
+            .get(identifier)
+            .expect(&format!("\"{}\" not in scope", identifier))
+    }
 }
 
 impl Transpiler {
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         let address = self.next_open_memory_address;
         self.next_open_memory_address += 1;
-        self.variables.insert(op.identifier.clone(), address);
+        // TODO: multiple declarations not working
+        assert_eq!(op.typed_identifiers.len(), 1);
+        // TODO: should use memory probably
+        // self.variables.insert(op.identifier.clone(), address);
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs);
-            self.top_is_var(&op.identifier);
+            self.top_is_var(op.typed_identifiers.first().unwrap().clone());
         }
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
-        // TODO: in the future we should be able to just mark that two variables share the same
-        // stack address, but I can't quite figure it out for the fibonacci example currently
+        // TODO: more than one identifier in assignment
+        assert_eq!(op.identifiers.len(), 1);
+        let typed_identifier = self.get_typed_identifier(&op.identifiers.first().unwrap());
         if let Expr::Variable(ExprVariableReference {
             identifier: target_ident,
         }) = &*op.rhs
         {
-            self.equate_reference(&op.identifier.clone(), target_ident);
+            let typed_source_identifier = self.get_typed_identifier(target_ident);
+            self.equate_reference(typed_identifier.clone(), typed_source_identifier.clone());
         } else {
+            self.top_is_var(typed_identifier.clone());
             self.transpile_op(&op.rhs);
-            self.top_is_var(&op.identifier.clone());
         }
     }
 
@@ -230,7 +245,8 @@ impl Transpiler {
     }
 
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
-        self.push_ref_to_top(&op.identifier);
+        let typed_identifier = self.get_typed_identifier(&op.identifier);
+        self.push_ref_to_top(typed_identifier.clone());
     }
 
     //TODO: stack management not quite working
@@ -245,13 +261,17 @@ impl Transpiler {
                 })
                 .collect(),
         );
+        for param in &op.params {
+            self.scoped_identifiers
+                .insert(param.identifier.clone(), param.clone());
+        }
         // let stack_target = self.stack.clone();
         self.add_line(&format!("proc.{}", op.function_name));
         self.indentation += 4;
         self.transpile_block(&op.block);
         // self.target_stack(stack_target);
         for return_ident in &op.returns {
-            self.push_ref_to_top(&return_ident);
+            self.push_ref_to_top(return_ident.clone());
         }
         self.drop_after(op.returns.len());
         let function_stack = self.stack.clone();
@@ -260,6 +280,9 @@ impl Transpiler {
         self.add_line("end");
         self.user_functions
             .insert(op.function_name.clone(), function_stack);
+        for param in &op.params {
+            self.scoped_identifiers.remove(&param.identifier);
+        }
     }
 
     //TODO: update placeholder
@@ -324,6 +347,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         stack: Stack::default(),
         program: "".to_string(),
         user_functions: HashMap::default(),
+        ..Default::default()
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {

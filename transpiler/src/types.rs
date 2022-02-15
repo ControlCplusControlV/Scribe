@@ -1,3 +1,5 @@
+use std::fmt;
+
 use primitive_types::U256;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -22,6 +24,22 @@ pub enum Expr {
     // Number(U256),
     // String(String),
     // Bool(bool),
+}
+
+#[derive(Hash, Clone, PartialEq, Eq, Debug)]
+pub enum YulType {
+    U32,
+    U256,
+}
+
+impl YulType {
+    pub fn from_annotation(annotation: &str) -> Self {
+        match annotation {
+            "u32" => Self::U32,
+            "u256" => Self::U256,
+            _ => panic!(),
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -50,8 +68,8 @@ pub struct ExprDefault {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprFunctionDefinition {
     pub function_name: String,
-    pub params: Vec<String>,
-    pub returns: Vec<String>,
+    pub params: Vec<TypedIdentifier>,
+    pub returns: Vec<TypedIdentifier>,
     pub block: ExprBlock,
 }
 
@@ -62,7 +80,7 @@ pub struct ExprBlock {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprAssignment {
-    pub identifier: String,
+    pub identifiers: Vec<String>,
     pub rhs: Box<Expr>,
 }
 
@@ -88,7 +106,7 @@ pub struct ExprRepeat {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprDeclareVariable {
-    pub identifier: String,
+    pub typed_identifiers: Vec<TypedIdentifier>,
     pub rhs: Option<Box<Expr>>,
 }
 
@@ -103,6 +121,14 @@ pub struct ExprFunctionCall {
     pub function_name: String,
     pub exprs: Box<Vec<Expr>>,
 }
+
+#[derive(Hash, PartialEq, Eq, Debug, Clone)]
+pub struct TypedIdentifier {
+    pub identifier: String,
+    pub yul_type: YulType,
+}
+
+pub type Identifier = String;
 
 use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 
@@ -141,14 +167,24 @@ impl Expr {
             }
 
             // is expr assignment
-            Expr::Assignment(ExprAssignment { identifier, rhs }) => {
-                let _branch = tree.add_branch(&format!("assign - {}", &identifier.to_string()));
+            Expr::Assignment(ExprAssignment { rhs, identifiers }) => {
+                let _branch = tree.add_branch(&format!("assign - {}", &identifiers.join(", ")));
                 rhs.add_to_tree(tree);
             }
 
             //is declare variable
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                let _branch = tree.add_branch(&format!("declare - {}", &identifier.to_string()));
+            Expr::DeclareVariable(ExprDeclareVariable {
+                typed_identifiers,
+                rhs,
+            }) => {
+                let _branch = tree.add_branch(&format!(
+                    "declare - {}",
+                    &typed_identifiers
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ));
                 if let Some(rhs) = rhs {
                     rhs.add_to_tree(tree);
                 }
@@ -224,13 +260,13 @@ impl Expr {
                 {
                     let _params_branch = tree.add_branch(&format!("params"));
                     for param in typed_identifier_list {
-                        tree.add_leaf(param);
+                        tree.add_leaf(&param.to_string());
                     }
                 }
                 {
                     let _params_branch = tree.add_branch(&format!("returns"));
                     for param in return_typed_identifier_list {
-                        tree.add_leaf(param);
+                        tree.add_leaf(&param.to_string());
                     }
                 }
                 let _branch = tree.add_branch(&format!("body"));
@@ -257,4 +293,19 @@ pub fn expressions_to_tree(expressions: &Vec<Expr>) -> String {
         expr.add_to_tree(&mut tree);
     }
     tree.string()
+}
+
+impl fmt::Display for TypedIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}", self.identifier, self.yul_type)
+    }
+}
+
+impl fmt::Display for YulType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            YulType::U32 => write!(f, "u32"),
+            YulType::U256 => write!(f, "u256"),
+        }
+    }
 }

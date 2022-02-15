@@ -69,17 +69,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let function_name = parts.next().unwrap().as_str();
 
             //get the typed identifiers from the function and parse each expression
-            let mut params: Vec<String> = vec![];
-            for identifier in parts.next().unwrap().into_inner() {
-                params.push(identifier.as_str().to_string());
-            }
-
-            //get the return typed identifiers from the function and parse each expression
-            let mut returns: Vec<String> = vec![];
-            for identifier in parts.next().unwrap().into_inner() {
-                // todo!()
-                returns.push(identifier.as_str().to_string());
-            }
+            let mut params: Vec<TypedIdentifier> =
+                parse_typed_identifier_list(parts.next().unwrap());
+            let mut returns: Vec<TypedIdentifier> =
+                parse_typed_identifier_list(parts.next().unwrap());
 
             let block = parts.next().unwrap();
 
@@ -98,7 +91,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let rhs = parts.next().unwrap();
             let rhs_expr = parse_expression(rhs);
             Expr::Assignment(ExprAssignment {
-                identifier: identifiers.first().unwrap().to_string(),
+                identifiers: identifiers,
                 rhs: Box::new(rhs_expr),
             })
         }
@@ -163,18 +156,15 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         //rule is variable declaration
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
-            let identifier_list = parts.next().unwrap();
-            let mut identifiers = Vec::new();
-            for identifier_rule in identifier_list.into_inner() {
-                identifiers.push(identifier_rule.as_str())
-            }
+            let typed_identifiers: Vec<TypedIdentifier> =
+                parse_typed_identifier_list(parts.next().unwrap());
             let rhs = parts.next();
             let mut rhs_expr = None;
             if let Some(rhs) = rhs {
                 rhs_expr = Some(parse_expression(rhs));
             }
             return Expr::DeclareVariable(ExprDeclareVariable {
-                identifier: identifiers.get(0).unwrap().to_string(),
+                typed_identifiers: typed_identifiers,
                 rhs: rhs_expr.map(Box::new),
             });
         }
@@ -186,10 +176,29 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
     }
 }
 
-fn parse_identifier_list(rule: Pair<Rule>) -> Vec<String> {
+fn parse_identifier_list(rule: Pair<Rule>) -> Vec<Identifier> {
     let mut identifiers = Vec::new();
-    for part in rule.into_inner() {
-        identifiers.push(part.as_str().to_string());
+    for rule in rule.into_inner() {
+        let identifier = rule.as_str();
+        identifiers.push(identifier.to_string());
+    }
+    identifiers
+}
+
+fn parse_typed_identifier_list(rule: Pair<Rule>) -> Vec<TypedIdentifier> {
+    let mut identifiers = Vec::new();
+    for rules in rule.into_inner() {
+        let mut parts = rules.into_inner();
+        let identifier = parts.next().unwrap().as_str();
+        let yul_type = parts
+            .next()
+            .map(|x| YulType::from_annotation(x.as_str()))
+            .unwrap_or(YulType::U32);
+        identifiers.push(TypedIdentifier {
+            identifier: identifier.to_string(),
+            yul_type,
+        })
+        // identifiers.push(part.as_str().to_string());
     }
     identifiers
 }
@@ -313,6 +322,16 @@ mod tests {
         insta::assert_snapshot!(parse_to_tree(
             "let x := 1
             let y := 2"
+        ));
+    }
+
+    #[test]
+    fn parse_var_declaration_with_types() {
+        insta::assert_snapshot!(parse_to_tree(
+            "let x:u32 := 1
+            let y:u256 := 2
+            let z := 2
+            "
         ));
     }
 

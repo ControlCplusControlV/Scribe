@@ -65,119 +65,125 @@ impl VariableAssignmentVisitor {
 // subtracting, etc.
 impl ExpressionVisitor for ForLoopToRepeatVisitor {
     fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::ForLoop(ExprForLoop {
-                init_block,
-                conditional,
-                after_block,
-                interior_block,
-            }) => {
-                let start: Option<u128>;
-                let iterator_identifier: Option<String>;
-                if let Some(first_expr) = (*init_block.exprs).first() {
-                    if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
-                        first_expr
-                    {
-                        if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
-                            start = Some(todo!("Need to get literal value here"));
-                            iterator_identifier = Some(identifier.to_string());
-                        } else {
-                            return Some(expr);
-                        }
-                    } else {
-                        return Some(expr);
-                    }
-                } else {
-                    return Some(expr);
-                }
-
-                if let Some(Expr::Assignment(assignment)) = (*after_block.exprs).first() {
-                    if *assignment
-                        == (ExprAssignment {
-                            identifier: iterator_identifier.clone().unwrap(),
-                            rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
-                                function_name: "add".to_string(),
-                                exprs: Box::new(vec![
-                                    Expr::Variable(ExprVariableReference {
-                                        identifier: iterator_identifier.clone().unwrap(),
-                                    }),
-                                    Expr::Literal(todo!("Need to get literal value here")),
-                                ]),
-                            })),
-                        })
-                    {}
-                } else {
-                    return Some(expr);
-                }
-                if let Expr::FunctionCall(ExprFunctionCall {
-                    function_name,
-                    exprs,
-                }) = &**conditional
-                {
-                    if function_name == "lt"
-                        && exprs[0]
-                            == Expr::Variable(ExprVariableReference {
-                                identifier: iterator_identifier.unwrap(),
-                            })
-                    {
-                        if let Expr::Literal(value) = exprs[1] {
-                            return Some(Expr::Repeat(ExprRepeat {
-                                interior_block: interior_block.clone(),
-                                iterations: todo!("Get end value from literal"),
-                            }));
-                        }
-                    }
-                } else {
-                    return Some(expr);
-                }
-            }
-            _ => {}
-        }
+        todo!();
+        //         match &expr {
+        //             Expr::ForLoop(ExprForLoop {
+        //                 init_block,
+        //                 conditional,
+        //                 after_block,
+        //                 interior_block,
+        //             }) => {
+        //                 let start: Option<u128>;
+        //                 let iterator_identifier: Option<String>;
+        //                 if let Some(first_expr) = (*init_block.exprs).first() {
+        //                     if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
+        //                         first_expr
+        //                     {
+        //                         if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
+        //                             start = Some(todo!("Need to get literal value here"));
+        //                             iterator_identifier = Some(identifier.to_string());
+        //                         } else {
+        //                             return Some(expr);
+        //                         }
+        //                     } else {
+        //                         return Some(expr);
+        //                     }
+        //                 } else {
+        //                     return Some(expr);
+        //                 }
+        //
+        //                 if let Some(Expr::Assignment(assignment)) = (*after_block.exprs).first() {
+        //                     if *assignment
+        //                         == (ExprAssignment {
+        //                             typed_identifier: iterator_identifier.clone().unwrap(),
+        //                             rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
+        //                                 function_name: "add".to_string(),
+        //                                 exprs: Box::new(vec![
+        //                                     Expr::Variable(ExprVariableReference {
+        //                                         identifier: iterator_identifier.clone().unwrap(),
+        //                                     }),
+        //                                     Expr::Literal(todo!("Need to get literal value here")),
+        //                                 ]),
+        //                             })),
+        //                         })
+        //                     {}
+        //                 } else {
+        //                     return Some(expr);
+        //                 }
+        //                 if let Expr::FunctionCall(ExprFunctionCall {
+        //                     function_name,
+        //                     exprs,
+        //                 }) = &**conditional
+        //                 {
+        //                     if function_name == "lt"
+        //                         && exprs[0]
+        //                             == Expr::Variable(ExprVariableReference {
+        //                                 identifier: iterator_identifier.unwrap(),
+        //                             })
+        //                     {
+        //                         if let Expr::Literal(value) = exprs[1] {
+        //                             return Some(Expr::Repeat(ExprRepeat {
+        //                                 interior_block: interior_block.clone(),
+        //                                 iterations: todo!("Get end value from literal"),
+        //                             }));
+        //                         }
+        //                     }
+        //                 } else {
+        //                     return Some(expr);
+        //                 }
+        //             }
+        //             _ => {}
+        //         }
         Some(expr)
     }
 }
 
 impl ExpressionVisitor for VariableAssignmentVisitor {
     fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                if let Some(Expr::Literal(literal)) = rhs.clone().map(|r| *r) {
-                    self.last_assignment.insert(identifier.clone(), literal);
-                }
-                let count = self
-                    .assignment_counter
-                    .entry(identifier.clone())
-                    .or_insert(0);
-                *count += 1;
-            }
-            Expr::Assignment(ExprAssignment { identifier, rhs: _ }) => {
-                let count = self
-                    .assignment_counter
-                    .entry(identifier.clone())
-                    .or_insert(0);
-                *count += 1;
-            }
-            _ => {}
-        }
+        todo!();
+        // match &expr {
+        //     Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
+        //         if let Some(Expr::Literal(literal)) = rhs.clone().map(|r| *r) {
+        //             self.last_assignment.insert(identifier.clone(), literal);
+        //         }
+        //         let count = self
+        //             .assignment_counter
+        //             .entry(identifier.clone())
+        //             .or_insert(0);
+        //         *count += 1;
+        //     }
+        //     Expr::Assignment(ExprAssignment {
+        //         typed_identifier: identifier,
+        //         rhs: _,
+        //     }) => {
+        //         let count = self
+        //             .assignment_counter
+        //             .entry(identifier.clone())
+        //             .or_insert(0);
+        //         *count += 1;
+        //     }
+        //     _ => {}
+        // }
         Some(expr)
     }
 }
 
 impl ExpressionVisitor for ConstVariableVisitor {
     fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
-        match &expr {
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs: _ }) => {
-                if self.const_variables.get(identifier).is_some() {
-                    return None;
-                }
-            }
-            Expr::Variable(ExprVariableReference { identifier }) => {
-                if let Some(value) = self.const_variables.get(identifier) {
-                    return Some(Expr::Literal(value.clone()));
-                }
-            }
-            _ => {}
-        }
+        todo!();
+        // match &expr {
+        //     Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs: _ }) => {
+        //         if self.const_variables.get(identifier).is_some() {
+        //             return None;
+        //         }
+        //     }
+        //     Expr::Variable(ExprVariableReference { identifier }) => {
+        //         if let Some(value) = self.const_variables.get(identifier) {
+        //             return Some(Expr::Literal(value.clone()));
+        //         }
+        //     }
+        //     _ => {}
+        // }
         Some(expr)
     }
 }
@@ -214,20 +220,22 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             }),
 
             //Expr is assignment
-            Expr::Assignment(ExprAssignment { identifier, rhs }) => {
-                Expr::Assignment(ExprAssignment {
-                    identifier,
-                    rhs: Box::new(walk_expr(*rhs, visitor).unwrap()),
-                })
-            }
+            Expr::Assignment(ExprAssignment {
+                identifiers: identifiers,
+                rhs,
+            }) => Expr::Assignment(ExprAssignment {
+                identifiers: identifiers,
+                rhs: Box::new(walk_expr(*rhs, visitor).unwrap()),
+            }),
 
             //Expr is declare variable
-            Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
-                Expr::DeclareVariable(ExprDeclareVariable {
-                    identifier,
-                    rhs: rhs.map(|rhs| Box::new(walk_expr(*rhs, visitor).unwrap())),
-                })
-            }
+            Expr::DeclareVariable(ExprDeclareVariable {
+                typed_identifiers,
+                rhs,
+            }) => Expr::DeclareVariable(ExprDeclareVariable {
+                typed_identifiers,
+                rhs: rhs.map(|rhs| Box::new(walk_expr(*rhs, visitor).unwrap())),
+            }),
 
             //TODO: Expr is function definition
             Expr::FunctionDefinition(ExprFunctionDefinition {
