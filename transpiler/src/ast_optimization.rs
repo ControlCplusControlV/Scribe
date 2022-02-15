@@ -199,9 +199,13 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             //Expr is function call
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
+                inferred_return_types,
+                inferred_param_types,
                 exprs,
             }) => Expr::FunctionCall(ExprFunctionCall {
                 function_name,
+                inferred_return_types,
+                inferred_param_types,
                 exprs: Box::new(vec![
                     walk_expr(exprs[0].clone(), visitor).unwrap(),
                     walk_expr(exprs[1].clone(), visitor).unwrap(),
@@ -221,10 +225,12 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
 
             //Expr is assignment
             Expr::Assignment(ExprAssignment {
-                identifiers: identifiers,
+                inferred_types,
+                identifiers,
                 rhs,
             }) => Expr::Assignment(ExprAssignment {
-                identifiers: identifiers,
+                identifiers,
+                inferred_types,
                 rhs: Box::new(walk_expr(*rhs, visitor).unwrap()),
             }),
 
@@ -293,7 +299,10 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             }),
 
             //Expr is variable
-            Expr::Variable(ExprVariableReference { identifier: _ }) => expr,
+            Expr::Variable(ExprVariableReference {
+                ref identifier,
+                ref inferred_type,
+            }) => expr,
             Expr::Case(_) => todo!(),
         });
     }

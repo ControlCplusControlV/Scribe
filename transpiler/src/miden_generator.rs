@@ -47,7 +47,7 @@ type MidenInstruction = String;
 
 impl Transpiler {
     fn equate_reference(&mut self, x: TypedIdentifier, y: TypedIdentifier) {
-        if (x.yul_type != y.yul_type) {
+        if x.yul_type != y.yul_type {
             panic!("Should never be assigning a {:?} to a {:?}", x, y);
         }
         let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(&y)).unwrap();
@@ -105,7 +105,7 @@ impl Transpiler {
 
     fn drop_after(&mut self, n: usize) {
         let stack_size = self.stack.0.len();
-        for n in (0..n) {
+        for n in 0..n {
             let shift = stack_size - 1;
             if shift == 1 {
                 self.add_line(&format!("swap"));
@@ -167,16 +167,17 @@ impl Transpiler {
         let typed_identifier = self
             .get_typed_identifier(&op.identifiers.first().unwrap())
             .clone();
-        if let Expr::Variable(ExprVariableReference {
-            identifier: target_ident,
-        }) = &*op.rhs
-        {
-            let typed_source_identifier = self.get_typed_identifier(target_ident);
-            self.equate_reference(typed_identifier.clone(), typed_source_identifier.clone());
-        } else {
-            self.transpile_op(&op.rhs);
-            self.top_is_var(typed_identifier);
-        }
+        // TODO: bring back equating references
+        // if let Expr::Variable(ExprVariableReference {
+        //     identifier: target_ident,
+        // }) = &*op.rhs
+        // {
+        //     let typed_source_identifier = self.get_typed_identifier(target_ident);
+        //     self.equate_reference(typed_identifier.clone(), typed_source_identifier.clone());
+        // } else {
+        self.transpile_op(&op.rhs);
+        self.top_is_var(typed_identifier);
+        // }
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) {
@@ -242,20 +243,11 @@ impl Transpiler {
         for expr in op.exprs.clone().into_iter() {
             self.transpile_op(&expr);
         }
-        // TODO: this is terrible
-        if self
-            .stack
-            .0
-            .first()
-            .unwrap()
-            .iter()
-            .next()
-            .map(|ti| ti.yul_type.clone())
-            == Some(YulType::U256)
+        // If there is a first param and we've inferred it to be of type u256
+        if op.inferred_param_types.first() == Some(&Some(YulType::U256))
+            && op.function_name == "add"
         {
-            if (op.function_name == "add") {
-                todo!("Need to insert u256 addition here");
-            }
+            todo!("Need to insert u256 addition here");
         }
         self.consume(2);
         self.add_unknown();
@@ -273,9 +265,12 @@ impl Transpiler {
 
     fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
-            ExprLiteral::Number(v) => {
+            ExprLiteral::Number(ExprLiteralNumber {
+                value,
+                inferred_type,
+            }) => {
                 // TODO: check size
-                self.push(*v);
+                self.push(*value);
             }
             ExprLiteral::String(_) => todo!(),
             &ExprLiteral::Bool(_) => todo!(),

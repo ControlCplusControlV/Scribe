@@ -26,6 +26,12 @@ pub enum Expr {
     // Bool(bool),
 }
 
+impl Expr {
+    pub fn get_inferred_type() -> Option<YulType> {
+        todo!()
+    }
+}
+
 #[derive(Hash, Clone, PartialEq, Eq, Debug)]
 pub enum YulType {
     U32,
@@ -44,14 +50,22 @@ impl YulType {
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum ExprLiteral {
-    Number(U256),
+    Number(ExprLiteralNumber),
     String(String),
     Bool(bool),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprLiteralNumber {
+    pub inferred_type: Option<YulType>,
+    // Always parse as u256, even if u32
+    pub value: U256,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprVariableReference {
     pub identifier: String,
+    pub inferred_type: Option<YulType>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -81,6 +95,7 @@ pub struct ExprBlock {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprAssignment {
     pub identifiers: Vec<String>,
+    pub inferred_types: Vec<Option<YulType>>,
     pub rhs: Box<Expr>,
 }
 
@@ -120,6 +135,8 @@ pub struct ExprIfStatement {
 pub struct ExprFunctionCall {
     pub function_name: String,
     pub exprs: Box<Vec<Expr>>,
+    pub inferred_return_types: Vec<Option<YulType>>,
+    pub inferred_param_types: Vec<Option<YulType>>,
 }
 
 #[derive(Hash, PartialEq, Eq, Debug, Clone)]
@@ -137,7 +154,17 @@ impl Expr {
         match self {
             //is literal
             Expr::Literal(literal) => match literal {
-                ExprLiteral::Number(x) => tree.add_leaf(&x.to_string()),
+                ExprLiteral::Number(ExprLiteralNumber {
+                    inferred_type,
+                    value,
+                }) => tree.add_leaf(&format!(
+                    "{}:{}",
+                    value,
+                    inferred_type
+                        .clone()
+                        .map(|yt| yt.to_string())
+                        .unwrap_or("unknown".to_string())
+                )),
                 ExprLiteral::String(x) => tree.add_leaf(&x),
                 ExprLiteral::Bool(x) => tree.add_leaf(&x.to_string()),
             },
@@ -146,9 +173,16 @@ impl Expr {
             //is function call
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
+                inferred_return_types,
+                inferred_param_types,
                 exprs,
             }) => {
-                let _branch = tree.add_branch(&format!("{}()", &function_name.to_string()));
+                let _branch = tree.add_branch(&format!(
+                    "{}({}): {}",
+                    &function_name.to_string(),
+                    format_inferred_types(&inferred_param_types),
+                    format_inferred_types(&inferred_return_types)
+                ));
                 for expression in exprs.clone().into_iter() {
                     expression.add_to_tree(tree);
                 }
@@ -167,8 +201,20 @@ impl Expr {
             }
 
             // is expr assignment
-            Expr::Assignment(ExprAssignment { rhs, identifiers }) => {
-                let _branch = tree.add_branch(&format!("assign - {}", &identifiers.join(", ")));
+            Expr::Assignment(ExprAssignment {
+                rhs,
+                inferred_types,
+                identifiers,
+            }) => {
+                let _branch = tree.add_branch(&format!(
+                    "assign - {}",
+                    identifiers
+                        .iter()
+                        .zip(inferred_types.iter())
+                        .map(|(ident, yt)| format!("{}:{}", ident, inferred_type_to_string(yt)))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ));
                 rhs.add_to_tree(tree);
             }
 
@@ -244,8 +290,15 @@ impl Expr {
             }
 
             //is variable
-            Expr::Variable(ExprVariableReference { identifier }) => {
-                let _branch = tree.add_branch(&format!("var - {}", identifier));
+            Expr::Variable(ExprVariableReference {
+                identifier,
+                inferred_type,
+            }) => {
+                let _branch = tree.add_branch(&format!(
+                    "var - {}:{}",
+                    identifier,
+                    inferred_type_to_string(inferred_type)
+                ));
             }
 
             //is function definition
@@ -266,6 +319,7 @@ impl Expr {
                 {
                     let _params_branch = tree.add_branch(&format!("returns"));
                     for param in return_typed_identifier_list {
+                        dbg!(&return_typed_identifier_list);
                         tree.add_leaf(&param.to_string());
                     }
                 }
@@ -308,4 +362,19 @@ impl fmt::Display for YulType {
             YulType::U256 => write!(f, "u256"),
         }
     }
+}
+
+fn inferred_type_to_string(inferred_type: &Option<YulType>) -> String {
+    match inferred_type {
+        Some(yul_type) => yul_type.to_string(),
+        None => "unknown".to_string(),
+    }
+}
+
+fn format_inferred_types(inferred_types: &Vec<Option<YulType>>) -> String {
+    inferred_types
+        .iter()
+        .map(|it| inferred_type_to_string(it))
+        .collect::<Vec<_>>()
+        .join(", ")
 }

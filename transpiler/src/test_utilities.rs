@@ -3,6 +3,7 @@ use crate::ast_optimization::optimize_ast;
 use crate::executor;
 use crate::miden_generator;
 use crate::parser;
+use crate::type_inference::infer_types;
 use crate::types::expressions_to_tree;
 use colored::*;
 use miden_processor::StarkField;
@@ -32,6 +33,11 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
 
     let ast = optimize_ast(parsed);
     print_title("Optimized AST");
+    println!("{}", expressions_to_tree(&ast));
+    println!();
+
+    let ast = infer_types(&ast);
+    print_title("With type-inference");
     println!("{}", expressions_to_tree(&ast));
     println!();
 

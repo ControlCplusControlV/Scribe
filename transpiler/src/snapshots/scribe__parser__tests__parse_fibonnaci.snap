@@ -1,50 +1,50 @@
 ---
 source: src/parser.rs
-assertion_line: 364
+assertion_line: 380
 expression: "parse_to_tree(\"\n    let f := 1\n    let s := 1\n    let next\n    for { let i := 0 } lt(i, 10) { i := add(i, 1)}\n    {\n      if lt(i, 2) {\n        mstore(i, 1)\n      }\n      if gt(i, 1) {\n        next := add(s, f)\n        f := s\n        s := next\n        mstore(i, s)\n      }\n    }\")"
 
 ---
 AST
 ├╼ declare - f:u32
-│ └╼ 1
+│ └╼ 1:u32
 ├╼ declare - s:u32
-│ └╼ 1
+│ └╼ 1:u32
 ├╼ declare - next:u32
 └╼ for loop
   ├╼ init block
   │ └╼ declare - i:u32
-  │   └╼ 0
+  │   └╼ 0:u32
   ├╼ conditional
-  │ └╼ lt()
-  │   ├╼ var - i
-  │   └╼ 10
+  │ └╼ lt(u32, u32): u32
+  │   ├╼ var - i:u32
+  │   └╼ 10:u32
   ├╼ after block
-  │ └╼ assign - i
-  │   └╼ add()
-  │     ├╼ var - i
-  │     └╼ 1
+  │ └╼ assign - i:u32
+  │   └╼ add(u32, u32): u32
+  │     ├╼ var - i:u32
+  │     └╼ 1:u32
   └╼ interior block
     ├╼ if statement
     │ └╼ conditional
-    │   ├╼ lt()
-    │   │ ├╼ var - i
-    │   │ └╼ 2
-    │   └╼ mstore()
-    │     ├╼ var - i
-    │     └╼ 1
+    │   ├╼ lt(u32, u32): u32
+    │   │ ├╼ var - i:u32
+    │   │ └╼ 2:u32
+    │   └╼ mstore(u32, u32): u32
+    │     ├╼ var - i:u32
+    │     └╼ 1:u32
     └╼ if statement
       └╼ conditional
-        ├╼ gt()
-        │ ├╼ var - i
-        │ └╼ 1
-        ├╼ assign - next
-        │ └╼ add()
-        │   ├╼ var - s
-        │   └╼ var - f
-        ├╼ assign - f
-        │ └╼ var - s
-        ├╼ assign - s
-        │ └╼ var - next
-        └╼ mstore()
-          ├╼ var - i
-          └╼ var - s
+        ├╼ gt(u32, u32): u32
+        │ ├╼ var - i:u32
+        │ └╼ 1:u32
+        ├╼ assign - next:u32
+        │ └╼ add(u32, u32): u32
+        │   ├╼ var - s:u32
+        │   └╼ var - f:u32
+        ├╼ assign - f:u32
+        │ └╼ var - s:u32
+        ├╼ assign - s:u32
+        │ └╼ var - next:u32
+        └╼ mstore(u32, u32): u32
+          ├╼ var - i:u32
+          └╼ var - s:u32

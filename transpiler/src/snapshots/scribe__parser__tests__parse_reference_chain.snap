@@ -1,0 +1,18 @@
+---
+source: src/parser.rs
+assertion_line: 477
+expression: "parse_to_tree(\"\n            function fun__spendAllowance_564(var_owner_524, var_spender_526, var_amount_528) {\n                let _110 := var_owner_524\n                let expr_534 := _110\n            }\")"
+
+---
+AST
+└╼ function definition - fun__spendAllowance_564
+  ├╼ params
+  │ ├╼ var_owner_524:u32
+  │ ├╼ var_spender_526:u32
+  │ └╼ var_amount_528:u32
+  ├╼ returns
+  └╼ body
+    ├╼ declare - _110:u32
+    │ └╼ var - var_owner_524:u32
+    └╼ declare - expr_534:u32
+      └╼ var - _110:u32

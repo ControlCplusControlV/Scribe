@@ -4,6 +4,7 @@ use pest::Parser;
 use pest_derive::Parser;
 use primitive_types::U256;
 
+use crate::type_inference::infer_types;
 use crate::types::*;
 
 #[derive(Parser)]
@@ -71,10 +72,12 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let function_name = parts.next().unwrap().as_str();
 
             //get the typed identifiers from the function and parse each expression
-            let mut params: Vec<TypedIdentifier> =
-                parse_typed_identifier_list(parts.next().unwrap());
-            let mut returns: Vec<TypedIdentifier> =
-                parse_typed_identifier_list(parts.next().unwrap());
+            let params: Vec<TypedIdentifier> = parse_typed_identifier_list(parts.next().unwrap());
+            let returns_rule = parts.next().unwrap();
+            let mut returns = vec![];
+            if let Some(inner) = returns_rule.into_inner().next() {
+                returns = parse_typed_identifier_list(inner);
+            }
 
             let block = parts.next().unwrap();
 
@@ -93,7 +96,8 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             let rhs = parts.next().unwrap();
             let rhs_expr = parse_expression(rhs);
             Expr::Assignment(ExprAssignment {
-                identifiers: identifiers,
+                identifiers,
+                inferred_types: vec![],
                 rhs: Box::new(rhs_expr),
             })
         }
@@ -233,16 +237,25 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::hex_number => {
             // TODO: parse hex numbers
             let i = expression.as_str();
-            Expr::Literal(ExprLiteral::Number(U256::MAX))
+            Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                inferred_type: None,
+                value: U256::MAX,
+            }))
         }
         Rule::hex_literal => {
             // TODO: parse hex numbers
             let i = expression.as_str();
-            Expr::Literal(ExprLiteral::Number(U256::MAX))
+            Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                inferred_type: None,
+                value: U256::MAX,
+            }))
         }
         Rule::decimal_number => {
             let i = expression.as_str();
-            Expr::Literal(ExprLiteral::Number(U256::from_dec_str(i).unwrap()))
+            Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                inferred_type: None,
+                value: U256::from_dec_str(i).unwrap(),
+            }))
         }
         Rule::string_literal => {
             let content = expression.into_inner().next().unwrap();
@@ -270,6 +283,8 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             return Expr::FunctionCall(ExprFunctionCall {
                 function_name: function_name.to_string(),
                 exprs: Box::new(exprs),
+                inferred_return_types: vec![],
+                inferred_param_types: vec![],
             });
         }
 
@@ -283,6 +298,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
 fn parse_identifier(identifier: Pair<Rule>) -> Expr {
     return Expr::Variable(ExprVariableReference {
         identifier: identifier.as_str().to_string(),
+        inferred_type: None,
     });
 }
 
@@ -290,7 +306,7 @@ fn parse_block(expression: Pair<Rule>) -> ExprBlock {
     let mut exprs: Vec<Expr> = Vec::new();
     for statement in expression.into_inner() {
         // for comments, probably better solution here
-        if (statement.clone().into_inner().next().is_some()) {
+        if statement.clone().into_inner().next().is_some() {
             exprs.push(parse_statement(statement));
         }
     }
@@ -316,7 +332,9 @@ mod tests {
     use super::*;
 
     fn parse_to_tree(yul: &str) -> String {
-        expressions_to_tree(&parse_yul_syntax(yul))
+        let ast = parse_yul_syntax(yul);
+        let ast_with_inferred_types = infer_types(&ast);
+        expressions_to_tree(&ast_with_inferred_types)
     }
 
     #[test]
@@ -435,7 +453,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_function_def() {
+    fn parse_function_def_with_return() {
         insta::assert_snapshot!(parse_to_tree(
             "
             function allocate_unbounded() -> memPtr {
@@ -443,5 +461,16 @@ mod tests {
             }"
         ));
     }
+
+    #[test]
+    fn parse_function_def_without_return() {
+        insta::assert_snapshot!(parse_to_tree(
+            "
+            function allocate_unbounded()  {
+                let memPtr := mload(64)
+            }"
+        ));
+    }
+
     //TODO: add test for default
 }
