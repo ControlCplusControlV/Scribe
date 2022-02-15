@@ -69,6 +69,23 @@ fn u256_equality() {
 
 #[ignore]
 #[test]
+fn u256_function() {
+    run_example(
+        "
+            function add_a_lot(a:u256) -> b {
+                let b:u256 = 100;
+                if eq(a, 100) {
+                    b := add(a, 18446744073709551616)
+                } 
+            }
+            add_a_lot(100);
+            ",
+        MidenResult::U256(U256::from_dec_str("18446744073709551716").unwrap()),
+    );
+}
+
+#[ignore]
+#[test]
 fn u256_sum_odds() {
     run_example(
         "
