@@ -242,6 +242,22 @@ impl Transpiler {
         for expr in op.exprs.clone().into_iter() {
             self.transpile_op(&expr);
         }
+        // TODO: this is terrible
+        if self
+            .stack
+            .0
+            .first()
+            .unwrap()
+            .iter()
+            .next()
+            .unwrap()
+            .yul_type
+            == YulType::U256
+        {
+            if (op.function_name == "add") {
+                todo!("Need to insert u256 addition here");
+            }
+        }
         self.consume(2);
         self.add_unknown();
         self.add_line(miden_function_name);
