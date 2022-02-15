@@ -7,7 +7,12 @@ use crate::types::expressions_to_tree;
 use colored::*;
 use miden_processor::StarkField;
 
-pub fn run_example(yul_code: &str, expected_output: Vec<u64>) {
+pub enum MidenResult {
+    U256(primitive_types::U256),
+    U32(u32),
+}
+
+pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     fn print_title(s: &str) {
         let s1 = format!("=== {} ===", s).blue().bold();
         println!("{}", s1);
@@ -41,9 +46,16 @@ pub fn run_example(yul_code: &str, expected_output: Vec<u64>) {
 
     print_title("Miden Output");
     println!("{}", last_stack_value);
-    if *expected_output.first().unwrap() != last_stack_value.as_int() {
-        print_title("Miden Stack");
-        println!("{:?}", stack);
-        panic!("Failed, stack result not right");
+    match expected_output {
+        MidenResult::U256(expected) => {
+            todo!();
+        }
+        MidenResult::U32(expected) => {
+            if expected != last_stack_value.as_int() as u32 {
+                print_title("Miden Stack");
+                println!("{:?}", stack);
+                panic!("Failed, stack result not right");
+            }
+        }
     }
 }

@@ -1,25 +1,25 @@
-use scribe::test_utilities::run_example;
+use scribe::test_utilities::{run_example, MidenResult};
 
 #[test]
 fn integration_math() {
-    run_example("add(1, 2)", vec![3]);
-    run_example("mul(2, 3)", vec![6]);
-    run_example("mul(2, 3)", vec![6]);
-    run_example("sub(4, 2)", vec![2]);
-    run_example("div(8, 2)", vec![4]);
+    run_example("add(1, 2)", MidenResult::U32(3));
+    run_example("mul(2, 3)", MidenResult::U32(6));
+    run_example("mul(2, 3)", MidenResult::U32(6));
+    run_example("sub(4, 2)", MidenResult::U32(2));
+    run_example("div(8, 2)", MidenResult::U32(4));
 }
 
 #[test]
 fn integration_boolean() {
-    run_example("lt(2, 6)", vec![1]);
-    run_example("lt(6, 2)", vec![0]);
-    run_example("eq(2, 2)", vec![1]);
-    run_example("eq(4, 2)", vec![0]);
-    run_example("or(1, 0)", vec![1]);
-    run_example("or(0, 0)", vec![0]);
-    run_example("and(1, 1)", vec![1]);
-    run_example("and(0, 1)", vec![0]);
-    run_example("and(0, 0)", vec![0]);
+    run_example("lt(2, 6)", MidenResult::U32(1));
+    run_example("lt(6, 2)", MidenResult::U32(0));
+    run_example("eq(2, 2)", MidenResult::U32(1));
+    run_example("eq(4, 2)", MidenResult::U32(0));
+    run_example("or(1, 0)", MidenResult::U32(1));
+    run_example("or(0, 0)", MidenResult::U32(0));
+    run_example("and(1, 1)", MidenResult::U32(1));
+    run_example("and(0, 1)", MidenResult::U32(0));
+    run_example("and(0, 0)", MidenResult::U32(0));
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn integration_variables() {
             x := 4
             add(x, y)
             ",
-        vec![7],
+        MidenResult::U32(7),
     );
 }
 
@@ -45,7 +45,7 @@ fn integration_if() {
                 5
             }
             ",
-        vec![5],
+        MidenResult::U32(5),
     );
 }
 
@@ -61,7 +61,7 @@ fn integration_function() {
             }
             mul(square(3), secret())
             ",
-        vec![378],
+        MidenResult::U32(378),
     );
 }
 
@@ -75,7 +75,7 @@ fn integration_for() {
             }
             i
             ",
-        vec![5],
+        MidenResult::U32(5),
     );
 }
 
@@ -96,6 +96,6 @@ fn integration_fib() {
             }
             b
             ",
-        vec![89],
+        MidenResult::U32(89),
     );
 }
