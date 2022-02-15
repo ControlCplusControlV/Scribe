@@ -250,9 +250,8 @@ impl Transpiler {
             .unwrap()
             .iter()
             .next()
-            .unwrap()
-            .yul_type
-            == YulType::U256
+            .map(|ti| ti.yul_type.clone())
+            == Some(YulType::U256)
         {
             if (op.function_name == "add") {
                 todo!("Need to insert u256 addition here");
@@ -348,6 +347,16 @@ impl Transpiler {
         )
     }
 
+    fn add_proc(&mut self, proc_name: &str, lines: &str) {
+        self.add_line(&format!("proc.{}", proc_name));
+        self.indentation += 4;
+        for line in lines.split("\n") {
+            self.add_line(&line.trim_start())
+        }
+        self.indentation -= 4;
+        self.add_line("end");
+    }
+
     fn add_lines(&mut self, lines: Vec<MidenInstruction>) {
         for line in lines {
             self.add_line(&line);
@@ -376,6 +385,43 @@ impl Transpiler {
             // Expr::Case(op) => self.transpile_case(op),
         }
     }
+    fn add_utility_functions(&mut self) {
+        self.add_proc(
+            "u256add",
+            r##"
+                swapw.2
+                swapw.3
+                movup.3
+                movup.7
+                u32add.unsafe
+                movup.4
+                movup.7
+                u32addc.unsafe
+                movup.4
+                movup.6
+                u32addc.unsafe
+                movup.4
+                movup.7
+                u32addc.unsafe
+                movdn.4
+                swapw.2
+                movup.4
+                movup.4
+                movup.8
+                u32addc.unsafe
+                movup.4
+                movup.7
+                u32addc.unsafe
+                movup.4
+                movup.6
+                u32addc.unsafe
+                movup.4
+                movup.5
+                u32addc.unsafe
+                drop
+            "##,
+        )
+    }
 }
 
 pub fn transpile_program(expressions: Vec<Expr>) -> String {
@@ -395,6 +441,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
             _ => (),
         }
     }
+    transpiler.add_utility_functions();
     transpiler.add_line("begin");
     transpiler.indentation += 4;
     for expr in ast {
