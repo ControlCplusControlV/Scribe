@@ -10,6 +10,8 @@ use crate::types::*;
 #[grammar = "./grammar.pest"]
 struct IdentParser;
 
+const DEFAULT_TYPE: YulType = YulType::U32;
+
 //function to parse yul syntax into miden opcodes
 pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     // Parse the entire file as a string
@@ -193,7 +195,7 @@ fn parse_typed_identifier_list(rule: Pair<Rule>) -> Vec<TypedIdentifier> {
         let yul_type = parts
             .next()
             .map(|x| YulType::from_annotation(x.as_str()))
-            .unwrap_or(YulType::U32);
+            .unwrap_or(DEFAULT_TYPE);
         identifiers.push(TypedIdentifier {
             identifier: identifier.to_string(),
             yul_type,

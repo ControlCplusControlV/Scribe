@@ -1,0 +1,13 @@
+---
+source: src/parser.rs
+assertion_line: 331
+expression: "parse_to_tree(\"let x:u32 := 1\n            let y:u256 := 2\n            let z := 2\n            \")"
+
+---
+AST
+├╼ declare - x:u32
+│ └╼ 1
+├╼ declare - y:u256
+│ └╼ 2
+└╼ declare - z:u32
+  └╼ 2

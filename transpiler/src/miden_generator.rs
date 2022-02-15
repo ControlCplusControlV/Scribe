@@ -22,8 +22,22 @@ struct Stack(Vec<StackValue>);
 
 impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "\n").unwrap();
         for value in self.0.iter() {
-            write!(f, "\n{:?}", value).unwrap();
+            if value.is_empty() {
+                write!(f, "EMPTY\n").unwrap();
+            } else {
+                write!(
+                    f,
+                    "{}\n",
+                    value
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )
+                .unwrap();
+            }
         }
         Ok(())
     }
@@ -128,8 +142,15 @@ impl Transpiler {
 
 impl Transpiler {
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
-        let address = self.next_open_memory_address;
-        self.next_open_memory_address += 1;
+        assert_eq!(op.typed_identifiers.len(), 1);
+        // let address = self.next_open_memory_address;
+        for typed_identifier in &op.typed_identifiers {
+            self.scoped_identifiers.insert(
+                typed_identifier.identifier.clone(),
+                typed_identifier.clone(),
+            );
+        }
+        // self.next_open_memory_address += 1;
         // TODO: multiple declarations not working
         assert_eq!(op.typed_identifiers.len(), 1);
         // TODO: should use memory probably
@@ -143,7 +164,9 @@ impl Transpiler {
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
         // TODO: more than one identifier in assignment
         assert_eq!(op.identifiers.len(), 1);
-        let typed_identifier = self.get_typed_identifier(&op.identifiers.first().unwrap());
+        let typed_identifier = self
+            .get_typed_identifier(&op.identifiers.first().unwrap())
+            .clone();
         if let Expr::Variable(ExprVariableReference {
             identifier: target_ident,
         }) = &*op.rhs
@@ -151,8 +174,8 @@ impl Transpiler {
             let typed_source_identifier = self.get_typed_identifier(target_ident);
             self.equate_reference(typed_identifier.clone(), typed_source_identifier.clone());
         } else {
-            self.top_is_var(typed_identifier.clone());
             self.transpile_op(&op.rhs);
+            self.top_is_var(typed_identifier);
         }
     }
 
