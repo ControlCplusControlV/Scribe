@@ -248,7 +248,7 @@ impl Transpiler {
             op.inferred_param_types.first().unwrap(),
             op.function_name.as_ref(),
         ) {
-            //u256add
+            //u256 operations
             (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
@@ -552,29 +552,29 @@ impl Transpiler {
             swapw.3
             movup.3
             movup.7
-            u32or
+            u32xor
             movup.3
             movup.6
-            u32or
+            u32xor
             movup.3
             movup.5
-            u32or
+            u32xor
             movup.3
             movup.4
-            u32or
+            u32xor
             swapw.2
             movup.3
             movup.7
-            u32or
+            u32xor
             movup.3
             movup.6
-            u32or
+            u32xor
             movup.3
             movup.5
-            u32or
+            u32xor
             movup.3
             movup.4
-            u32or
+            u32xor
             "##,
         );
     }
