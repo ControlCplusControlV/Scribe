@@ -277,7 +277,8 @@ impl Transpiler {
         if op.inferred_param_types.first() == Some(&Some(YulType::U256))
             && op.function_name == "add"
         {
-            todo!("Need to insert u256 addition here");
+            self.add_line("exec.u256add");
+            return;
         }
         self.consume(2);
         self.add_unknown();

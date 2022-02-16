@@ -14,7 +14,7 @@ pub enum MidenResult {
     U32(u32),
 }
 pub fn run_example_temp_u256_mode(yul_code: &str, expected_output: MidenResult) {
-    run_example(yul_code, expected_output);
+    _run_example(yul_code, expected_output, true);
 }
 
 fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bool) {
@@ -55,16 +55,18 @@ fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bo
     let last_stack_value = stack.first().unwrap();
 
     print_title("Miden Output");
-    println!("{}", last_stack_value);
     match expected_output {
         MidenResult::U256(expected) => {
-            if expected != miden_to_u256(execution_value) {
+            let stack_value = miden_to_u256(execution_value);
+            println!("{}", stack_value);
+            if expected != stack_value {
                 print_title("Miden Stack");
                 println!("{:?}", stack);
                 panic!("Failed, stack result not right");
             }
         }
         MidenResult::U32(expected) => {
+            println!("{}", last_stack_value);
             if expected != last_stack_value.as_int() as u32 {
                 print_title("Miden Stack");
                 println!("{:?}", stack);
