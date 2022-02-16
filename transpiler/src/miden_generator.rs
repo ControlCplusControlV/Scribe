@@ -227,6 +227,7 @@ impl Transpiler {
             self.add_line("push.0");
             self.add_line("eq");
             self.consume(1);
+            return;
         }
         // TODO: All functions are assumed to consume 2 stack elements and add one, for now
         // I how Rust handles strings, why are &str and String different? Just to torment me?
