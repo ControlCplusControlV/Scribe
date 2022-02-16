@@ -1,5 +1,5 @@
 use primitive_types::U256;
-use scribe::test_utilities::{run_example, MidenResult};
+use scribe::test_utilities::{run_example, run_example_temp_u256_mode, MidenResult};
 
 #[ignore]
 #[test]
@@ -15,7 +15,7 @@ fn u256_literal() {
 #[ignore]
 #[test]
 fn u256_add() {
-    run_example(
+    run_example_temp_u256_mode(
         "
             let x:u256 := 28948022309329048855892746252171976963317496166410141009864396001978282409984
             let y:u256 := 21711016731996786641919559689128982722488122124807605757398297001483711807488

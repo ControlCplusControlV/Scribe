@@ -5,7 +5,6 @@ use primitive_types::U256;
 
 use crate::{ast_optimization::optimize_ast, types::*};
 
-#[derive(Default)]
 struct Transpiler {
     variables: HashMap<String, u32>,
     indentation: u32,
@@ -14,6 +13,7 @@ struct Transpiler {
     program: String,
     user_functions: HashMap<String, Stack>,
     scoped_identifiers: HashMap<String, TypedIdentifier>,
+    temporary_u256_mode: bool,
 }
 
 type StackValue = HashSet<TypedIdentifier>;
@@ -76,7 +76,9 @@ impl Transpiler {
             .position(|sv| variables.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, variables);
-        self.add_line(&format!("dup.{}", location));
+        if !self.temporary_u256_mode {
+            self.add_line(&format!("dup.{}", location))
+        }
     }
 
     fn push_refs_to_top(&mut self, identifiers: &HashSet<TypedIdentifier>) {
@@ -90,7 +92,9 @@ impl Transpiler {
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, identifiers.clone());
-        self.add_line(&format!("dup.{}", location))
+        if !self.temporary_u256_mode {
+            self.add_line(&format!("dup.{}", location))
+        }
     }
 
     fn push(&mut self, value: U256) {
@@ -491,15 +495,16 @@ impl Transpiler {
     }
 }
 
-pub fn transpile_program(expressions: Vec<Expr>) -> String {
+pub fn transpile_program(expressions: Vec<Expr>, temp_u256_mode: bool) -> String {
     let mut transpiler = Transpiler {
         variables: HashMap::new(),
         next_open_memory_address: 0,
         indentation: 0,
         stack: Stack::default(),
+        scoped_identifiers: HashMap::new(),
         program: "".to_string(),
         user_functions: HashMap::default(),
-        ..Default::default()
+        temporary_u256_mode: temp_u256_mode,
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {
@@ -518,4 +523,3 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     transpiler.add_line("end");
     transpiler.program
 }
-

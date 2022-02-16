@@ -47,7 +47,7 @@ fn main() {
         pause();
 
         clear_screen();
-        let miden_code = miden_generator::transpile_program(parsed);
+        let miden_code = miden_generator::transpile_program(parsed, false);
         print_title("Generated Miden Assembly");
         println!("{}", miden_code);
         println!();

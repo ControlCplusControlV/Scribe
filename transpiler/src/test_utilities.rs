@@ -12,8 +12,11 @@ pub enum MidenResult {
     U256(primitive_types::U256),
     U32(u32),
 }
+pub fn run_example_temp_u256_mode(yul_code: &str, expected_output: MidenResult) {
+    run_example(yul_code, expected_output);
+}
 
-pub fn run_example(yul_code: &str, expected_output: MidenResult) {
+fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bool) {
     fn print_title(s: &str) {
         let s1 = format!("=== {} ===", s).blue().bold();
         println!("{}", s1);
@@ -41,7 +44,7 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     println!("{}", expressions_to_tree(&ast));
     println!();
 
-    let miden_code = miden_generator::transpile_program(ast);
+    let miden_code = miden_generator::transpile_program(ast, temp_u256_mode);
     print_title("Generated Miden Assembly");
     println!("{}", miden_code);
     println!();
@@ -64,4 +67,8 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
             }
         }
     }
+}
+
+pub fn run_example(yul_code: &str, expected_output: MidenResult) {
+    _run_example(yul_code, expected_output, false);
 }
