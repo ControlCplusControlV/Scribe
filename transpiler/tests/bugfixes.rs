@@ -13,6 +13,7 @@ fn test_is_zero() {
     );
 }
 
+#[ignore]
 #[test]
 fn test_is_zero_u256() {
     run_example_temp_u256_mode(
