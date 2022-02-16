@@ -1,4 +1,3 @@
-// Tests to make sure fixed bugs stay fixed
 use primitive_types::U256;
 use scribe::test_utilities::{run_example, run_example_temp_u256_mode, MidenResult};
 #[test]
