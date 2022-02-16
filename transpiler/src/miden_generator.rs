@@ -248,9 +248,21 @@ impl Transpiler {
             op.inferred_param_types.first().unwrap(),
             op.function_name.as_ref(),
         ) {
-            //u256iszero
-            (Some(YulType::U256), "iszero") => {
-                self.add_line("exec.u256iszero");
+            //u256add
+            (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero") => {
+                let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
+                self.add_line(&u256_operation);
+                return;
+            }
+
+            //other operations
+            (
+                Some(YulType::U32) | None,
+                "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
+            ) => {
+                self.consume(2);
+                self.add_unknown();
+                self.add_line(op.function_name.as_ref());
                 return;
             }
 
@@ -259,23 +271,6 @@ impl Transpiler {
                 self.add_line("push.0");
                 self.add_line("eq");
                 self.consume(1);
-                return;
-            }
-
-            //u256add
-            (Some(YulType::U256), "add") => {
-                self.add_line("exec.u256add");
-                return;
-            }
-
-            //additional operations
-            (
-                Some(YulType::U32) | None,
-                "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
-            ) => {
-                self.consume(2);
-                self.add_unknown();
-                self.add_line(op.function_name.as_ref());
                 return;
             }
 
@@ -416,42 +411,7 @@ impl Transpiler {
     }
     fn add_utility_functions(&mut self) {
         self.add_proc(
-            "u256add",
-            r##"
-            swapw.3
-            movup.3
-            movup.7
-            u32add.unsafe
-            movup.4
-            movup.7
-            u32addc.unsafe
-            movup.4
-            movup.6
-            u32addc.unsafe
-            movup.4
-            movup.5
-            u32addc.unsafe
-            movdn.12
-            swapw.2
-            movup.12
-            movup.4
-            movup.8
-            u32addc.unsafe
-            movup.4
-            movup.7
-            u32addc.unsafe
-            movup.4
-            movup.6
-            u32addc.unsafe
-            movup.4
-            movup.5
-            u32addc.unsafe
-            drop
-                    "##,
-        );
-
-        self.add_proc(
-            "u256iszero",
+            "u256iszero_unsafe",
             r##"
             push.0
             eq
@@ -523,7 +483,7 @@ impl Transpiler {
         );
 
         self.add_proc(
-            "u256and",
+            "u256and_unsafe",
             r##"
             swapw.3
             movup.3
@@ -555,39 +515,39 @@ impl Transpiler {
         );
 
         self.add_proc(
-            "u256or",
+            "u256or_unsafe",
             r##"
-                   swapw.3
-        movup.3
-        movup.7
-        u32or
-        movup.3
-        movup.6
-        u32or
-        movup.3
-        movup.5
-        u32or
-        movup.3
-        movup.4
-        u32or
-        swapw.2
-        movup.3
-        movup.7
-        u32or
-        movup.3
-        movup.6
-        u32or
-        movup.3
-        movup.5
-        u32or
-        movup.3
-        movup.4
-        u32or
+            swapw.3
+            movup.3
+            movup.7
+            u32or
+            movup.3
+            movup.6
+            u32or
+            movup.3
+            movup.5
+            u32or
+            movup.3
+            movup.4
+            u32or
+            swapw.2
+            movup.3
+            movup.7
+            u32or
+            movup.3
+            movup.6
+            u32or
+            movup.3
+            movup.5
+            u32or
+            movup.3
+            movup.4
+            u32or
             "##,
         );
 
         self.add_proc(
-            "u256xor",
+            "u256xor_unsafe",
             r##"
             swapw.3
             movup.3
