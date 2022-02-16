@@ -107,7 +107,7 @@ impl Transpiler {
         for bytes in &bytes.iter().chunks(4) {
             let mut stack_value: u32 = 0;
             for (i, bytes) in bytes.enumerate() {
-                stack_value = stack_value | ((*bytes as u32) << ((4 - i) * 8)) as u32
+                stack_value = stack_value | ((*bytes as u32) << ((3 - i) * 8)) as u32
             }
             self.add_line(&format!("push.{}", stack_value));
         }
