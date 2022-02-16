@@ -7,6 +7,7 @@ use crate::type_inference::infer_types;
 use crate::types::expressions_to_tree;
 use colored::*;
 use miden_processor::StarkField;
+use primitive_types::U256;
 
 pub enum MidenResult {
     U256(primitive_types::U256),
@@ -57,7 +58,11 @@ fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bo
     println!("{}", last_stack_value);
     match expected_output {
         MidenResult::U256(expected) => {
-            todo!();
+            if expected != miden_to_u256(execution_value) {
+                print_title("Miden Stack");
+                println!("{:?}", stack);
+                panic!("Failed, stack result not right");
+            }
         }
         MidenResult::U32(expected) => {
             if expected != last_stack_value.as_int() as u32 {
@@ -67,6 +72,22 @@ fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bo
             }
         }
     }
+}
+
+//convert the miden output to U256
+pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
+    let u256_bytes = execuiton_trace
+        .last_stack_state()
+        .iter()
+        .take(8)
+        .flat_map(|x| {
+            let svint = x.as_int() as u32;
+
+            return svint.to_le_bytes();
+        })
+        .collect::<Vec<_>>();
+
+    U256::from_little_endian(&u256_bytes)
 }
 
 pub fn run_example(yul_code: &str, expected_output: MidenResult) {
