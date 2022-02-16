@@ -8,7 +8,7 @@ fn test_is_zero() {
         let five:u32 := 5
         let x:u32 := iszero(five)
         x
-        }", MidenResult::U32(10));
+        }", MidenResult::U32(0));
     
 }
 
