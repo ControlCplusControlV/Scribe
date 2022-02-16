@@ -1,10 +1,10 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
 use primitive_types::U256;
 
 use crate::{ast_optimization::optimize_ast, types::*};
 
-#[derive(Default)]
 struct Transpiler {
     variables: HashMap<String, u32>,
     indentation: u32,
@@ -13,6 +13,7 @@ struct Transpiler {
     program: String,
     user_functions: HashMap<String, Stack>,
     scoped_identifiers: HashMap<String, TypedIdentifier>,
+    temporary_u256_mode: bool,
 }
 
 type StackValue = HashSet<TypedIdentifier>;
@@ -75,7 +76,9 @@ impl Transpiler {
             .position(|sv| variables.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, variables);
-        self.add_line(&format!("dup.{}", location));
+        if !self.temporary_u256_mode {
+            self.add_line(&format!("dup.{}", location))
+        }
     }
 
     fn push_refs_to_top(&mut self, identifiers: &HashSet<TypedIdentifier>) {
@@ -89,12 +92,29 @@ impl Transpiler {
             .position(|sv| identifiers.is_subset(sv))
             .unwrap();
         self.stack.0.insert(0, identifiers.clone());
-        self.add_line(&format!("dup.{}", location))
+        if !self.temporary_u256_mode {
+            self.add_line(&format!("dup.{}", location))
+        }
     }
 
     fn push(&mut self, value: U256) {
         self.stack.0.insert(0, HashSet::new());
         self.add_line(&format!("push.{}", value));
+    }
+
+    fn push_u256(&mut self, value: U256) {
+        for i in 0..8 {
+            self.stack.0.insert(0, HashSet::new());
+        }
+        let mut bytes = [0u8; 32];
+        value.to_big_endian(&mut bytes);
+        for bytes in &bytes.iter().chunks(4) {
+            let mut stack_value: u32 = 0;
+            for (i, bytes) in bytes.enumerate() {
+                stack_value = stack_value | ((*bytes as u32) << ((3 - i) * 8)) as u32
+            }
+            self.add_line(&format!("push.{}", stack_value));
+        }
     }
 
     fn consume(&mut self, n: u32) {
@@ -222,6 +242,12 @@ impl Transpiler {
             self.add_function_stack(function_stack);
             return;
         }
+        if op.inferred_param_types.first() == Some(&Some(YulType::U256))
+            && op.function_name == "iszero"
+        {
+            self.add_line("exec.u256iszero");
+            return;
+        }
         if op.function_name == "iszero" {
             // inline iszero thing
             self.add_line("push.0");
@@ -274,7 +300,7 @@ impl Transpiler {
                 inferred_type,
             }) => {
                 if inferred_type == &Some(YulType::U256) {
-                    todo!("Need to implement u256 number literals");
+                    self.push_u256(*value);
                 } else {
                     self.push(*value);
                 }
@@ -422,19 +448,63 @@ impl Transpiler {
                 u32addc.unsafe
                 drop
             "##,
-        )
+        );
+
+        self.add_proc(
+            "u256iszero",
+            r##"
+            push.0
+            eq
+            # 1 result at the top of the stack #
+            swap.1
+            push.0
+            eq
+            # 2 results at the top of the stack #
+            swap.2 # Move the 3rd and 4th items to the top so we can compare them #
+            push.0
+            eq
+            swap.1
+            # 4th item originally at the top of the stack #
+            push.0
+            eq
+            # 4 results at the top of the stack #
+            swap.4
+            # Top 4 stack items are final items to compare with #
+            push.0
+            eq
+            swap.1
+            push.0
+            eq
+            swap.2
+            push.0
+            eq
+            swap.1
+            push.0
+            eq
+
+            # Combine all results into a single value at the top of the stack #
+            and
+            and
+            and
+            and
+            and
+            and
+            and
+            "##,
+        );
     }
 }
 
-pub fn transpile_program(expressions: Vec<Expr>) -> String {
+pub fn transpile_program(expressions: Vec<Expr>, temp_u256_mode: bool) -> String {
     let mut transpiler = Transpiler {
         variables: HashMap::new(),
         next_open_memory_address: 0,
         indentation: 0,
         stack: Stack::default(),
+        scoped_identifiers: HashMap::new(),
         program: "".to_string(),
         user_functions: HashMap::default(),
-        ..Default::default()
+        temporary_u256_mode: temp_u256_mode,
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {
