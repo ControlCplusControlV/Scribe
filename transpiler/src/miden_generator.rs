@@ -223,9 +223,9 @@ impl Transpiler {
             return;
         }
         if op.function_name == "iszero" {
-            // inlen iszero thing
-            self.add_line("___");
-            self.add_line("___");
+            // inline iszero thing
+            self.add_line("push.0");
+            self.add_line("eq");
             self.consume(1);
         }
         // TODO: All functions are assumed to consume 2 stack elements and add one, for now
