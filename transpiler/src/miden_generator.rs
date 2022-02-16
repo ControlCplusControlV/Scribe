@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
 use primitive_types::U256;
@@ -95,6 +96,21 @@ impl Transpiler {
     fn push(&mut self, value: U256) {
         self.stack.0.insert(0, HashSet::new());
         self.add_line(&format!("push.{}", value));
+    }
+
+    fn push_u256(&mut self, value: U256) {
+        for i in 0..8 {
+            self.stack.0.insert(0, HashSet::new());
+        }
+        let mut bytes = [0u8; 32];
+        value.to_big_endian(&mut bytes);
+        for bytes in &bytes.iter().chunks(4) {
+            let mut stack_value: u32 = 0;
+            for (i, bytes) in bytes.enumerate() {
+                stack_value = stack_value | ((*bytes as u32) << ((4 - i) * 8)) as u32
+            }
+            self.add_line(&format!("push.{}", stack_value));
+        }
     }
 
     fn consume(&mut self, n: u32) {
@@ -274,7 +290,7 @@ impl Transpiler {
                 inferred_type,
             }) => {
                 if inferred_type == &Some(YulType::U256) {
-                    todo!("Need to implement u256 number literals");
+                    self.push_u256(*value);
                 } else {
                     self.push(*value);
                 }

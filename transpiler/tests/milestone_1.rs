@@ -3,6 +3,17 @@ use scribe::test_utilities::{run_example, MidenResult};
 
 #[ignore]
 #[test]
+fn u256_literal() {
+    run_example(
+        "
+            let x:u256 := 39847239847923879823657234623047
+        ",
+        MidenResult::U256(U256::from_dec_str("39847239847923879823657234623047").unwrap()),
+    );
+}
+
+#[ignore]
+#[test]
 fn u256_add() {
     run_example(
         "
