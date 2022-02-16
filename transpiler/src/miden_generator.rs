@@ -237,52 +237,52 @@ impl Transpiler {
         for expr in op.exprs.clone().into_iter() {
             self.transpile_op(&expr);
         }
+
         if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
             self.add_line(&format!("exec.{}", op.function_name));
             self.add_function_stack(function_stack);
             return;
         }
-        if op.inferred_param_types.first() == Some(&Some(YulType::U256))
-            && op.function_name == "iszero"
-        {
-            self.add_line("exec.u256iszero");
-            return;
-        }
-        if op.function_name == "iszero" {
-            // inline iszero thing
-            self.add_line("push.0");
-            self.add_line("eq");
-            self.consume(1);
-            return;
-        }
-        // TODO: All functions are assumed to consume 2 stack elements and add one, for now
-        // I how Rust handles strings, why are &str and String different? Just to torment me?
-        let miden_function_name = match op.function_name.as_str() {
-            // Basic Arithmetic Operations
-            "add" => "add",
-            "sub" => "sub",
-            "mul" => "mul",
-            "div" => "div",
 
-            // Boolean Operations
-            "gt" => "gt",
-            "lt" => "lt",
-            "eq" => "eq",
-            "and" => "and",
-            "or" => "or",
-            // TODO: check whether we've actually generated a function for this call
-            _ => todo!("Need to implement {} function in miden", op.function_name),
+        match (
+            op.inferred_param_types.first().unwrap(),
+            op.function_name.as_ref(),
+        ) {
+            //u256iszero
+            (Some(YulType::U256), "iszero") => {
+                self.add_line("exec.u256iszero");
+                return;
+            }
+
+            //iszero
+            (Some(YulType::U32) | None, "iszero") => {
+                self.add_line("push.0");
+                self.add_line("eq");
+                self.consume(1);
+                return;
+            }
+
+            //u256add
+            (Some(YulType::U256), "add") => {
+                self.add_line("exec.u256add");
+                return;
+            }
+
+            //additional operations
+            (
+                Some(YulType::U32) | None,
+                "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
+            ) => {
+                self.consume(2);
+                self.add_unknown();
+                self.add_line(op.function_name.as_ref());
+                return;
+            }
+
+            _ => {
+                todo!()
+            }
         };
-        // If there is a first param and we've inferred it to be of type u256
-        if op.inferred_param_types.first() == Some(&Some(YulType::U256))
-            && op.function_name == "add"
-        {
-            self.add_line("exec.u256add");
-            return;
-        }
-        self.consume(2);
-        self.add_unknown();
-        self.add_line(miden_function_name);
     }
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
@@ -418,36 +418,36 @@ impl Transpiler {
         self.add_proc(
             "u256add",
             r##"
-    swapw.3
-    movup.3
-    movup.7
-    u32add.unsafe
-    movup.4
-    movup.7
-    u32addc.unsafe
-    movup.4
-    movup.6
-    u32addc.unsafe
-    movup.4
-    movup.5
-    u32addc.unsafe
-    movdn.12
-    swapw.2
-    movup.12
-    movup.4
-    movup.8
-    u32addc.unsafe
-    movup.4
-    movup.7
-    u32addc.unsafe
-    movup.4
-    movup.6
-    u32addc.unsafe
-    movup.4
-    movup.5
-    u32addc.unsafe
-    drop
-            "##,
+            swapw.3
+            movup.3
+            movup.7
+            u32add.unsafe
+            movup.4
+            movup.7
+            u32addc.unsafe
+            movup.4
+            movup.6
+            u32addc.unsafe
+            movup.4
+            movup.5
+            u32addc.unsafe
+            movdn.12
+            swapw.2
+            movup.12
+            movup.4
+            movup.8
+            u32addc.unsafe
+            movup.4
+            movup.7
+            u32addc.unsafe
+            movup.4
+            movup.6
+            u32addc.unsafe
+            movup.4
+            movup.5
+            u32addc.unsafe
+            drop
+                    "##,
         );
 
         self.add_proc(
@@ -484,6 +484,137 @@ impl Transpiler {
             and 
             and 
             and 
+            "##,
+        );
+
+        self.add_proc(
+            "u256add_unsafe",
+            r##"
+            swapw.3
+            movup.3
+            movup.7
+            u32add.unsafe
+            movup.4
+            movup.7
+            u32addc.unsafe
+            movup.4
+            movup.6
+            u32addc.unsafe
+            movup.4
+            movup.5
+            u32addc.unsafe
+            movdn.12
+            swapw.2
+            movup.12
+            movup.4
+            movup.8
+            u32addc.unsafe
+            movup.4
+            movup.7
+            u32addc.unsafe
+            movup.4
+            movup.6
+            u32addc.unsafe
+            movup.4
+            movup.5
+            u32addc.unsafe
+            drop
+            "##,
+        );
+
+        self.add_proc(
+            "u256and",
+            r##"
+            swapw.3
+            movup.3
+            movup.7
+            u32and
+            movup.3
+            movup.6
+            u32and
+            movup.3
+            movup.5
+            u32and
+            movup.3
+            movup.4
+            u32and
+            swapw.2
+            movup.3
+            movup.7
+            u32and
+            movup.3
+            movup.6
+            u32and
+            movup.3
+            movup.5
+            u32and
+            movup.3
+            movup.4
+            u32and
+            "##,
+        );
+
+        self.add_proc(
+            "u256or",
+            r##"
+                   swapw.3
+        movup.3
+        movup.7
+        u32or
+        movup.3
+        movup.6
+        u32or
+        movup.3
+        movup.5
+        u32or
+        movup.3
+        movup.4
+        u32or
+        swapw.2
+        movup.3
+        movup.7
+        u32or
+        movup.3
+        movup.6
+        u32or
+        movup.3
+        movup.5
+        u32or
+        movup.3
+        movup.4
+        u32or
+            "##,
+        );
+
+        self.add_proc(
+            "u256xor",
+            r##"
+            swapw.3
+            movup.3
+            movup.7
+            u32or
+            movup.3
+            movup.6
+            u32or
+            movup.3
+            movup.5
+            u32or
+            movup.3
+            movup.4
+            u32or
+            swapw.2
+            movup.3
+            movup.7
+            u32or
+            movup.3
+            movup.6
+            u32or
+            movup.3
+            movup.5
+            u32or
+            movup.3
+            movup.4
+            u32or
             "##,
         );
     }
