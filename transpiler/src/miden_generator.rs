@@ -418,36 +418,35 @@ impl Transpiler {
         self.add_proc(
             "u256add",
             r##"
-                swapw.2
-                swapw.3
-                movup.3
-                movup.7
-                u32add.unsafe
-                movup.4
-                movup.7
-                u32addc.unsafe
-                movup.4
-                movup.6
-                u32addc.unsafe
-                movup.4
-                movup.7
-                u32addc.unsafe
-                movdn.4
-                swapw.2
-                movup.4
-                movup.4
-                movup.8
-                u32addc.unsafe
-                movup.4
-                movup.7
-                u32addc.unsafe
-                movup.4
-                movup.6
-                u32addc.unsafe
-                movup.4
-                movup.5
-                u32addc.unsafe
-                drop
+    swapw.3
+    movup.3
+    movup.7
+    u32add.unsafe
+    movup.4
+    movup.7
+    u32addc.unsafe
+    movup.4
+    movup.6
+    u32addc.unsafe
+    movup.4
+    movup.5
+    u32addc.unsafe
+    movdn.12
+    swapw.2
+    movup.12
+    movup.4
+    movup.8
+    u32addc.unsafe
+    movup.4
+    movup.7
+    u32addc.unsafe
+    movup.4
+    movup.6
+    u32addc.unsafe
+    movup.4
+    movup.5
+    u32addc.unsafe
+    drop
             "##,
         );
 
@@ -456,41 +455,35 @@ impl Transpiler {
             r##"
             push.0
             eq
-            # 1 result at the top of the stack #
-            swap.1
-            push.0
-            eq
-            # 2 results at the top of the stack #
-            swap.2 # Move the 3rd and 4th items to the top so we can compare them #
-            push.0
-            eq
-            swap.1
-            # 4th item originally at the top of the stack #
-            push.0
-            eq
-            # 4 results at the top of the stack #
-            swap.4
-            # Top 4 stack items are final items to compare with #
-            push.0
-            eq
-            swap.1
-            push.0
-            eq
+            swap.1 
+            push.0 
+            eq 
             swap.2
-            push.0
+            push.0 
+            eq 
+            swap.3
+            push.0 
             eq
-            swap.1
-            push.0
+            swap.4
+            push.0 
+            eq
+            swap.5
+            push.0 
+            eq
+            swap.6
+            push.0 
+            eq
+            swap.7
+            push.0 
             eq
 
-            # Combine all results into a single value at the top of the stack #
-            and
-            and
-            and
-            and
-            and
-            and
-            and
+            and 
+            and 
+            and 
+            and 
+            and 
+            and 
+            and 
             "##,
         );
     }

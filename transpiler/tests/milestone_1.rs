@@ -12,7 +12,6 @@ fn u256_literal() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_add() {
     run_example_temp_u256_mode(
