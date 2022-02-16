@@ -238,6 +238,12 @@ impl Transpiler {
             self.add_function_stack(function_stack);
             return;
         }
+        if op.inferred_param_types.first() == Some(&Some(YulType::U256))
+            && op.function_name == "iszero"
+        {
+            self.add_line("exec.u256iszero");
+            return;
+        }
         if op.function_name == "iszero" {
             // inline iszero thing
             self.add_line("push.0");
@@ -438,7 +444,50 @@ impl Transpiler {
                 u32addc.unsafe
                 drop
             "##,
-        )
+        );
+
+        self.add_proc(
+            "u256iszero",
+            r##"
+            push.0
+            eq
+            # 1 result at the top of the stack #
+            swap.1
+            push.0
+            eq
+            # 2 results at the top of the stack #
+            swap.2 # Move the 3rd and 4th items to the top so we can compare them #
+            push.0
+            eq
+            swap.1
+            # 4th item originally at the top of the stack #
+            push.0
+            eq
+            # 4 results at the top of the stack #
+            swap.4
+            # Top 4 stack items are final items to compare with #
+            push.0
+            eq
+            swap.1
+            push.0
+            eq
+            swap.2
+            push.0
+            eq
+            swap.1
+            push.0
+            eq
+
+            # Combine all results into a single value at the top of the stack #
+            and
+            and
+            and
+            and
+            and
+            and
+            and
+            "##,
+        );
     }
 }
 
@@ -469,3 +518,4 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     transpiler.add_line("end");
     transpiler.program
 }
+
