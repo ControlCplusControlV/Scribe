@@ -12,6 +12,7 @@ pub enum Expr {
     DeclareVariable(ExprDeclareVariable),
     ForLoop(ExprForLoop),
     Block(ExprBlock),
+    Switch(ExprSwitch),
     Case(ExprCase),
     Default(ExprDefault),
     Variable(ExprVariableReference),
@@ -66,6 +67,14 @@ pub struct ExprLiteralNumber {
 pub struct ExprVariableReference {
     pub identifier: String,
     pub inferred_type: Option<YulType>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct ExprSwitch {
+    pub default_case: Option<ExprBlock>,
+    pub inferred_type: Option<YulType>,
+    pub expr: Box<Expr>,
+    pub cases: Vec<ExprCase>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -169,6 +178,19 @@ impl Expr {
                 ExprLiteral::Bool(x) => tree.add_leaf(&x.to_string()),
             },
             Expr::Case(_) => todo!(),
+            Expr::Switch(ExprSwitch {
+                inferred_type,
+                cases,
+                default_case,
+                expr,
+            }) => {
+                let _branch = tree.add_branch(&format!("switch"));
+                expr.add_to_tree(tree);
+                for case in cases {
+                    let _branch = tree.add_branch(&format!("case"));
+                    Expr::Block(case.block.clone()).add_to_tree(tree);
+                }
+            }
 
             //is function call
             Expr::FunctionCall(ExprFunctionCall {

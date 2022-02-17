@@ -26,18 +26,7 @@ impl TypeInferrer {
     fn walk_expr(&mut self, expr: Expr) -> Expr {
         return match expr {
             //Expr is literal
-            Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                value,
-                inferred_type: _,
-            })) => {
-                let inferred_type = self.expected_types.first().unwrap_or(&None).clone();
-                self.evaluated_types = vec![inferred_type.clone()];
-                Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                    value,
-                    inferred_type: inferred_type,
-                }))
-            }
-            Expr::Literal(ref _x) => expr,
+            Expr::Literal(literal) => Expr::Literal(self.infer_literal(literal)),
 
             //Expr is function call
             Expr::FunctionCall(ExprFunctionCall {
@@ -211,11 +200,58 @@ impl TypeInferrer {
                 let inferred_type = self.scoped_variables.get(&identifier).cloned();
                 self.evaluated_types = vec![inferred_type.clone()];
                 Expr::Variable(ExprVariableReference {
-                    inferred_type: inferred_type,
+                    inferred_type,
                     identifier,
                 })
             }
-            Expr::Case(_) => todo!(),
+            Expr::Switch(ExprSwitch {
+                default_case,
+                inferred_type: _,
+                expr,
+                cases,
+            }) => {
+                let new_expr = self.walk_expr(*expr.clone());
+                let inferred_type = self.evaluated_types.first().unwrap_or(&None).clone();
+                let expected_types = self.evaluated_types.clone();
+                dbg!(&inferred_type);
+                dbg!(&cases);
+                let cases = cases
+                    .into_iter()
+                    .map(|case| {
+                        self.expected_types = expected_types.clone();
+                        ExprCase {
+                            literal: self.infer_literal(case.literal),
+                            block: ExprBlock {
+                                exprs: self.walk_ast(&case.block.exprs),
+                            },
+                        }
+                    })
+                    .collect();
+                Expr::Switch(ExprSwitch {
+                    default_case,
+                    inferred_type,
+                    expr: Box::new(new_expr),
+                    cases,
+                })
+            }
+            _ => unreachable!(),
         };
+    }
+
+    fn infer_literal(&mut self, literal: ExprLiteral) -> ExprLiteral {
+        match literal {
+            ExprLiteral::Number(ExprLiteralNumber {
+                value,
+                inferred_type: _,
+            }) => {
+                let inferred_type = self.expected_types.first().unwrap_or(&None).clone();
+                self.evaluated_types = vec![inferred_type.clone()];
+                ExprLiteral::Number(ExprLiteralNumber {
+                    value,
+                    inferred_type: inferred_type,
+                })
+            }
+            x => x,
+        }
     }
 }

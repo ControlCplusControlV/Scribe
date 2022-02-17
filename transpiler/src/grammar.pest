@@ -7,15 +7,15 @@ WHITESPACE = _{ " " }
 
 
 block = { "{" ~ NEWLINE* ~ statement* ~ NEWLINE* ~ "}" }
-statement = { NEWLINE* ~ (for_loop | variable_declaration | assignment | if_statement | block | function_definition | switch |  break_ | continue_ | leave | expr | comment)  ~ NEWLINE*  } 
+statement = { NEWLINE* ~ (for_loop | switch | if_statement | variable_declaration | assignment |  block | function_definition |   break_ | continue_ | leave | expr | comment)  ~ NEWLINE*  } 
 function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list ~ ")" ~ function_returns ~ block }
 function_returns = { ( "->" ~ typed_identifier_list)? } 
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
 assignment = { (identifier_list) ~ ":=" ~ NEWLINE * ~ expr }
 expr = { function_call | literal | identifier  }
 if_statement = { "if" ~ expr ~ block}
-switch = { "switch" ~ expr ~ ((case+ ~ default?) | default) }
-case = { "case" ~ literal ~ block }
+switch = { "switch" ~ expr ~ NEWLINE* ~ ((case+ ~ default?) | default) }
+case = { "case" ~ literal ~ block ~ NEWLINE* }
 default = { "default" ~ block }
 for_loop = { "for" ~ block ~ expr ~ block ~ (NEWLINE*) ~ block}
 break_ = @{ "break" }

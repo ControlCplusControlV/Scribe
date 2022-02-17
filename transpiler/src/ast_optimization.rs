@@ -304,6 +304,7 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
                 ref inferred_type,
             }) => expr,
             Expr::Case(_) => todo!(),
+            Expr::Switch(_) => todo!(),
         });
     }
     None

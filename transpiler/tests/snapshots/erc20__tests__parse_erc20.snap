@@ -661,88 +661,71 @@ AST
 │   │ └╼ 0:unknown
 │   ├╼ assign - 
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ var - switch:unknown
-│   ├╼ gt(): 
-│   │ ├╼ var - newLen:unknown
-│   │ └╼ 31:unknown
-│   ├╼ var - case:unknown
-│   ├╼ 1:unknown
-│   ├╼ declare - loopEnd:u32
-│   │ └╼ and(): 
-│   │   ├╼ var - newLen:unknown
-│   │   └╼ not(): 
-│   │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - dstPtr:u32
-│   │ └╼ array_dataslot_t_string_storage(): 
-│   │   └╼ var - slot:unknown
-│   ├╼ declare - i:u32
-│   │ └╼ 0:unknown
-│   ├╼ for loop
-│   │ ├╼ init block
-│   │ ├╼ conditional
-│   │ │ └╼ lt(): 
-│   │ │   ├╼ var - i:unknown
-│   │ │   └╼ var - loopEnd:unknown
-│   │ ├╼ after block
-│   │ │ └╼ assign - 
-│   │ │   └╼ add(): 
-│   │ │     ├╼ var - i:unknown
-│   │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   │ └╼ interior block
-│   │   ├╼ sstore(): 
-│   │   │ ├╼ var - dstPtr:unknown
-│   │   │ └╼ mload(): 
-│   │   │   └╼ add(): 
-│   │   │     ├╼ var - src:unknown
-│   │   │     └╼ var - srcOffset:unknown
-│   │   ├╼ assign - 
-│   │   │ └╼ add(): 
-│   │   │   ├╼ var - dstPtr:unknown
-│   │   │   └╼ 1:unknown
-│   │   └╼ assign - 
-│   │     └╼ add(): 
-│   │       ├╼ var - srcOffset:unknown
-│   │       └╼ 32:unknown
-│   ├╼ if statement
-│   │ └╼ conditional
-│   │   ├╼ lt(): 
-│   │   │ ├╼ var - loopEnd:unknown
-│   │   │ └╼ var - newLen:unknown
-│   │   ├╼ declare - lastValue:u32
-│   │   │ └╼ mload(): 
-│   │   │   └╼ add(): 
-│   │   │     ├╼ var - src:unknown
-│   │   │     └╼ var - srcOffset:unknown
-│   │   └╼ sstore(): 
-│   │     ├╼ var - dstPtr:unknown
-│   │     └╼ mask_bytes_dynamic(): 
-│   │       ├╼ var - lastValue:unknown
-│   │       └╼ and(): 
-│   │         ├╼ var - newLen:unknown
-│   │         └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ sstore(): 
-│   │ ├╼ var - slot:unknown
-│   │ └╼ add(): 
-│   │   ├╼ mul(): 
-│   │   │ ├╼ var - newLen:unknown
-│   │   │ └╼ 2:unknown
-│   │   └╼ 1:unknown
-│   ├╼ var - default:unknown
-│   ├╼ declare - value:u32
-│   │ └╼ 0:unknown
-│   ├╼ if statement
-│   │ └╼ conditional
-│   │   ├╼ var - newLen:unknown
-│   │   └╼ assign - 
-│   │     └╼ mload(): 
-│   │       └╼ add(): 
-│   │         ├╼ var - src:unknown
-│   │         └╼ var - srcOffset:unknown
-│   └╼ sstore(): 
-│     ├╼ var - slot:unknown
-│     └╼ extract_used_part_and_set_length_of_short_byte_array(): 
-│       ├╼ var - value:unknown
-│       └╼ var - newLen:unknown
+│   └╼ switch
+│     ├╼ gt(): 
+│     │ ├╼ var - newLen:unknown
+│     │ └╼ 31:unknown
+│     └╼ case
+│       ├╼ declare - loopEnd:u32
+│       │ └╼ and(): 
+│       │   ├╼ var - newLen:unknown
+│       │   └╼ not(): 
+│       │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│       ├╼ declare - dstPtr:u32
+│       │ └╼ array_dataslot_t_string_storage(): 
+│       │   └╼ var - slot:unknown
+│       ├╼ declare - i:u32
+│       │ └╼ 0:unknown
+│       ├╼ for loop
+│       │ ├╼ init block
+│       │ ├╼ conditional
+│       │ │ └╼ lt(): 
+│       │ │   ├╼ var - i:unknown
+│       │ │   └╼ var - loopEnd:unknown
+│       │ ├╼ after block
+│       │ │ └╼ assign - 
+│       │ │   └╼ add(): 
+│       │ │     ├╼ var - i:unknown
+│       │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│       │ └╼ interior block
+│       │   ├╼ sstore(): 
+│       │   │ ├╼ var - dstPtr:unknown
+│       │   │ └╼ mload(): 
+│       │   │   └╼ add(): 
+│       │   │     ├╼ var - src:unknown
+│       │   │     └╼ var - srcOffset:unknown
+│       │   ├╼ assign - 
+│       │   │ └╼ add(): 
+│       │   │   ├╼ var - dstPtr:unknown
+│       │   │   └╼ 1:unknown
+│       │   └╼ assign - 
+│       │     └╼ add(): 
+│       │       ├╼ var - srcOffset:unknown
+│       │       └╼ 32:unknown
+│       ├╼ if statement
+│       │ └╼ conditional
+│       │   ├╼ lt(): 
+│       │   │ ├╼ var - loopEnd:unknown
+│       │   │ └╼ var - newLen:unknown
+│       │   ├╼ declare - lastValue:u32
+│       │   │ └╼ mload(): 
+│       │   │   └╼ add(): 
+│       │   │     ├╼ var - src:unknown
+│       │   │     └╼ var - srcOffset:unknown
+│       │   └╼ sstore(): 
+│       │     ├╼ var - dstPtr:unknown
+│       │     └╼ mask_bytes_dynamic(): 
+│       │       ├╼ var - lastValue:unknown
+│       │       └╼ and(): 
+│       │         ├╼ var - newLen:unknown
+│       │         └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│       └╼ sstore(): 
+│         ├╼ var - slot:unknown
+│         └╼ add(): 
+│           ├╼ mul(): 
+│           │ ├╼ var - newLen:unknown
+│           │ └╼ 2:unknown
+│           └╼ 1:unknown
 ├╼ function definition - update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage
 │ ├╼ params
 │ │ ├╼ slot:u32
@@ -1662,55 +1645,53 @@ AST
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr(): 
 │   │   ├╼ var - pos:unknown
 │   │   └╼ var - length:unknown
-│   ├╼ var - switch:unknown
-│   ├╼ and(): 
-│   │ ├╼ var - slotValue:unknown
-│   │ └╼ 1:unknown
-│   ├╼ var - case:unknown
-│   ├╼ 0:unknown
-│   ├╼ mstore(): 
-│   │ ├╼ var - pos:unknown
-│   │ └╼ and(): 
-│   │   ├╼ var - slotValue:unknown
-│   │   └╼ not(): 
-│   │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ assign - 
-│   │ └╼ add(): 
-│   │   ├╼ var - pos:unknown
-│   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ var - case:unknown
-│   ├╼ 1:unknown
-│   ├╼ declare - dataPos:u32
-│   │ └╼ array_dataslot_t_string_storage(): 
-│   │   └╼ var - value:unknown
-│   ├╼ declare - i:u32
-│   │ └╼ 0:unknown
-│   ├╼ for loop
-│   │ ├╼ init block
-│   │ ├╼ conditional
-│   │ │ └╼ lt(): 
-│   │ │   ├╼ var - i:unknown
-│   │ │   └╼ var - length:unknown
-│   │ ├╼ after block
-│   │ │ └╼ assign - 
-│   │ │   └╼ add(): 
-│   │ │     ├╼ var - i:unknown
-│   │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   │ └╼ interior block
-│   │   ├╼ mstore(): 
-│   │   │ ├╼ add(): 
-│   │   │ │ ├╼ var - pos:unknown
-│   │   │ │ └╼ var - i:unknown
-│   │   │ └╼ sload(): 
-│   │   │   └╼ var - dataPos:unknown
-│   │   └╼ assign - 
-│   │     └╼ add(): 
-│   │       ├╼ var - dataPos:unknown
-│   │       └╼ 1:unknown
-│   └╼ assign - 
-│     └╼ add(): 
-│       ├╼ var - pos:unknown
-│       └╼ var - i:unknown
+│   └╼ switch
+│     ├╼ and(): 
+│     │ ├╼ var - slotValue:unknown
+│     │ └╼ 1:unknown
+│     ├╼ case
+│     │ ├╼ mstore(): 
+│     │ │ ├╼ var - pos:unknown
+│     │ │ └╼ and(): 
+│     │ │   ├╼ var - slotValue:unknown
+│     │ │   └╼ not(): 
+│     │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│     │ └╼ assign - 
+│     │   └╼ add(): 
+│     │     ├╼ var - pos:unknown
+│     │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│     └╼ case
+│       ├╼ declare - dataPos:u32
+│       │ └╼ array_dataslot_t_string_storage(): 
+│       │   └╼ var - value:unknown
+│       ├╼ declare - i:u32
+│       │ └╼ 0:unknown
+│       ├╼ for loop
+│       │ ├╼ init block
+│       │ ├╼ conditional
+│       │ │ └╼ lt(): 
+│       │ │   ├╼ var - i:unknown
+│       │ │   └╼ var - length:unknown
+│       │ ├╼ after block
+│       │ │ └╼ assign - 
+│       │ │   └╼ add(): 
+│       │ │     ├╼ var - i:unknown
+│       │ │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
+│       │ └╼ interior block
+│       │   ├╼ mstore(): 
+│       │   │ ├╼ add(): 
+│       │   │ │ ├╼ var - pos:unknown
+│       │   │ │ └╼ var - i:unknown
+│       │   │ └╼ sload(): 
+│       │   │   └╼ var - dataPos:unknown
+│       │   └╼ assign - 
+│       │     └╼ add(): 
+│       │       ├╼ var - dataPos:unknown
+│       │       └╼ 1:unknown
+│       └╼ assign - 
+│         └╼ add(): 
+│           ├╼ var - pos:unknown
+│           └╼ var - i:unknown
 ├╼ function definition - abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
 │ │ ├╼ value0:u32

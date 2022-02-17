@@ -60,6 +60,13 @@ impl Transpiler {
             // TODO: can do a no-op or padding op if no identifiers
             self.push_refs_to_top(v);
         }
+        self.stack.0 = self
+            .stack
+            .0
+            .clone()
+            .into_iter()
+            .take(target_stack.0.len())
+            .collect();
     }
 
     fn add_unknown(&mut self) {
@@ -117,10 +124,16 @@ impl Transpiler {
         }
     }
 
-    fn consume(&mut self, n: u32) {
+    fn consume_top_stack_values(&mut self, n: u32) {
         for _ in 0..n {
             self.stack.0.remove(0);
         }
+    }
+
+    fn dup_top_stack_value(&mut self) {
+        self.stack.0.insert(0, self.stack.0.get(0).unwrap().clone());
+        // TODO: u256 stuff
+        self.add_line("dup");
     }
 
     fn drop_after(&mut self, n: usize) {
@@ -212,13 +225,13 @@ impl Transpiler {
         self.transpile_op(&op.conditional);
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack
-        self.consume(1);
+        self.consume_top_stack_values(1);
         self.indentation += 4;
         self.transpile_block(&op.interior_block);
         self.transpile_block(&op.after_block);
         self.target_stack(stack_target);
         self.transpile_op(&op.conditional);
-        self.consume(1);
+        self.consume_top_stack_values(1);
         self.indentation -= 4;
         self.add_line("end");
     }
@@ -231,6 +244,17 @@ impl Transpiler {
         self.target_stack(stack_target);
         self.indentation -= 4;
         self.add_line("end");
+    }
+
+    fn transpile_switch(&mut self, op: &ExprSwitch) {
+        self.add_line("");
+        self.transpile_op(&op.expr);
+        for case in &op.cases {
+            self.transpile_case(&case, &op);
+        }
+        self.add_line("drop");
+        self.consume_top_stack_values(1);
+        self.add_line("");
     }
 
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
@@ -260,7 +284,7 @@ impl Transpiler {
                 Some(YulType::U32) | None,
                 "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
             ) => {
-                self.consume(2);
+                self.consume_top_stack_values(2);
                 self.add_unknown();
                 self.add_line(op.function_name.as_ref());
                 return;
@@ -270,7 +294,7 @@ impl Transpiler {
             (Some(YulType::U32) | None, "iszero") => {
                 self.add_line("push.0");
                 self.add_line("eq");
-                self.consume(1);
+                self.consume_top_stack_values(1);
                 return;
             }
 
@@ -360,7 +384,23 @@ impl Transpiler {
     fn transpile_default(&mut self, op: &ExprDefault) {}
 
     // //TODO: update placeholder
-    // fn transpile_case(&mut self, op: &ExprCase) {}
+    fn transpile_case(&mut self, op: &ExprCase, switch: &ExprSwitch) {
+        self.dup_top_stack_value();
+        self.transpile_literal(&op.literal);
+        if (switch.inferred_type == Some(YulType::U256)) {
+            // TODO: u256 equality
+        } else {
+            self.add_line("eq");
+            self.consume_top_stack_values(2);
+            let stack_target = self.stack.clone();
+            self.add_line("if.true");
+            self.indentation += 4;
+            self.transpile_block(&op.block);
+            self.target_stack(stack_target);
+            self.indentation -= 4;
+            self.add_line("end");
+        }
+    }
 
     fn add_line(&mut self, line: &str) {
         self.program = format!(
@@ -404,9 +444,8 @@ impl Transpiler {
             Expr::Break => self.transpile_break(),
             Expr::Continue => self.transpile_continue(),
             Expr::Leave => self.transpile_leave(),
-            Expr::Default(op) => self.transpile_default(op),
-            Expr::Case(_) => todo!(),
-            // Expr::Case(op) => self.transpile_case(op),
+            Expr::Switch(op) => self.transpile_switch(op),
+            _ => unreachable!(),
         }
     }
     fn add_utility_functions(&mut self) {

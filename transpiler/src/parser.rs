@@ -114,6 +114,28 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
         }
 
         //rule is switch
+        Rule::switch => {
+            let mut parts = inner.into_inner();
+            let mut default_case = None;
+            let mut cases = Vec::new();
+            let expr = parse_expression(parts.next().unwrap());
+            for part in parts {
+                match part.as_rule() {
+                    Rule::case => cases.push(parse_case(part)),
+                    Rule::default => {
+                        default_case = Some(parse_block(part.into_inner().next().unwrap()))
+                    }
+                    _ => unreachable!(),
+                }
+            }
+
+            Expr::Switch(ExprSwitch {
+                expr: Box::new(expr),
+                inferred_type: None,
+                cases,
+                default_case,
+            })
+        }
 
         // // rule is case
         Rule::case => {
@@ -189,6 +211,13 @@ fn parse_identifier_list(rule: Pair<Rule>) -> Vec<Identifier> {
         identifiers.push(identifier.to_string());
     }
     identifiers
+}
+
+fn parse_case(rule: Pair<Rule>) -> ExprCase {
+    let mut parts = rule.into_inner();
+    let literal = parse_literal(parts.next().unwrap());
+    let block = parse_block(parts.next().unwrap());
+    ExprCase { block, literal }
 }
 
 fn parse_typed_identifier_list(rule: Pair<Rule>) -> Vec<TypedIdentifier> {

@@ -99,3 +99,26 @@ fn integration_fib() {
         MidenResult::U32(89),
     );
 }
+
+#[test]
+fn integration_case() {
+    run_example(
+        "
+            let x := 5
+            let y := 8
+            switch x
+                case 3 {
+                    y := 5
+                }
+                case 5 {
+                    y := 12
+                    let z := 15
+                }
+                case 8 {
+                    y := 15
+                }
+            y
+            ",
+        MidenResult::U32(12),
+    );
+}
