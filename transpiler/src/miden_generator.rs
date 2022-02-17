@@ -249,7 +249,7 @@ impl Transpiler {
             op.function_name.as_ref(),
         ) {
             //u256 operations
-            (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero") => {
+            (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero" | "eq") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 return;
@@ -550,6 +550,23 @@ impl Transpiler {
             movup.3
             movup.4
             u32xor
+            "##,
+        );
+
+        self.add_proc(
+            "u256eq_unsafe",
+            r##"
+            swapw.3
+            eqw
+            movdn.8
+            dropw
+            dropw
+            movdn.8
+            eqw
+            movdn.8
+            dropw
+            dropw
+            and
             "##,
         );
     }
