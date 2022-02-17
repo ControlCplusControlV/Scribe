@@ -413,37 +413,12 @@ impl Transpiler {
         self.add_proc(
             "u256iszero_unsafe",
             r##"
-            push.0
-            eq
-            swap.1 
-            push.0 
-            eq 
-            swap.2
-            push.0 
-            eq 
-            swap.3
-            push.0 
-            eq
-            swap.4
-            push.0 
-            eq
-            swap.5
-            push.0 
-            eq
-            swap.6
-            push.0 
-            eq
-            swap.7
-            push.0 
-            eq
-
-            and 
-            and 
-            and 
-            and 
-            and 
-            and 
-            and 
+                eq.0
+                repeat.7
+                    swap
+                    eq.0
+                    and
+                end
             "##,
         );
 
