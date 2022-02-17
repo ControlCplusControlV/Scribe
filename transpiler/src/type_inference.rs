@@ -11,6 +11,7 @@ pub fn infer_types(ast: &Vec<Expr>) -> Vec<Expr> {
 struct TypeInferrer {
     scoped_variables: HashMap<String, YulType>,
     expected_types: Vec<Option<YulType>>,
+    evaluated_types: Vec<Option<YulType>>,
 }
 
 impl TypeInferrer {
@@ -27,11 +28,15 @@ impl TypeInferrer {
             //Expr is literal
             Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                 value,
-                inferred_type,
-            })) => Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                value,
-                inferred_type: self.expected_types.first().unwrap_or(&None).clone(),
-            })),
+                inferred_type: _,
+            })) => {
+                let inferred_type = self.expected_types.first().unwrap_or(&None).clone();
+                self.evaluated_types = vec![inferred_type.clone()];
+                Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                    value,
+                    inferred_type: inferred_type,
+                }))
+            }
             Expr::Literal(ref _x) => expr,
 
             //Expr is function call
@@ -44,22 +49,24 @@ impl TypeInferrer {
                 // TODO: this is dumb, but inferring that the params to the function should be the
                 // same type as the first return value. Will work for now, for our math and boolean
                 // ops
-                let expected_param_type = self.expected_types.first().unwrap_or(&None).clone();
+                let mut param_types = Vec::new();
                 let expressions = exprs
                     .iter()
                     .map(|expr| {
-                        self.expected_types = vec![expected_param_type.clone()];
-                        self.walk_expr(expr.clone())
+                        // self.expected_types = vec![expected_param_type.clone()];
+                        let new_expr = self.walk_expr(expr.clone());
+                        dbg!(&param_types, &self.evaluated_types);
+                        param_types.append(&mut self.evaluated_types.clone());
+                        new_expr
                     })
                     .collect();
 
+                let inferred_return_types = self.expected_types.clone();
+                self.evaluated_types = inferred_return_types.clone();
                 Expr::FunctionCall(ExprFunctionCall {
                     function_name,
-                    inferred_param_types: exprs
-                        .iter()
-                        .map(|_| expected_param_type.clone())
-                        .collect(),
-                    inferred_return_types: self.expected_types.clone(),
+                    inferred_param_types: param_types,
+                    inferred_return_types,
                     exprs: Box::new(expressions),
                 })
             }
@@ -200,10 +207,14 @@ impl TypeInferrer {
             Expr::Variable(ExprVariableReference {
                 identifier,
                 inferred_type: _,
-            }) => Expr::Variable(ExprVariableReference {
-                inferred_type: self.scoped_variables.get(&identifier).cloned(),
-                identifier,
-            }),
+            }) => {
+                let inferred_type = self.scoped_variables.get(&identifier).cloned();
+                self.evaluated_types = vec![inferred_type.clone()];
+                Expr::Variable(ExprVariableReference {
+                    inferred_type: inferred_type,
+                    identifier,
+                })
+            }
             Expr::Case(_) => todo!(),
         };
     }
