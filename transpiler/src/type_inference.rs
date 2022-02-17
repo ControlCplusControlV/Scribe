@@ -44,7 +44,6 @@ impl TypeInferrer {
                     .map(|expr| {
                         // self.expected_types = vec![expected_param_type.clone()];
                         let new_expr = self.walk_expr(expr.clone());
-                        dbg!(&param_types, &self.evaluated_types);
                         param_types.append(&mut self.evaluated_types.clone());
                         new_expr
                     })
@@ -213,8 +212,6 @@ impl TypeInferrer {
                 let new_expr = self.walk_expr(*expr.clone());
                 let inferred_type = self.evaluated_types.first().unwrap_or(&None).clone();
                 let expected_types = self.evaluated_types.clone();
-                dbg!(&inferred_type);
-                dbg!(&cases);
                 let cases = cases
                     .into_iter()
                     .map(|case| {

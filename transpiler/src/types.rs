@@ -33,7 +33,7 @@ impl Expr {
     }
 }
 
-#[derive(Hash, Clone, PartialEq, Eq, Debug)]
+#[derive(Hash, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum YulType {
     U32,
     U256,
@@ -45,6 +45,12 @@ impl YulType {
             "u32" => Self::U32,
             "u256" => Self::U256,
             _ => panic!(),
+        }
+    }
+    pub fn stack_width(&self) -> u32 {
+        match self {
+            Self::U32 => 1,
+            Self::U256 => 8,
         }
     }
 }

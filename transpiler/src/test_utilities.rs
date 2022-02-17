@@ -13,11 +13,7 @@ pub enum MidenResult {
     U256(primitive_types::U256),
     U32(u32),
 }
-pub fn run_example_temp_u256_mode(yul_code: &str, expected_output: MidenResult) {
-    _run_example(yul_code, expected_output, true);
-}
-
-fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bool) {
+pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     fn print_title(s: &str) {
         let s1 = format!("=== {} ===", s).blue().bold();
         println!("{}", s1);
@@ -31,23 +27,29 @@ fn _run_example(yul_code: &str, expected_output: MidenResult, temp_u256_mode: bo
 
     let parsed = parser::parse_yul_syntax(yul_code);
 
-    print_title("AST");
-    println!("{}", expressions_to_tree(&parsed));
-    println!();
+    // print_title("AST");
+    // println!("{}", expressions_to_tree(&parsed));
+    // println!();
 
     let ast = optimize_ast(parsed);
-    print_title("Optimized AST");
-    println!("{}", expressions_to_tree(&ast));
-    println!();
+    // print_title("Optimized AST");
+    // println!("{}", expressions_to_tree(&ast));
+    // println!();
 
     let ast = infer_types(&ast);
-    print_title("With type-inference");
+    print_title("AST");
     println!("{}", expressions_to_tree(&ast));
     println!();
 
-    let miden_code = miden_generator::transpile_program(ast, temp_u256_mode);
+    let miden_code = miden_generator::transpile_program(ast);
+    let mut trimmed_miden_code = miden_code
+        .split("\n")
+        .skip_while(|line| *line != "begin")
+        .collect::<Vec<_>>()
+        .join("\n");
+    trimmed_miden_code = format!("# ...std lib... #\n{}", trimmed_miden_code);
     print_title("Generated Miden Assembly");
-    println!("{}", miden_code);
+    println!("{}", trimmed_miden_code);
     println!();
 
     let execution_value = executor::execute(miden_code, vec![]).unwrap();
@@ -90,8 +92,4 @@ pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
         .collect::<Vec<_>>();
 
     U256::from_little_endian(&u256_bytes)
-}
-
-pub fn run_example(yul_code: &str, expected_output: MidenResult) {
-    _run_example(yul_code, expected_output, false);
 }

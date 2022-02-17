@@ -1,5 +1,5 @@
 use primitive_types::U256;
-use scribe::test_utilities::{run_example, run_example_temp_u256_mode, MidenResult};
+use scribe::test_utilities::{run_example, MidenResult};
 
 #[test]
 fn u256_literal() {
@@ -13,7 +13,7 @@ fn u256_literal() {
 
 #[test]
 fn u256_add() {
-    run_example_temp_u256_mode(
+    run_example(
         // x = 10 + (20 << 32) + (30 << 64) + (40 << 96) + (50 << 128) + (60 << 160) + (70 << 192) + (80 << 224)
         // y = 1 +  (2 << 32) +  (3 << 64) +  (4 << 96) +  (5 << 128) +  (6 << 160) +  (7 << 192) +  (8 << 224)
         "
@@ -32,7 +32,7 @@ fn u256_add() {
 
 #[test]
 fn u256_and() {
-    run_example_temp_u256_mode(
+    run_example(
         "
             let x:u256 := 2156795733811448305138118958686944006956945342567680366977754542899210
             let y:u256 := 215679573381144830513811895868694400695694534256768036697775454289921
@@ -47,7 +47,7 @@ fn u256_and() {
 
 #[test]
 fn u256_or() {
-    run_example_temp_u256_mode(
+    run_example(
         "
             let x:u256 := 2156795733811448305138118958686944006956945342567680366977754542899210
             let y:u256 := 215679573381144830513811895868694400695694534256768036697775454289921
@@ -64,7 +64,7 @@ fn u256_or() {
 
 #[test]
 fn u256_xor() {
-    run_example_temp_u256_mode(
+    run_example(
         "
             let x:u256 := 2156795733811448305138118958686944006956945342567680366977754542899210
             let y:u256 := 215679573381144830513811895868694400695694534256768036697775454289921
@@ -79,7 +79,6 @@ fn u256_xor() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_mixed_types() {
     run_example(
@@ -132,11 +131,11 @@ fn u256_match() {
 
 #[test]
 fn u256_equality() {
-    run_example_temp_u256_mode(
+    run_example(
         "
             let x:u256 := 31711016731996786641919559689128982722488122124807605757398297001483711807488
             let y:u256 := 21711016731996786641919559689128982722488122124807605757398297001483711807488
-            eq(y, x)
+            eq(x, y)
         ",
         MidenResult::U32(0)
     );

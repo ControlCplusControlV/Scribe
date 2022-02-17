@@ -13,10 +13,22 @@ struct Transpiler {
     program: String,
     user_functions: HashMap<String, Stack>,
     scoped_identifiers: HashMap<String, TypedIdentifier>,
-    temporary_u256_mode: bool,
 }
 
-type StackValue = HashSet<TypedIdentifier>;
+#[derive(Clone, Debug)]
+struct StackValue {
+    identifier: Option<String>,
+    yul_type: YulType,
+}
+
+impl From<&TypedIdentifier> for StackValue {
+    fn from(typed_identifier: &TypedIdentifier) -> Self {
+        StackValue {
+            identifier: Some(typed_identifier.identifier.clone()),
+            yul_type: typed_identifier.yul_type,
+        }
+    }
+}
 
 #[derive(Default, Clone)]
 struct Stack(Vec<StackValue>);
@@ -25,20 +37,13 @@ impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "\n").unwrap();
         for value in self.0.iter() {
-            if value.is_empty() {
-                write!(f, "EMPTY\n").unwrap();
-            } else {
-                write!(
-                    f,
-                    "{}\n",
-                    value
-                        .iter()
-                        .map(|s| s.to_string())
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                )
-                .unwrap();
-            }
+            write!(
+                f,
+                "{}:{}\n",
+                value.identifier.clone().unwrap_or("UNKNOWN".to_string()),
+                value.yul_type
+            )
+            .unwrap();
         }
         Ok(())
     }
@@ -48,17 +53,18 @@ type MidenInstruction = String;
 
 impl Transpiler {
     fn equate_reference(&mut self, x: TypedIdentifier, y: TypedIdentifier) {
-        if x.yul_type != y.yul_type {
-            panic!("Should never be assigning a {:?} to a {:?}", x, y);
-        }
-        let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(&y)).unwrap();
-        stack_value.insert(x);
+        panic!("This no longer works, should fix for optimizations");
+        // if x.yul_type != y.yul_type {
+        //     panic!("Should never be assigning a {:?} to a {:?}", x, y);
+        // }
+        // let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(&y)).unwrap();
+        // stack_value.insert(x);
     }
 
     fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            self.push_refs_to_top(v);
+            self.push_identifier_to_top(v.identifier.clone().expect("Need to deal w/ this case"));
         }
         self.stack.0 = self
             .stack
@@ -69,50 +75,81 @@ impl Transpiler {
             .collect();
     }
 
-    fn add_unknown(&mut self) {
-        self.stack.0.insert(0, HashSet::new());
+    fn add_unknown(&mut self, yul_type: YulType) {
+        self.stack.0.insert(
+            0,
+            StackValue {
+                identifier: None,
+                yul_type,
+            },
+        );
     }
 
-    fn push_ref_to_top(&mut self, variable: TypedIdentifier) {
-        let mut variables = HashSet::new();
-        variables.insert(variable);
-        let location = self
+    fn push_identifier_to_top(&mut self, identifier: String) {
+        let mut offset = 0;
+        let stack_value = self
             .stack
             .0
             .iter()
-            .position(|sv| variables.is_subset(sv))
-            .unwrap();
-        self.stack.0.insert(0, variables);
-        if !self.temporary_u256_mode {
-            self.add_line(&format!("dup.{}", location))
-        }
+            .find(|sv| {
+                if sv.identifier.as_ref() == Some(&identifier) {
+                    return true;
+                }
+                offset += sv.yul_type.stack_width();
+                return false;
+            })
+            .unwrap()
+            .clone();
+        self.stack.0.insert(0, stack_value.clone());
+        self.dup_from_offset(offset, stack_value.yul_type);
     }
 
-    fn push_refs_to_top(&mut self, identifiers: &HashSet<TypedIdentifier>) {
-        // TODO: need to figure out what to do when we're targeting a stack that has stack values
-        // w/ multiple references, there are probably cases that fail currently, where variables
-        // are equal to each other before a for loop but not after
-        let location = self
-            .stack
-            .0
-            .iter()
-            .position(|sv| identifiers.is_subset(sv))
-            .unwrap();
-        self.stack.0.insert(0, identifiers.clone());
-        if !self.temporary_u256_mode {
-            self.add_line(&format!("dup.{}", location))
-        }
+    fn dup_from_offset(&mut self, offset: u32, yul_type: YulType) {
+        match yul_type {
+            YulType::U32 => {
+                self.add_line(&format!("dup.{}", offset));
+            }
+            YulType::U256 => match offset + 7 {
+                7 => {
+                    self.add_line(&format!("dupw.1"));
+                    self.add_line(&format!("dupw.1"));
+                }
+                11 => {
+                    self.add_line(&format!("dupw.2"));
+                    self.add_line(&format!("dupw.2"));
+                }
+                15 => {
+                    self.add_line(&format!("dupw.3"));
+                    self.add_line(&format!("dupw.3"));
+                }
+                o => {
+                    for _ in (0..8) {
+                        self.add_line(&format!("dup.{}", o));
+                    }
+                }
+            },
+        };
     }
 
     fn push(&mut self, value: U256) {
-        self.stack.0.insert(0, HashSet::new());
+        self.stack.0.insert(
+            0,
+            StackValue {
+                identifier: None,
+                yul_type: YulType::U32,
+            },
+        );
         self.add_line(&format!("push.{}", value));
     }
 
     fn push_u256(&mut self, value: U256) {
-        for i in 0..8 {
-            self.stack.0.insert(0, HashSet::new());
-        }
+        self.stack.0.insert(
+            0,
+            StackValue {
+                identifier: None,
+                yul_type: YulType::U256,
+            },
+        );
         let mut bytes = [0u8; 32];
         value.to_big_endian(&mut bytes);
         for bytes in &bytes.iter().chunks(4) {
@@ -124,39 +161,76 @@ impl Transpiler {
         }
     }
 
-    fn consume_top_stack_values(&mut self, n: u32) {
+    fn _consume_top_stack_values(&mut self, n: u32) {
         for _ in 0..n {
             self.stack.0.remove(0);
         }
     }
 
     fn dup_top_stack_value(&mut self) {
-        self.stack.0.insert(0, self.stack.0.get(0).unwrap().clone());
-        // TODO: u256 stuff
-        self.add_line("dup");
+        let stack_value = self.stack.0.get(0).unwrap().clone();
+        match stack_value.yul_type {
+            YulType::U32 => {
+                self.add_line("dup");
+            }
+            YulType::U256 => {
+                self.add_line("dupw.1");
+                self.add_line("dupw.1");
+            }
+        }
+        self.stack.0.insert(0, stack_value.clone());
+    }
+
+    fn drop_top_stack_value(&mut self) {
+        let stack_value = self.stack.0.get(0).unwrap().clone();
+        self.stack.0.remove(0);
+        match stack_value.yul_type {
+            YulType::U32 => {
+                self.add_line("drop");
+            }
+            YulType::U256 => {
+                self.add_line("dropw.1");
+                self.add_line("dropw.1");
+            }
+        }
     }
 
     fn drop_after(&mut self, n: usize) {
-        let stack_size = self.stack.0.len();
+        let size_to_keep: u32 = self
+            .stack
+            .0
+            .iter()
+            .take(n)
+            .map(|sv| sv.yul_type.stack_width())
+            .sum();
+        let total_size: u32 = self
+            .stack
+            .0
+            .iter()
+            .map(|sv| sv.yul_type.stack_width())
+            .sum();
+
         for n in 0..n {
-            let shift = stack_size - 1;
+            let stack_length = self.stack.0.len();
+            self.stack.0.swap(n, stack_length - 1);
+        }
+        // TODO: deal w/ when the stack gets too big
+        for n in 0..size_to_keep {
+            let shift = total_size - 1;
             if shift == 1 {
                 self.add_line(&format!("swap"));
             } else {
                 self.add_line(&format!("movdn.{}", shift));
             }
-            self.stack.0.swap(n, stack_size - 1);
         }
-        for i in (n..stack_size).rev() {
-            self.stack.0.remove(0);
-            self.add_line(&format!("drop"));
+        for i in (n..self.stack.0.len()).rev() {
+            self.drop_top_stack_value();
         }
     }
 
     fn top_is_var(&mut self, typed_identifier: TypedIdentifier) {
-        let idents = self.stack.0.get_mut(0).unwrap();
-        idents.clear();
-        idents.insert(typed_identifier);
+        let stack_value = self.stack.0.get_mut(0).unwrap();
+        stack_value.identifier = Some(typed_identifier.identifier);
     }
 
     fn add_function_stack(&mut self, function_stack: &Stack) {
@@ -225,13 +299,13 @@ impl Transpiler {
         self.transpile_op(&op.conditional);
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack
-        self.consume_top_stack_values(1);
+        self._consume_top_stack_values(1);
         self.indentation += 4;
         self.transpile_block(&op.interior_block);
         self.transpile_block(&op.after_block);
         self.target_stack(stack_target);
         self.transpile_op(&op.conditional);
-        self.consume_top_stack_values(1);
+        self._consume_top_stack_values(1);
         self.indentation -= 4;
         self.add_line("end");
     }
@@ -253,7 +327,7 @@ impl Transpiler {
             self.transpile_case(&case, &op);
         }
         self.add_line("drop");
-        self.consume_top_stack_values(1);
+        self._consume_top_stack_values(1);
         self.add_line("");
     }
 
@@ -276,6 +350,8 @@ impl Transpiler {
             (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero" | "eq") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U256);
                 return;
             }
 
@@ -284,8 +360,8 @@ impl Transpiler {
                 Some(YulType::U32) | None,
                 "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
             ) => {
-                self.consume_top_stack_values(2);
-                self.add_unknown();
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U32);
                 self.add_line(op.function_name.as_ref());
                 return;
             }
@@ -294,7 +370,8 @@ impl Transpiler {
             (Some(YulType::U32) | None, "iszero") => {
                 self.add_line("push.0");
                 self.add_line("eq");
-                self.consume_top_stack_values(1);
+                self._consume_top_stack_values(1);
+                self.add_unknown(YulType::U32);
                 return;
             }
 
@@ -332,7 +409,7 @@ impl Transpiler {
 
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
         let typed_identifier = self.get_typed_identifier(&op.identifier);
-        self.push_ref_to_top(typed_identifier.clone());
+        self.push_identifier_to_top(typed_identifier.identifier.clone());
     }
 
     //TODO: stack management not quite working
@@ -340,11 +417,7 @@ impl Transpiler {
         self.stack = Stack(
             op.params
                 .iter()
-                .map(|param| {
-                    let mut identifiers = HashSet::new();
-                    identifiers.insert(param.clone());
-                    identifiers
-                })
+                .map(|param| StackValue::from(param))
                 .collect(),
         );
         for param in &op.params {
@@ -357,7 +430,7 @@ impl Transpiler {
         self.transpile_block(&op.block);
         // self.target_stack(stack_target);
         for return_ident in &op.returns {
-            self.push_ref_to_top(return_ident.clone());
+            self.push_identifier_to_top(return_ident.clone().identifier);
         }
         self.drop_after(op.returns.len());
         let function_stack = self.stack.clone();
@@ -387,11 +460,11 @@ impl Transpiler {
     fn transpile_case(&mut self, op: &ExprCase, switch: &ExprSwitch) {
         self.dup_top_stack_value();
         self.transpile_literal(&op.literal);
-        if (switch.inferred_type == Some(YulType::U256)) {
+        if switch.inferred_type == Some(YulType::U256) {
             // TODO: u256 equality
         } else {
             self.add_line("eq");
-            self.consume_top_stack_values(2);
+            self._consume_top_stack_values(2);
             let stack_target = self.stack.clone();
             self.add_line("if.true");
             self.indentation += 4;
@@ -611,7 +684,7 @@ impl Transpiler {
     }
 }
 
-pub fn transpile_program(expressions: Vec<Expr>, temp_u256_mode: bool) -> String {
+pub fn transpile_program(expressions: Vec<Expr>) -> String {
     let mut transpiler = Transpiler {
         variables: HashMap::new(),
         next_open_memory_address: 0,
@@ -620,7 +693,6 @@ pub fn transpile_program(expressions: Vec<Expr>, temp_u256_mode: bool) -> String
         scoped_identifiers: HashMap::new(),
         program: "".to_string(),
         user_functions: HashMap::default(),
-        temporary_u256_mode: temp_u256_mode,
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {
