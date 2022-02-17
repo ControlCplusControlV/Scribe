@@ -501,5 +501,26 @@ mod tests {
         ));
     }
 
+    #[test]
+    fn parse_switch_statement() {
+        insta::assert_snapshot!(parse_to_tree(
+            "
+            let x := 5
+            let y := 8
+            switch x
+                case 3 {
+                    y := 5
+                }
+                case 5 {
+                    y := 12
+                    let z := 15
+                }
+                case 8 {
+                    y := 15
+                }
+            y"
+        ));
+    }
+
     //TODO: add test for default
 }
