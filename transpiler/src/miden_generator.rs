@@ -569,6 +569,55 @@ impl Transpiler {
             "##,
         );
 
+        // self.add_proc(
+        //     "u256sub_unsafe",
+        //     r##"
+
+        //     swapw.3
+
+        //     movup.4
+
+        //     u32.sub.unsafe
+
+        //     if.true
+        //         #need to have logic if a<b#
+
+        //     movup.1
+
+        //     movup.4
+
+        //     u32.sub.unsafe
+
+        //     if.true
+        //         #need to have logic if a<b#
+
+        //     movup.2
+
+        //     movup.4
+
+        //     u32.sub.unsafe
+
+        //     if.true
+        //         #need to have logic if a<b#
+
+        //     #
+
+        //     movup.3
+
+        //     movup.4
+
+        //     u32.sub.unsafe
+
+        //     if.true
+        //         #need to have logic if a<b#
+
+        //     swapw.2
+
+        //     #need to handle the last two words#
+
+        //     "##,
+        // );
+
         self.add_proc(
             "u256and_unsafe",
             r##"
