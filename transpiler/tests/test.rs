@@ -143,7 +143,6 @@ fn integration_lots_of_vars() {
         let x14 := 14
         let x15 := 15
         let x16 := 16
-        let x16 := 16
         let x17 := 17
         let x18 := 18
         x1

@@ -10,3 +10,25 @@ pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace
     let inputs = ProgramInputs::new(&pub_inputs, &[], vec![]).unwrap();
     miden_processor::execute(&program, &inputs)
 }
+
+#[ignore]
+#[test]
+fn debug_execution() {
+    // You can put a miden program here to debug output, manually modifying it if needed
+    let execution_value = execute(
+        r##"
+        begin
+        push.5
+        mul.5
+        end
+        "##
+        .to_string(),
+        vec![],
+    )
+    .unwrap();
+
+    println!("Miden Output");
+    let stack = execution_value.last_stack_state();
+    dbg!(&stack);
+    let last_stack_value = stack.first().unwrap();
+}

@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::backtrace::Backtrace;
 use std::collections::{HashMap, HashSet};
 
 use primitive_types::U256;
@@ -101,14 +102,22 @@ impl Transpiler {
                 self.add_line("dropw");
             }
             YulType::U256 => {
-                self.add_line(&format!("mem.push.{}", address + 0));
                 self.add_line(&format!("mem.push.{}", address + 1));
+                self.add_line(&format!("mem.push.{}", address + 0));
             }
         }
+        self.stack.0.insert(
+            0,
+            StackValue {
+                typed_identifier: Some(typed_identifier.clone()),
+                yul_type: typed_identifier.yul_type,
+            },
+        );
     }
 
     fn push_identifier_to_top(&mut self, typed_identifier: TypedIdentifier) {
         let mut offset = 0;
+        self.prepare_for_stack_values(&typed_identifier.yul_type);
         let stack_value = self
             .stack
             .0
@@ -121,7 +130,6 @@ impl Transpiler {
                 return false;
             })
             .cloned();
-        self.prepare_for_stack_values(&typed_identifier.yul_type);
         match stack_value {
             Some(stack_value) => {
                 self.stack.0.insert(
@@ -227,16 +235,12 @@ impl Transpiler {
             YulType::U256 => {
                 match num_stack_values_above {
                     8 => {
-                        self.add_line(&format!("movupw.2"));
-                        self.add_line(&format!("movupw.2"));
-                    }
-                    12 => {
                         self.add_line(&format!("movupw.3"));
                         self.add_line(&format!("movupw.3"));
                     }
                     o => {
                         for _ in (0..8) {
-                            self.add_line(&format!("movup.{}", o));
+                            self.add_line(&format!("movup.{}", o + 7));
                         }
                     }
                 };
@@ -572,6 +576,7 @@ impl Transpiler {
 
     // //TODO: update placeholder
     fn transpile_case(&mut self, op: &ExprCase, switch: &ExprSwitch) {
+        self.prepare_for_stack_values(&switch.inferred_type.unwrap());
         self.dup_top_stack_value();
         self.transpile_literal(&op.literal);
         if switch.inferred_type == Some(YulType::U256) {
