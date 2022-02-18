@@ -578,7 +578,7 @@ impl Transpiler {
         //     movup.4
 
         //     u32.sub.unsafe
-
+        //     #need to check if a<b when subtracting#
         //     if.true
         //         #need to have logic if a<b#
 
