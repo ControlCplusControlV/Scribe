@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use std::backtrace::Backtrace;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use primitive_types::U256;
