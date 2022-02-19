@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use std::backtrace::Backtrace;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use primitive_types::U256;
 
@@ -14,6 +14,13 @@ struct Transpiler {
     program: String,
     user_functions: HashMap<String, Stack>,
     scoped_identifiers: HashMap<String, TypedIdentifier>,
+    branches: VecDeque<Branch>,
+}
+
+#[derive(Default, Clone)]
+struct Branch {
+    modified_identifiers: HashSet<TypedIdentifier>,
+    stack_before: Stack,
 }
 
 #[derive(Clone, Debug)]
@@ -64,6 +71,29 @@ impl Transpiler {
         // stack_value.insert(x);
     }
 
+    fn begin_branch(&mut self) {
+        self.branches.push_front(Branch {
+            stack_before: self.stack.clone(),
+            ..Default::default()
+        });
+    }
+
+    fn end_branch(&mut self) {
+        let branch = self.branches.pop_front().unwrap();
+        for modified_identifier in branch.modified_identifiers {
+            if branch
+                .stack_before
+                .0
+                .iter()
+                .find(|sv| sv.typed_identifier == Some(modified_identifier.clone()))
+                .is_none()
+            {
+                self.update_identifier_in_memory(modified_identifier)
+            }
+        }
+        self.target_stack(branch.stack_before);
+    }
+
     fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
@@ -92,11 +122,15 @@ impl Transpiler {
         );
     }
 
+    fn update_identifier_in_memory(&mut self, typed_identifier: TypedIdentifier) {
+        self.push_identifier_to_top(typed_identifier);
+        self.pop_top_var_to_memory();
+    }
+
     fn load_identifier_from_memory(&mut self, typed_identifier: TypedIdentifier) {
         let address = self.variables.get(&typed_identifier).cloned().unwrap();
         match typed_identifier.yul_type {
             YulType::U32 => {
-                dbg!(&typed_identifier);
                 self.add_line(&format!("mem.push.{}", address));
                 self.add_line("dup");
                 self.add_line("dropw");
@@ -135,7 +169,7 @@ impl Transpiler {
                 self.stack.0.insert(
                     0,
                     StackValue {
-                        typed_identifier: None,
+                        typed_identifier: Some(typed_identifier),
                         yul_type: stack_value.yul_type,
                     },
                 );
@@ -175,7 +209,6 @@ impl Transpiler {
     }
 
     fn push(&mut self, value: U256) {
-        dbg!(&self.stack, value);
         self.prepare_for_stack_values(&YulType::U32);
         self.stack.0.insert(
             0,
@@ -194,7 +227,7 @@ impl Transpiler {
     }
 
     fn pop_bottom_var_to_memory(&mut self) {
-        let stack_value = self.stack.0.last().unwrap();
+        let stack_value = self.stack.0.last().cloned().unwrap();
 
         let address = match self
             .variables
@@ -203,7 +236,6 @@ impl Transpiler {
             Some(address) => *address,
             None => {
                 let address = self.next_open_memory_address;
-                dbg!(&stack_value.typed_identifier);
                 self.variables
                     .insert(stack_value.typed_identifier.clone().unwrap(), address);
                 self.next_open_memory_address += if stack_value.yul_type == YulType::U256 {
@@ -223,14 +255,11 @@ impl Transpiler {
             .collect();
         let num_stack_values_above: u32 =
             stack_above.iter().map(|sv| sv.yul_type.stack_width()).sum();
-        dbg!(&stack_value);
-        dbg!(&self.stack);
         match stack_value.yul_type {
             YulType::U32 => {
                 self.add_line(&format!("movup.{}", num_stack_values_above));
                 self.add_line("padw");
                 self.add_line("drop");
-                self.add_line(&format!("mem.pop.{}", address));
             }
             YulType::U256 => {
                 match num_stack_values_above {
@@ -244,11 +273,43 @@ impl Transpiler {
                         }
                     }
                 };
+            }
+        }
+        self.stack.0.pop();
+        self.stack.0.insert(0, stack_value.clone());
+        self.pop_top_var_to_memory();
+    }
+
+    fn pop_top_var_to_memory(&mut self) {
+        let stack_value = self.stack.0.first().unwrap();
+
+        let address = match self
+            .variables
+            .get(&stack_value.typed_identifier.clone().unwrap())
+        {
+            Some(address) => *address,
+            None => {
+                let address = self.next_open_memory_address;
+                self.variables
+                    .insert(stack_value.typed_identifier.clone().unwrap(), address);
+                self.next_open_memory_address += if stack_value.yul_type == YulType::U256 {
+                    2
+                } else {
+                    1
+                };
+                address
+            }
+        };
+        match stack_value.yul_type {
+            YulType::U32 => {
+                self.add_line(&format!("mem.pop.{}", address));
+            }
+            YulType::U256 => {
                 self.add_line(&format!("mem.pop.{}", address));
                 self.add_line(&format!("mem.pop.{}", address + 1));
             }
         }
-        self.stack.0 = stack_above;
+        self.stack.0.remove(0);
     }
 
     fn get_size_of_stack(&self) -> u32 {
@@ -392,6 +453,9 @@ impl Transpiler {
         let typed_identifier = self
             .get_typed_identifier(&op.identifiers.first().unwrap())
             .clone();
+        if let Some(branch) = self.branches.front_mut() {
+            branch.modified_identifiers.insert(typed_identifier.clone());
+        }
         // TODO: bring back equating references
         // if let Expr::Variable(ExprVariableReference {
         //     identifier: target_ident,
@@ -413,15 +477,15 @@ impl Transpiler {
 
     fn transpile_for_loop(&mut self, op: &ExprForLoop) {
         self.transpile_block(&op.init_block);
-        let stack_target = self.stack.clone();
         self.transpile_op(&op.conditional);
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack
         self._consume_top_stack_values(1);
         self.indentation += 4;
+        self.begin_branch();
         self.transpile_block(&op.interior_block);
         self.transpile_block(&op.after_block);
-        self.target_stack(stack_target);
+        self.end_branch();
         self.transpile_op(&op.conditional);
         self._consume_top_stack_values(1);
         self.indentation -= 4;
@@ -465,11 +529,18 @@ impl Transpiler {
             op.function_name.as_ref(),
         ) {
             //u256 operations
-            (Some(YulType::U256), "add" | "and" | "or" | "xor" | "iszero" | "eq") => {
+            (Some(YulType::U256), "add") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
                 self.add_unknown(YulType::U256);
+                return;
+            }
+            (Some(YulType::U256), "and" | "or" | "xor" | "iszero" | "eq") => {
+                let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
+                self.add_line(&u256_operation);
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U32);
                 return;
             }
 
@@ -501,9 +572,12 @@ impl Transpiler {
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
+        self._consume_top_stack_values(1);
         self.add_line("if.true");
         self.indentation += 4;
+        self.begin_branch();
         self.transpile_block(&op.second_expr);
+        self.end_branch();
         self.indentation -= 4;
         self.add_line("end");
     }
@@ -806,6 +880,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         scoped_identifiers: HashMap::new(),
         program: "".to_string(),
         user_functions: HashMap::default(),
+        branches: VecDeque::new(),
     };
     let ast = optimize_ast(expressions);
     for expr in &ast {

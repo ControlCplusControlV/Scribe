@@ -42,8 +42,9 @@ fn integration_if() {
             let x := 2
             let y := 3
             if lt(x, y) {
-                5
+                x := 5
             }
+            x
             ",
         MidenResult::U32(5),
     );
@@ -147,6 +148,6 @@ fn integration_lots_of_vars() {
         let x18 := 18
         x1
             ",
-        MidenResult::U32(12),
+        MidenResult::U32(1),
     );
 }
