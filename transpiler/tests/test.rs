@@ -42,8 +42,9 @@ fn integration_if() {
             let x := 2
             let y := 3
             if lt(x, y) {
-                5
+                x := 5
             }
+            x
             ",
         MidenResult::U32(5),
     );
@@ -120,5 +121,33 @@ fn integration_case() {
             y
             ",
         MidenResult::U32(12),
+    );
+}
+
+#[test]
+fn integration_lots_of_vars() {
+    run_example(
+        "
+        let x1 := 1
+        let x2 := 2
+        let x3 := 3
+        let x4 := 4
+        let x5 := 5
+        let x6 := 6
+        let x7 := 7
+        let x8 := 8
+        let x9 := 9
+        let x10 := 10
+        let x11 := 11
+        let x12 := 12
+        let x13 := 13
+        let x14 := 14
+        let x15 := 15
+        let x16 := 16
+        let x17 := 17
+        let x18 := 18
+        x1
+            ",
+        MidenResult::U32(1),
     );
 }
