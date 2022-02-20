@@ -1,4 +1,5 @@
 use colored::*;
+use std::path::Path;
 
 use scribe::executor;
 use scribe::miden_generator;
@@ -22,7 +23,12 @@ struct Opts {
 
 #[derive(Parser)]
 enum SubCommand {
-    Repl,
+    Repl {
+        #[clap(short, long)]
+        functions_file: Option<String>,
+        #[clap(short, long)]
+        stack: Option<String>,
+    },
 }
 
 fn print_title(s: &str) {
@@ -46,8 +52,11 @@ fn main() {
     // opts.skip_setup = true;
 
     match opts.subcmd {
-        Some(SubCommand::Repl) => {
-            start_repl();
+        Some(SubCommand::Repl {
+            functions_file,
+            stack,
+        }) => {
+            start_repl(functions_file, stack);
         }
         None => {
             let yul_contracts = read_yul_contracts();
