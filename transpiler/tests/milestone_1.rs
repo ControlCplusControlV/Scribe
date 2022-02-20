@@ -150,7 +150,6 @@ fn u256_stack_overflow() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_less_than() {
     run_example(

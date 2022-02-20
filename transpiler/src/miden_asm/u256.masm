@@ -184,3 +184,45 @@ proc.u256eq_unsafe
     dropw
     and
 end
+
+proc.u256lt_w
+    movup.3
+    movup.7
+    lt
+    if.true 
+      dropw
+      drop
+      drop
+      push.1
+    else
+      movup.2
+      movup.5
+      lt
+      if.true
+        dropw
+        push.1
+      else
+        swap
+        movup.3
+        lt
+        if.true
+          drop
+          drop
+          push.1
+        else
+          swap
+          lt
+        end
+      end
+    end
+end
+
+proc.u256lt_unsafe
+    swapw.3
+    exec.u256lt_w
+    if.true
+      push.1
+    else
+      exec.u256lt_w
+    end
+end

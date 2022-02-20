@@ -814,12 +814,49 @@ impl Transpiler {
         );
 
         self.add_proc(
+            "u256lt_w",
+            r##"
+            movup.3
+            movup.7
+            lt
+            if.true 
+            dropw
+            drop
+            drop
+            push.1
+            else
+            movup.2
+            movup.5
+            lt
+            if.true
+                dropw
+                push.1
+            else
+                movup.2
+                lt
+                if.true
+                drop
+                drop
+                push.1
+                else
+                swap
+                lt
+                end
+            end
+            end
+            "##,
+        );
+
+        self.add_proc(
             "u256lt_unsafe",
             r##"
-            exec.u256subc_unsafe
-            movdn.9
-            dropw
-            dropw
+            swapw.3
+            exec.u256lt_w
+            if.true
+            push.1
+            else
+            exec.u256lt_w
+            end
             "##,
         );
 
