@@ -2,13 +2,29 @@ use crate::executor::execute;
 use colored::*;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
+use std::fs;
+use std::path::Path;
 
-pub fn start_repl() {
+pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) {
     let mut program_lines: Vec<String> = Vec::new();
-    let mut rl = Editor::<()>::new();
-    if rl.load_history("repl_history.txt").is_err() {
-        println!("No previous history.");
+    let mut functions_miden = "".to_string();
+    if let Some(functions_file) = functions_file {
+        let path = Path::new(&functions_file);
+        functions_miden = fs::read_to_string(path).expect("Something went wrong reading the file");
     }
+    if let Some(stack_string) = stack_string {
+        program_lines.push(
+            stack_string
+                .split(",")
+                .map(|s| format!("push.{}", s))
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+                .collect::<Vec<_>>()
+                .join(" "),
+        );
+    }
+    let mut rl = Editor::<()>::new();
     loop {
         let program = format!(
             "begin\n{}\nend",
@@ -18,7 +34,7 @@ pub fn start_repl() {
                 .collect::<Vec<_>>()
                 .join("\n")
         );
-        let result = execute(program.clone(), vec![]);
+        let result = execute(format!("{}\n{}", functions_miden, program.clone()), vec![]);
         let mut result_string = "".to_string();
         if program_lines.len() > 0 {
             match result {
