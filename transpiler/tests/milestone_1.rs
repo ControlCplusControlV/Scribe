@@ -171,13 +171,15 @@ fn u256_equality() {
 fn u256_function() {
     run_example(
         "
-            function add_a_lot(a:u256) -> b {
+            function add_a_lot(a:u256) -> b:u256 {
                 let b:u256 := 100
                 if eq(a, 100) {
                     b := add(a, 18446744073709551616)
                 } 
             }
-            add_a_lot(100)
+            let z := add_a_lot(100)
+            let b := 4
+            z
             ",
         MidenResult::U256(U256::from_dec_str("18446744073709551716").unwrap()),
     );

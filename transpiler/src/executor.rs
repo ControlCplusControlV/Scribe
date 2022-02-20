@@ -1,14 +1,20 @@
-use miden_processor::{ExecutionError, ExecutionTrace};
-pub use miden_processor::{Felt as BaseElement, FieldElement, ProgramInputs};
+use miden_processor::ExecutionTrace;
+pub use miden_processor::{ExecutionError, Felt as BaseElement, FieldElement, ProgramInputs};
 
-pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, ExecutionError> {
+#[derive(Debug)]
+pub enum MidenError {
+    AssemblyError(miden_assembly::AssemblyError),
+    ExecutionError(ExecutionError),
+}
+
+pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, MidenError> {
     let program = miden_assembly::Assembler::new()
         .compile_script(&program)
-        .unwrap();
+        .map_err(|e| MidenError::AssemblyError(e))?;
 
     let pub_inputs = vec![];
     let inputs = ProgramInputs::new(&pub_inputs, &[], vec![]).unwrap();
-    miden_processor::execute(&program, &inputs)
+    miden_processor::execute(&program, &inputs).map_err(|e| MidenError::ExecutionError(e))
 }
 
 #[ignore]
