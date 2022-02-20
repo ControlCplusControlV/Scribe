@@ -31,6 +31,18 @@ fn u256_add() {
 }
 
 #[test]
+fn u256_sub() {
+    run_example(
+        "
+            let x:u256 := 1000000
+            let y:u256 := 999
+            sub(x, y)
+        ",
+        MidenResult::U256(U256::from_dec_str("999001").unwrap()),
+    );
+}
+
+#[test]
 fn u256_and() {
     run_example(
         "

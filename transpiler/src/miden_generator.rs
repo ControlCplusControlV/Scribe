@@ -530,14 +530,15 @@ impl Transpiler {
             op.function_name.as_ref(),
         ) {
             //u256 operations
-            (Some(YulType::U256), "add") => {
+            (Some(YulType::U256), "add" | "sub" | "and" | "or" | "xor") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
                 self.add_unknown(YulType::U256);
                 return;
             }
-            (Some(YulType::U256), "and" | "or" | "xor" | "iszero" | "eq") => {
+
+            (Some(YulType::U256), "iszero" | "eq") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
@@ -757,54 +758,80 @@ impl Transpiler {
             "##,
         );
 
-        // self.add_proc(
-        //     "u256sub_unsafe",
-        //     r##"
+        self.add_proc(
+            "u32subc_unsafe",
+            r##"
+            # Assumes b, a, c at the top of the stack #
+            # stack output is e (borrow out), d (result) at position 0,1 #
 
-        //     swapw.3
+            # subtract a-b-c #
+            dup
+            dup.2
+            movdn.4
+            movdn.4
+            sub
+            swap
+            sub
+            movdn.2
 
-        //     movup.4
+            # borrow out calculation -- ((^x & y) | (^(x ^ y) & diff)) >> 31 #
+            dup
+            movdn.2
+            push.4294967295
+            u32xor
+            swap
+            dup
+            movdn.3
+            movdn.3
+            u32xor
+            push.4294967295
+            u32xor
+            movup.2
+            dup
+            movdn.3
+            u32and
+            swap
+            u32or
+            u32shr.31
+            "##,
+        );
 
-        //     u32.sub.unsafe
-        //     #need to check if a<b when subtracting#
-        //     if.true
-        //         #need to have logic if a<b#
-
-        //     movup.1
-
-        //     movup.4
-
-        //     u32.sub.unsafe
-
-        //     if.true
-        //         #need to have logic if a<b#
-
-        //     movup.2
-
-        //     movup.4
-
-        //     u32.sub.unsafe
-
-        //     if.true
-        //         #need to have logic if a<b#
-
-        //     #
-
-        //     movup.3
-
-        //     movup.4
-
-        //     u32.sub.unsafe
-
-        //     if.true
-        //         #need to have logic if a<b#
-
-        //     swapw.2
-
-        //     #need to handle the last two words#
-
-        //     "##,
-        // );
+        self.add_proc(
+            "u256sub_unsafe",
+            r##"
+            swapw.3
+            movup.3
+            movup.7
+            push.0
+            movdn.2
+            exec.u32subc_unsafe
+            movup.4
+            movup.7
+            exec.u32subc_unsafe
+            movup.4
+            movup.6
+            exec.u32subc_unsafe
+            movup.4
+            movup.5
+            exec.u32subc_unsafe
+            movdn.12
+            swapw.2
+            movup.12
+            movup.4
+            movup.8
+            exec.u32subc_unsafe
+            movup.4
+            movup.7
+            exec.u32subc_unsafe
+            movup.4
+            movup.6
+            exec.u32subc_unsafe
+            movup.4
+            movup.5
+            exec.u32subc_unsafe
+            drop
+            "##,
+        );
 
         self.add_proc(
             "u256and_unsafe",
