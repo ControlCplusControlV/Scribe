@@ -1,12 +1,2 @@
 #V2
-push.1
-setack
-push.2
-push.3
-push.4
-push.5
-movdn.4
-movup.4
-ls
-movdn.3
-movup.3
+movdn.2

@@ -7,6 +7,51 @@ proc.u256iszero_unsafe
     end
 end
 
+proc.u32subc_unsafe
+    movup.2
+    add
+    u32sub.unsafe
+end
+
+proc.u256subc_unsafe
+    swapw.3
+    movup.3
+    movup.7
+    push.0
+    movdn.2
+    exec.u32subc_unsafe
+    movup.4
+    movup.7
+    exec.u32subc_unsafe
+    movup.4
+    movup.6
+    exec.u32subc_unsafe
+    movup.4
+    movup.5
+    exec.u32subc_unsafe
+    movdn.12
+    swapw.2
+    movup.12
+    movup.8
+    movup.5
+    exec.u32subc_unsafe
+    movup.7
+    movup.5
+    exec.u32subc_unsafe
+    movup.6
+    movup.5
+    exec.u32subc_unsafe
+    movup.5
+    movup.5
+    exec.u32subc_unsafe
+end
+
+
+proc.u256sub_unsafe
+    exec.u256subc_unsafe
+    drop
+end
+
 proc.u256add_unsafe
     swapw.3
     movup.3

@@ -538,7 +538,7 @@ impl Transpiler {
                 return;
             }
 
-            (Some(YulType::U256), "iszero" | "eq") => {
+            (Some(YulType::U256), "iszero" | "eq" | "lt") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
@@ -763,41 +763,14 @@ impl Transpiler {
             r##"
             # Assumes b, a, c at the top of the stack #
             # stack output is e (borrow out), d (result) at position 0,1 #
-
-            # subtract a-b-c #
-            dup
-            dup.2
-            movdn.4
-            movdn.4
-            sub
-            swap
-            sub
-            movdn.2
-
-            # borrow out calculation -- ((^x & y) | (^(x ^ y) & diff)) >> 31 #
-            dup
-            movdn.2
-            push.4294967295
-            u32xor
-            swap
-            dup
-            movdn.3
-            movdn.3
-            u32xor
-            push.4294967295
-            u32xor
             movup.2
-            dup
-            movdn.3
-            u32and
-            swap
-            u32or
-            u32shr.31
+            add
+            u32sub.unsafe	
             "##,
         );
 
         self.add_proc(
-            "u256sub_unsafe",
+            "u256subc_unsafe",
             r##"
             swapw.3
             movup.3
@@ -817,19 +790,36 @@ impl Transpiler {
             movdn.12
             swapw.2
             movup.12
-            movup.4
             movup.8
-            exec.u32subc_unsafe
-            movup.4
-            movup.7
-            exec.u32subc_unsafe
-            movup.4
-            movup.6
-            exec.u32subc_unsafe
-            movup.4
             movup.5
             exec.u32subc_unsafe
+            movup.7
+            movup.5
+            exec.u32subc_unsafe
+            movup.6
+            movup.5
+            exec.u32subc_unsafe
+            movup.5
+            movup.5
+            exec.u32subc_unsafe
+            "##,
+        );
+
+        self.add_proc(
+            "u256sub_unsafe",
+            r##"
+            exec.u256subc_unsafe
             drop
+            "##,
+        );
+
+        self.add_proc(
+            "u256lt_unsafe",
+            r##"
+            exec.u256subc_unsafe
+            movdn.9
+            dropw
+            dropw
             "##,
         );
 
