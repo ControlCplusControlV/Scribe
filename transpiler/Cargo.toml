@@ -10,9 +10,14 @@ pest = "2.0"
 pest_derive = "2.0"
 miden-assembly = {path = "./miden/assembly"}
 miden-processor = {path = "./miden/processor"}
+miden-core = {path = "./miden/core"}
 colored = "2"
 debug_tree = "0.4.0"
 insta = "1.12.0"
 primitive-types = "0.11.1"
 itertools = "0.10.3"
+rustyline = "9.1.2"
+clap = {version = "3.0.14", features = ["derive"]}
+anyhow = "1.0.54"
+thiserror = "1.0.30"
 

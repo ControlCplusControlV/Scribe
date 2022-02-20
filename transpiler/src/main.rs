@@ -3,15 +3,27 @@ use colored::*;
 use scribe::executor;
 use scribe::miden_generator;
 use scribe::parser;
+use scribe::repl::start_repl;
 
 use scribe::types::expressions_to_tree;
 use std::fs;
 use std::io::{stdin, stdout, Read, Write};
 
 #[macro_use]
-extern crate pest_derive;
-#[macro_use]
 extern crate insta;
+use clap::Parser;
+
+#[derive(Parser)]
+#[clap(version = "1.0", author = "Me")]
+struct Opts {
+    #[clap(subcommand)]
+    subcmd: Option<SubCommand>,
+}
+
+#[derive(Parser)]
+enum SubCommand {
+    Repl,
+}
 
 fn print_title(s: &str) {
     let s1 = format!("=== {} ===", s).blue().bold();
@@ -30,36 +42,46 @@ fn clear_screen() {
 }
 
 fn main() {
-    let yul_contracts = read_yul_contracts();
+    let opts: Opts = Opts::parse();
+    // opts.skip_setup = true;
 
-    for yul_code in yul_contracts {
-        clear_screen();
-        print_title("Input File");
-        println!("{}", yul_code.file_contents);
-        pause();
-        let inputs = vec![];
-        let parsed = parser::parse_yul_syntax(&yul_code.file_contents);
+    match opts.subcmd {
+        Some(SubCommand::Repl) => {
+            start_repl();
+        }
+        None => {
+            let yul_contracts = read_yul_contracts();
 
-        clear_screen();
-        print_title("Parsed Expressions");
-        println!("{}", expressions_to_tree(&parsed));
-        println!();
-        pause();
+            for yul_code in yul_contracts {
+                clear_screen();
+                print_title("Input File");
+                println!("{}", yul_code.file_contents);
+                pause();
+                let inputs = vec![];
+                let parsed = parser::parse_yul_syntax(&yul_code.file_contents);
 
-        clear_screen();
-        let miden_code = miden_generator::transpile_program(parsed);
-        print_title("Generated Miden Assembly");
-        println!("{}", miden_code);
-        println!();
-        pause();
+                clear_screen();
+                print_title("Parsed Expressions");
+                println!("{}", expressions_to_tree(&parsed));
+                println!();
+                pause();
 
-        clear_screen();
-        print_title("Miden Output");
-        let execution_value = executor::execute(miden_code, inputs).unwrap();
-        let stack = execution_value.last_stack_state();
-        let last_stack_value = stack.first().unwrap();
-        println!("{}", last_stack_value);
-        pause();
+                clear_screen();
+                let miden_code = miden_generator::transpile_program(parsed);
+                print_title("Generated Miden Assembly");
+                println!("{}", miden_code);
+                println!();
+                pause();
+
+                clear_screen();
+                print_title("Miden Output");
+                let execution_value = executor::execute(miden_code, inputs).unwrap();
+                let stack = execution_value.last_stack_state();
+                let last_stack_value = stack.first().unwrap();
+                println!("{}", last_stack_value);
+                pause();
+            }
+        }
     }
 }
 

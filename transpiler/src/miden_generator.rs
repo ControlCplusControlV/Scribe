@@ -127,6 +127,8 @@ impl Transpiler {
     }
 
     fn load_identifier_from_memory(&mut self, typed_identifier: TypedIdentifier) {
+        dbg!(&self.variables);
+        dbg!(&typed_identifier);
         let address = self.variables.get(&typed_identifier).cloned().unwrap();
         match typed_identifier.yul_type {
             YulType::U32 => {
@@ -367,8 +369,8 @@ impl Transpiler {
                 self.add_line("drop");
             }
             YulType::U256 => {
-                self.add_line("dropw.1");
-                self.add_line("dropw.1");
+                self.add_line("dropw");
+                self.add_line("dropw");
             }
         }
     }
@@ -931,13 +933,14 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         branches: VecDeque::new(),
     };
     let ast = optimize_ast(expressions);
+    transpiler.add_utility_functions();
+    transpiler.add_line("# end std lib #");
     for expr in &ast {
         match expr {
             Expr::FunctionDefinition(op) => transpiler.transpile_function_declaration(&op),
             _ => (),
         }
     }
-    transpiler.add_utility_functions();
     transpiler.add_line("begin");
     transpiler.indentation += 4;
     for expr in ast {

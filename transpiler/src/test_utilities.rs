@@ -44,10 +44,9 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     let miden_code = miden_generator::transpile_program(ast);
     let mut trimmed_miden_code = miden_code
         .split("\n")
-        .skip_while(|line| *line != "begin")
+        .skip_while(|line| *line != "# end std lib #")
         .collect::<Vec<_>>()
         .join("\n");
-    trimmed_miden_code = format!("# ...std lib... #\n{}", trimmed_miden_code);
     print_title("Generated Miden Assembly");
     println!("{}", trimmed_miden_code);
     println!();
