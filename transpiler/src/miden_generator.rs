@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 
 use primitive_types::U256;
 
-use crate::{ast_optimization::optimize_ast, types::*};
+use crate::{ast_optimization::optimize_ast, types::*, utils::convert_u256_to_pushes};
 
 struct Transpiler {
     variables: HashMap<TypedIdentifier, u32>,
@@ -330,15 +330,7 @@ impl Transpiler {
                 yul_type: YulType::U256,
             },
         );
-        let mut bytes = [0u8; 32];
-        value.to_big_endian(&mut bytes);
-        for bytes in &bytes.iter().chunks(4) {
-            let mut stack_value: u32 = 0;
-            for (i, bytes) in bytes.enumerate() {
-                stack_value = stack_value | ((*bytes as u32) << ((3 - i) * 8)) as u32
-            }
-            self.add_line(&format!("push.{}", stack_value));
-        }
+        self.add_line(&convert_u256_to_pushes(&value));
     }
 
     fn _consume_top_stack_values(&mut self, n: u32) {

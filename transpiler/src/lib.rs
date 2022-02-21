@@ -6,3 +6,4 @@ pub mod repl;
 pub mod test_utilities;
 pub mod type_inference;
 pub mod types;
+pub mod utils;

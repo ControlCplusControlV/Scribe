@@ -83,6 +83,7 @@ pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
         .last_stack_state()
         .iter()
         .take(8)
+        .rev()
         .flat_map(|x| {
             let svint = x.as_int() as u32;
 
