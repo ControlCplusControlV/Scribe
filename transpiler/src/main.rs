@@ -10,6 +10,9 @@ use scribe::types::expressions_to_tree;
 use std::fs;
 use std::io::{stdin, stdout, Read, Write};
 
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
+
 #[macro_use]
 extern crate insta;
 use clap::Parser;
