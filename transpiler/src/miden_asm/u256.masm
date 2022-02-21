@@ -13,6 +13,60 @@ proc.u32subc_unsafe
     u32sub.unsafe
 end
 
+proc.u256div_by_one
+  push.2
+  u32div
+  swap.1
+  push.2
+  u32div 
+  swap.2
+  push.2
+  u32div
+  swap.3
+  push.2
+  u32div
+  swap.4
+  push.2
+  u32div
+  swap.5
+  push.2
+  u32div
+  swap.6
+  push.2
+  u32div
+  swap.7
+  push.2
+  u32div
+  movdn.7
+end
+
+proc.u256lsh_by_one
+  push.2
+  u32mul
+  swap.1
+  push.2
+  u32mul  
+  swap.2
+  push.2
+  u32mul 
+  swap.3
+  push.2
+  u32mul 
+  swap.4
+  push.2
+  u32mul 
+  swap.5
+  push.2
+  u32mul 
+  swap.6
+  push.2
+  u32mul 
+  swap.7
+  push.2
+  u32mul 
+  movdn.7
+end
+
 proc.u256subc_unsafe
     swapw.3
     movup.3
