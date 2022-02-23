@@ -513,6 +513,7 @@ impl Transpiler {
 
     fn transpile_for_loop(&mut self, op: &ExprForLoop) {
         self.transpile_block(&op.init_block);
+        self.add_comment("-- conditional --");
         self.transpile_op(&op.conditional);
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack

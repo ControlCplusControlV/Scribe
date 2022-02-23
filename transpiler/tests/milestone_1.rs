@@ -239,13 +239,13 @@ fn u256_sum_odds() {
     run_example(
         "
             let sum_odds:u256 := 0
-            let n:u256 := 1218794287928347239847
+            let n:u256 := 72
             for { let i:u256 := 1 } lt(i, n) { i := add(i, 2)} { 
                 sum_odds := add(i, sum_odds)
             }
             sum_odds
         ",
-        MidenResult::U32(0),
+        MidenResult::U256(U256::from_dec_str("1296").unwrap()),
     );
 }
 
