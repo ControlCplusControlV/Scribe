@@ -44,6 +44,18 @@ fn addition(x: U256, y: U256) -> TestResult {
 }
 
 #[quickcheck]
+fn shl(x: U256) -> TestResult {
+    let expected = x.0 << 1 as u32;
+    run_miden_function("exec.u256shl_unsafe", vec![x], expected)
+}
+
+#[quickcheck]
+fn shr(x: U256) -> TestResult {
+    let expected = x.0 >> 1 as u32;
+    run_miden_function("exec.u256shr_unsafe", vec![x], expected)
+}
+
+#[quickcheck]
 fn auto_and(x: U256, y: U256) -> TestResult {
     let expected = x.0 & y.0;
     run_miden_function("exec.u256and_unsafe", vec![x, y], expected)

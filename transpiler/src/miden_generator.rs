@@ -70,6 +70,13 @@ impl Transpiler {
         // stack_value.insert(x);
     }
 
+    fn indent(&mut self) {
+        self.indentation += 4;
+    }
+    fn outdent(&mut self) {
+        self.indentation -= 4;
+    }
+
     fn begin_branch(&mut self) {
         self.branches.push_front(Branch {
             stack_before: self.stack.clone(),
@@ -79,6 +86,8 @@ impl Transpiler {
 
     fn end_branch(&mut self) {
         let branch = self.branches.pop_front().unwrap();
+        self.add_comment("cleaning up after branch");
+        self.indent();
         for modified_identifier in branch.modified_identifiers {
             if branch
                 .stack_before
@@ -91,6 +100,7 @@ impl Transpiler {
             }
         }
         self.target_stack(branch.stack_before);
+        self.outdent();
     }
 
     fn target_stack(&mut self, target_stack: Stack) {
@@ -127,8 +137,10 @@ impl Transpiler {
     }
 
     fn load_identifier_from_memory(&mut self, typed_identifier: TypedIdentifier) {
-        dbg!(&self.variables);
-        dbg!(&typed_identifier);
+        self.add_comment(&format!(
+            "push {} to top of stack",
+            typed_identifier.identifier
+        ));
         let address = self.variables.get(&typed_identifier).cloned().unwrap();
         match typed_identifier.yul_type {
             YulType::U32 => {
@@ -148,6 +160,7 @@ impl Transpiler {
                 yul_type: typed_identifier.yul_type,
             },
         );
+        self.newline();
     }
 
     fn push_identifier_to_top(&mut self, typed_identifier: TypedIdentifier) {
@@ -170,11 +183,17 @@ impl Transpiler {
                 self.stack.0.insert(
                     0,
                     StackValue {
-                        typed_identifier: Some(typed_identifier),
+                        typed_identifier: Some(typed_identifier.clone()),
                         yul_type: stack_value.yul_type,
                     },
                 );
+                self.add_comment(&format!(
+                    "pushing {} to the top",
+                    typed_identifier.identifier
+                ));
+                self.indent();
                 self.dup_from_offset(offset, stack_value.yul_type);
+                self.outdent()
             }
             None => {
                 self.load_identifier_from_memory(typed_identifier);
@@ -218,12 +237,20 @@ impl Transpiler {
                 yul_type: YulType::U32,
             },
         );
+        self.add_comment(&format!("u32 literal {}", value));
         self.add_line(&format!("push.{}", value));
+        self.newline();
     }
 
     fn prepare_for_stack_values(&mut self, yul_type: &YulType) {
         while self.get_size_of_stack() + yul_type.stack_width() > 16 {
+            self.add_comment(&format!(
+                "stack would be too large after {}, popping to memory",
+                yul_type,
+            ));
+            self.indent();
             self.pop_bottom_var_to_memory();
+            self.outdent();
         }
     }
 
@@ -256,6 +283,10 @@ impl Transpiler {
             .collect();
         let num_stack_values_above: u32 =
             stack_above.iter().map(|sv| sv.yul_type.stack_width()).sum();
+        self.add_comment(&format!(
+            "Moving {} to top of stack",
+            stack_value.typed_identifier.as_ref().unwrap().identifier
+        ));
         match stack_value.yul_type {
             YulType::U32 => {
                 self.add_line(&format!("movup.{}", num_stack_values_above));
@@ -282,7 +313,7 @@ impl Transpiler {
     }
 
     fn pop_top_var_to_memory(&mut self) {
-        let stack_value = self.stack.0.first().unwrap();
+        let stack_value = self.stack.0.first().unwrap().clone();
 
         let address = match self
             .variables
@@ -301,6 +332,10 @@ impl Transpiler {
                 address
             }
         };
+        self.add_comment(&format!(
+            "popping {} from top of stack to memory",
+            stack_value.typed_identifier.clone().unwrap()
+        ));
         match stack_value.yul_type {
             YulType::U32 => {
                 self.add_line(&format!("mem.pop.{}", address));
@@ -310,6 +345,7 @@ impl Transpiler {
                 self.add_line(&format!("mem.pop.{}", address + 1));
             }
         }
+        self.newline();
         self.stack.0.remove(0);
     }
 
@@ -323,6 +359,7 @@ impl Transpiler {
 
     fn push_u256(&mut self, value: U256) {
         self.prepare_for_stack_values(&YulType::U256);
+        self.add_comment(&format!("u256 literal: {}", value));
         self.stack.0.insert(
             0,
             StackValue {
@@ -331,6 +368,7 @@ impl Transpiler {
             },
         );
         self.add_line(&convert_u256_to_pushes(&value));
+        self.newline();
     }
 
     fn _consume_top_stack_values(&mut self, n: u32) {
@@ -340,6 +378,7 @@ impl Transpiler {
     }
 
     fn dup_top_stack_value(&mut self) {
+        self.add_comment(&format!("duping top stack value"));
         let stack_value = self.stack.0.get(0).unwrap().clone();
         match stack_value.yul_type {
             YulType::U32 => {
@@ -351,9 +390,11 @@ impl Transpiler {
             }
         }
         self.stack.0.insert(0, stack_value.clone());
+        self.newline();
     }
 
     fn drop_top_stack_value(&mut self) {
+        self.add_comment(&format!("dropping top stack value"));
         let stack_value = self.stack.0.get(0).unwrap().clone();
         self.stack.0.remove(0);
         match stack_value.yul_type {
@@ -365,6 +406,7 @@ impl Transpiler {
                 self.add_line("dropw");
             }
         }
+        self.newline();
     }
 
     fn drop_after(&mut self, n: usize) {
@@ -386,7 +428,7 @@ impl Transpiler {
             let stack_length = self.stack.0.len();
             self.stack.0.swap(n, stack_length - 1);
         }
-        // TODO: deal w/ when the stack gets too big
+        self.add_comment(&format!("dropping after {} ", n));
         for n in 0..size_to_keep {
             let shift = total_size - 1;
             if shift == 1 {
@@ -398,6 +440,7 @@ impl Transpiler {
         for i in (n..self.stack.0.len()).rev() {
             self.drop_top_stack_value();
         }
+        self.newline();
     }
 
     fn top_is_var(&mut self, typed_identifier: TypedIdentifier) {
@@ -474,24 +517,42 @@ impl Transpiler {
         self.add_line("while.true");
         // Because the while.true will consume the top of the stack
         self._consume_top_stack_values(1);
-        self.indentation += 4;
+        self.indent();
         self.begin_branch();
+
+        self.add_comment("-- interior block --");
+        self.indent();
         self.transpile_block(&op.interior_block);
+        self.outdent();
+        self.newline();
+
+        self.add_comment("-- after block --");
+        self.indent();
         self.transpile_block(&op.after_block);
+        self.newline();
         self.end_branch();
+        self.outdent();
+        self.newline();
+
+        self.add_comment("-- conditional --");
+        self.indent();
         self.transpile_op(&op.conditional);
+        self.outdent();
+        self.newline();
         self._consume_top_stack_values(1);
-        self.indentation -= 4;
+        self.outdent();
+
         self.add_line("end");
+        self.newline();
     }
 
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
         let stack_target = self.stack.clone();
         self.add_line(&format!("repeat.{}", op.iterations));
-        self.indentation += 4;
+        self.indent();
         self.transpile_block(&op.interior_block);
         self.target_stack(stack_target);
-        self.indentation -= 4;
+        self.outdent();
         self.add_line("end");
     }
 
@@ -510,6 +571,8 @@ impl Transpiler {
         for expr in op.exprs.clone().into_iter() {
             self.transpile_op(&expr);
         }
+
+        self.add_comment(&format!("{}()", op.function_name));
 
         if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
             self.add_line(&format!("exec.{}", op.function_name));
@@ -537,6 +600,13 @@ impl Transpiler {
                 self.add_unknown(YulType::U32);
                 return;
             }
+            (Some(YulType::U256), "shl" | "shr") => {
+                let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
+                self.add_line(&u256_operation);
+                self._consume_top_stack_values(1);
+                self.add_unknown(YulType::U256);
+                return;
+            }
 
             //other operations
             (
@@ -562,17 +632,18 @@ impl Transpiler {
                 todo!()
             }
         };
+        self.newline();
     }
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
         self._consume_top_stack_values(1);
         self.add_line("if.true");
-        self.indentation += 4;
+        self.indent();
         self.begin_branch();
         self.transpile_block(&op.second_expr);
         self.end_branch();
-        self.indentation -= 4;
+        self.outdent();
         self.add_line("end");
     }
 
@@ -612,7 +683,7 @@ impl Transpiler {
         }
         // let stack_target = self.stack.clone();
         self.add_line(&format!("proc.{}", op.function_name));
-        self.indentation += 4;
+        self.indent();
         self.transpile_block(&op.block);
         // self.target_stack(stack_target);
         for return_ident in &op.returns {
@@ -621,7 +692,7 @@ impl Transpiler {
         self.drop_after(op.returns.len());
         let function_stack = self.stack.clone();
         self.stack = Stack::default();
-        self.indentation -= 4;
+        self.outdent();
         self.add_line("end");
         self.user_functions
             .insert(op.function_name.clone(), function_stack);
@@ -654,10 +725,10 @@ impl Transpiler {
             self._consume_top_stack_values(2);
             let stack_target = self.stack.clone();
             self.add_line("if.true");
-            self.indentation += 4;
+            self.indent();
             self.transpile_block(&op.block);
             self.target_stack(stack_target);
-            self.indentation -= 4;
+            self.outdent();
             self.add_line("end");
         }
     }
@@ -671,14 +742,17 @@ impl Transpiler {
         )
     }
 
-    fn add_proc(&mut self, proc_name: &str, lines: &str) {
-        self.add_line(&format!("proc.{}", proc_name));
-        self.indentation += 4;
-        for line in lines.split("\n") {
-            self.add_line(&line.trim_start())
-        }
-        self.indentation -= 4;
-        self.add_line("end");
+    fn newline(&mut self) {
+        self.program = format!("{}\n", self.program)
+    }
+
+    fn add_comment(&mut self, comment: &str) {
+        self.program = format!(
+            "{}\n{}# {} #",
+            self.program,
+            " ".repeat(self.indentation.try_into().unwrap()),
+            comment
+        )
     }
 
     // TODO: re-order AST to have all functions first
@@ -730,11 +804,11 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         }
     }
     transpiler.add_line("begin");
-    transpiler.indentation += 4;
+    transpiler.indent();
     for expr in ast {
         transpiler.transpile_op(&expr);
     }
-    transpiler.indentation -= 4;
+    transpiler.outdent();
     transpiler.add_line("end");
     transpiler.program
 }
