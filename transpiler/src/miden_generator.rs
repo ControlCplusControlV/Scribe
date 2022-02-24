@@ -138,7 +138,7 @@ impl Transpiler {
 
     fn load_identifier_from_memory(&mut self, typed_identifier: TypedIdentifier) {
         self.add_comment(&format!(
-            "push {} to top of stack",
+            "push {} from memory to top of stack",
             typed_identifier.identifier
         ));
         let address = self.variables.get(&typed_identifier).cloned().unwrap();
@@ -248,9 +248,11 @@ impl Transpiler {
                 "stack would be too large after {}, popping to memory",
                 yul_type,
             ));
+            // dbg!(&self.stack);
             self.indent();
             self.pop_bottom_var_to_memory();
             self.outdent();
+            // dbg!(&self.stack);
         }
     }
 
@@ -293,6 +295,9 @@ impl Transpiler {
             }
             YulType::U256 => {
                 match num_stack_values_above {
+                    1 => {
+                        self.add_line(&format!("movdn.8"));
+                    }
                     8 => {
                         self.add_line(&format!("movupw.3"));
                         self.add_line(&format!("movupw.3"));
@@ -477,10 +482,16 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         // TODO: should use memory probably
         // self.variables.insert(op.identifier.clone(), address);
+        self.add_comment(&format!(
+            "Assigning to {}",
+            op.typed_identifiers.first().unwrap().identifier
+        ));
+        self.indent();
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs);
             self.top_is_var(op.typed_identifiers.first().unwrap().clone());
         }
+        self.outdent();
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
@@ -489,6 +500,7 @@ impl Transpiler {
         let typed_identifier = self
             .get_typed_identifier(&op.identifiers.first().unwrap())
             .clone();
+        self.add_comment(&format!("Assigning to {}", typed_identifier.identifier));
         if let Some(branch) = self.branches.front_mut() {
             branch.modified_identifiers.insert(typed_identifier.clone());
         }
@@ -750,6 +762,7 @@ impl Transpiler {
     }
 
     fn add_comment(&mut self, comment: &str) {
+        // dbg!(comment);
         self.program = format!(
             "{}\n{}# {} #",
             self.program,
