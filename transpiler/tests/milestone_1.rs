@@ -182,7 +182,6 @@ fn u256_less_than() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_match() {
     run_example(
@@ -233,7 +232,6 @@ fn u256_function() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_sum_odds() {
     run_example(

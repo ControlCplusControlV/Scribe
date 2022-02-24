@@ -290,8 +290,6 @@ impl Transpiler {
         match stack_value.yul_type {
             YulType::U32 => {
                 self.add_line(&format!("movup.{}", num_stack_values_above));
-                self.add_line("padw");
-                self.add_line("drop");
             }
             YulType::U256 => {
                 match num_stack_values_above {
@@ -338,6 +336,8 @@ impl Transpiler {
         ));
         match stack_value.yul_type {
             YulType::U32 => {
+                self.add_line("padw");
+                self.add_line("drop");
                 self.add_line(&format!("mem.pop.{}", address));
             }
             YulType::U256 => {
@@ -720,18 +720,20 @@ impl Transpiler {
         self.dup_top_stack_value();
         self.transpile_literal(&op.literal);
         if switch.inferred_type == Some(YulType::U256) {
-            // TODO: u256 equality
+            self.add_line("exec.u256eq_unsafe");
         } else {
             self.add_line("eq");
-            self._consume_top_stack_values(2);
-            let stack_target = self.stack.clone();
-            self.add_line("if.true");
-            self.indent();
-            self.transpile_block(&op.block);
-            self.target_stack(stack_target);
-            self.outdent();
-            self.add_line("end");
         }
+        self.add_unknown(YulType::U32);
+        self._consume_top_stack_values(2);
+        self.begin_branch();
+        self._consume_top_stack_values(1);
+        self.add_line("if.true");
+        self.indent();
+        self.transpile_block(&op.block);
+        self.end_branch();
+        self.outdent();
+        self.add_line("end");
     }
 
     fn add_line(&mut self, line: &str) {
