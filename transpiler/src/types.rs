@@ -47,10 +47,16 @@ impl YulType {
             _ => panic!(),
         }
     }
-    pub fn stack_width(&self) -> u32 {
+    pub fn miden_stack_width(&self) -> u32 {
         match self {
             Self::U32 => 1,
             Self::U256 => 8,
+        }
+    }
+    pub fn miden_memory_addresses(&self) -> u32 {
+        match self {
+            Self::U32 => 1,
+            Self::U256 => 2,
         }
     }
 }

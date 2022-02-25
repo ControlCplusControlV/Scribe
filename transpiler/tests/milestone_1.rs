@@ -183,7 +183,7 @@ fn u256_less_than() {
 }
 
 #[test]
-fn u256_match() {
+fn u256_match_no_default() {
     run_example(
         "
             let x:u256 := 31711016731996786641919559689128982722488122124807605757398297001483711807488
@@ -195,6 +195,44 @@ fn u256_match() {
             foo
             ",
         MidenResult::U32(5),
+    );
+}
+
+#[test]
+fn u256_match_default_with_match() {
+    run_example(
+        "
+            let x:u256 := 50
+            let foo:u32 := 1
+            switch x
+                case 50 {
+                    foo := 5
+                }
+                default {
+                    foo := 83
+                }
+            foo
+            ",
+        MidenResult::U32(5),
+    );
+}
+
+#[test]
+fn u256_match_default_no_match() {
+    run_example(
+        "
+            let x:u256 := 80
+            let foo:u32 := 1
+            switch x
+                case 50 {
+                    foo := 5
+                }
+                default {
+                    foo := 83
+                }
+            foo
+            ",
+        MidenResult::U32(83),
     );
 }
 

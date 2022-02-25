@@ -101,7 +101,6 @@ fn integration_fib() {
     );
 }
 
-#[ignore]
 #[test]
 fn integration_case() {
     run_example(

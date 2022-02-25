@@ -14,6 +14,7 @@ struct Transpiler {
     user_functions: HashMap<String, Stack>,
     scoped_identifiers: HashMap<String, TypedIdentifier>,
     branches: VecDeque<Branch>,
+    accept_overflow: bool,
 }
 
 #[derive(Default, Clone)]
@@ -103,6 +104,14 @@ impl Transpiler {
         self.outdent();
     }
 
+    fn begin_accepting_overflow(&mut self) {
+        self.accept_overflow = true;
+    }
+
+    fn stop_accepting_overflow(&mut self) {
+        self.accept_overflow = true;
+    }
+
     fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
@@ -133,7 +142,7 @@ impl Transpiler {
 
     fn update_identifier_in_memory(&mut self, typed_identifier: TypedIdentifier) {
         self.push_identifier_to_top(typed_identifier);
-        self.pop_top_var_to_memory();
+        self.pop_top_stack_value_to_memory();
     }
 
     fn load_identifier_from_memory(&mut self, typed_identifier: TypedIdentifier) {
@@ -142,7 +151,12 @@ impl Transpiler {
             typed_identifier.identifier
         ));
         let address = self.variables.get(&typed_identifier).cloned().unwrap();
-        match typed_identifier.yul_type {
+        self.push_from_memory_to_top_of_stack(address, &typed_identifier.yul_type);
+        self.stack.0.first_mut().unwrap().typed_identifier = Some(typed_identifier);
+    }
+
+    fn push_from_memory_to_top_of_stack(&mut self, address: u32, yul_type: &YulType) {
+        match yul_type {
             YulType::U32 => {
                 self.add_line(&format!("mem.push.{}", address));
                 self.add_line("dup");
@@ -156,8 +170,8 @@ impl Transpiler {
         self.stack.0.insert(
             0,
             StackValue {
-                typed_identifier: Some(typed_identifier.clone()),
-                yul_type: typed_identifier.yul_type,
+                typed_identifier: None,
+                yul_type: *yul_type,
             },
         );
         self.newline();
@@ -174,19 +188,15 @@ impl Transpiler {
                 if sv.typed_identifier.as_ref() == Some(&typed_identifier) {
                     return true;
                 }
-                offset += sv.yul_type.stack_width();
+                offset += sv.yul_type.miden_stack_width();
                 return false;
             })
             .cloned();
         match stack_value {
             Some(stack_value) => {
-                self.stack.0.insert(
-                    0,
-                    StackValue {
-                        typed_identifier: Some(typed_identifier.clone()),
-                        yul_type: stack_value.yul_type,
-                    },
-                );
+                self.stack
+                    .0
+                    .insert(0, StackValue::from(&typed_identifier.clone()));
                 self.add_comment(&format!(
                     "pushing {} to the top",
                     typed_identifier.identifier
@@ -243,7 +253,10 @@ impl Transpiler {
     }
 
     fn prepare_for_stack_values(&mut self, yul_type: &YulType) {
-        while self.get_size_of_stack() + yul_type.stack_width() > 16 {
+        if self.accept_overflow {
+            return;
+        }
+        while self.get_size_of_stack() + yul_type.miden_stack_width() > 16 {
             self.add_comment(&format!(
                 "stack would be too large after {}, popping to memory",
                 yul_type,
@@ -258,6 +271,7 @@ impl Transpiler {
 
     fn pop_bottom_var_to_memory(&mut self) {
         let stack_value = self.stack.0.last().cloned().unwrap();
+        dbg!(&self.stack);
 
         let address = match self
             .variables
@@ -283,8 +297,10 @@ impl Transpiler {
             .into_iter()
             .take(self.stack.0.len() - 1)
             .collect();
-        let num_stack_values_above: u32 =
-            stack_above.iter().map(|sv| sv.yul_type.stack_width()).sum();
+        let num_stack_values_above: u32 = stack_above
+            .iter()
+            .map(|sv| sv.yul_type.miden_stack_width())
+            .sum();
         self.add_comment(&format!(
             "Moving {} to top of stack",
             stack_value.typed_identifier.as_ref().unwrap().identifier
@@ -312,33 +328,37 @@ impl Transpiler {
         }
         self.stack.0.pop();
         self.stack.0.insert(0, stack_value.clone());
-        self.pop_top_var_to_memory();
+        self.pop_top_stack_value_to_memory();
     }
 
-    fn pop_top_var_to_memory(&mut self) {
+    fn pop_top_stack_value_to_memory(&mut self) -> u32 {
         let stack_value = self.stack.0.first().unwrap().clone();
 
-        let address = match self
-            .variables
-            .get(&stack_value.typed_identifier.clone().unwrap())
+        let address = match stack_value
+            .typed_identifier
+            .clone()
+            .map(|typed_identifier| self.variables.get(&typed_identifier.clone()))
+            .flatten()
         {
             Some(address) => *address,
             None => {
                 let address = self.next_open_memory_address;
-                self.variables
-                    .insert(stack_value.typed_identifier.clone().unwrap(), address);
-                self.next_open_memory_address += if stack_value.yul_type == YulType::U256 {
-                    2
-                } else {
-                    1
-                };
+                if let Some(ref typed_identifier) = stack_value.typed_identifier {
+                    self.variables.insert(typed_identifier.clone(), address);
+                }
+                self.next_open_memory_address += stack_value.yul_type.miden_memory_addresses();
                 address
             }
         };
         self.add_comment(&format!(
             "popping {} from top of stack to memory",
-            stack_value.typed_identifier.clone().unwrap()
+            stack_value
+                .typed_identifier
+                .clone()
+                .map(|ti| ti.identifier)
+                .unwrap_or("unknown".to_string())
         ));
+        self.stack.0.remove(0);
         match stack_value.yul_type {
             YulType::U32 => {
                 self.add_line("padw");
@@ -351,14 +371,18 @@ impl Transpiler {
             }
         }
         self.newline();
-        self.stack.0.remove(0);
+        address
+    }
+
+    fn get_next_open_memory_address(&mut self) {
+        self.next_open_memory_address;
     }
 
     fn get_size_of_stack(&self) -> u32 {
         self.stack
             .0
             .iter()
-            .map(|sv| sv.yul_type.stack_width())
+            .map(|sv| sv.yul_type.miden_stack_width())
             .sum()
     }
 
@@ -420,13 +444,13 @@ impl Transpiler {
             .0
             .iter()
             .take(n)
-            .map(|sv| sv.yul_type.stack_width())
+            .map(|sv| sv.yul_type.miden_stack_width())
             .sum();
         let total_size: u32 = self
             .stack
             .0
             .iter()
-            .map(|sv| sv.yul_type.stack_width())
+            .map(|sv| sv.yul_type.miden_stack_width())
             .sum();
 
         for n in 0..n {
@@ -501,6 +525,7 @@ impl Transpiler {
             .get_typed_identifier(&op.identifiers.first().unwrap())
             .clone();
         self.add_comment(&format!("Assigning to {}", typed_identifier.identifier));
+        self.indent();
         if let Some(branch) = self.branches.front_mut() {
             branch.modified_identifiers.insert(typed_identifier.clone());
         }
@@ -514,6 +539,7 @@ impl Transpiler {
         // } else {
         self.transpile_op(&op.rhs);
         self.top_is_var(typed_identifier);
+        self.outdent();
         // }
     }
 
@@ -571,12 +597,49 @@ impl Transpiler {
 
     fn transpile_switch(&mut self, op: &ExprSwitch) {
         self.add_line("");
+        let switch_matched_pseudovar = TypedIdentifier {
+            identifier: "switch_matched".to_string(),
+            yul_type: YulType::U32,
+        };
+        self.scoped_identifiers.insert(
+            switch_matched_pseudovar.identifier.clone(),
+            switch_matched_pseudovar.clone(),
+        );
+        self.add_comment("keeping track of whether we've hit any cases");
+        self.add_line("push.0");
+        self.add_unknown(YulType::U32);
+        self.top_is_var(switch_matched_pseudovar.clone());
         self.transpile_op(&op.expr);
-        for case in &op.cases {
-            self.transpile_case(&case, &op);
+        // TODO: these have to be unique, some way to do that, incrementing?
+        let switch_target_pseudovar = TypedIdentifier {
+            identifier: "switch".to_string(),
+            yul_type: op.inferred_type.unwrap(),
+        };
+        self.scoped_identifiers.insert(
+            switch_target_pseudovar.identifier.clone(),
+            switch_target_pseudovar.clone(),
+        );
+        self.top_is_var(switch_target_pseudovar.clone());
+        for (i, case) in op.cases.iter().enumerate() {
+            self.push_identifier_to_top(switch_target_pseudovar.clone());
+            self.transpile_case(
+                &case,
+                &op,
+                switch_target_pseudovar.clone(),
+                switch_matched_pseudovar.clone(),
+            );
         }
-        self.add_line("drop");
-        self._consume_top_stack_values(1);
+        if let Some(default_case) = &op.default_case {
+            self.add_comment("default case");
+            self.push_identifier_to_top(switch_matched_pseudovar);
+            self.add_line("not");
+            self._consume_top_stack_values(1);
+            self.add_line("if.true");
+            self.begin_branch();
+            self.transpile_block(&default_case);
+            self.end_branch();
+            self.add_line("end");
+        }
         self.add_line("");
     }
 
@@ -645,7 +708,6 @@ impl Transpiler {
                 todo!()
             }
         };
-        self.newline();
     }
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
@@ -727,21 +789,34 @@ impl Transpiler {
     fn transpile_default(&mut self, op: &ExprDefault) {}
 
     // //TODO: update placeholder
-    fn transpile_case(&mut self, op: &ExprCase, switch: &ExprSwitch) {
-        self.prepare_for_stack_values(&switch.inferred_type.unwrap());
-        self.dup_top_stack_value();
+    fn transpile_case(
+        &mut self,
+        op: &ExprCase,
+        switch: &ExprSwitch,
+        switch_var: TypedIdentifier,
+        matched_var: TypedIdentifier,
+    ) {
+        self.begin_accepting_overflow();
         self.transpile_literal(&op.literal);
         if switch.inferred_type == Some(YulType::U256) {
             self.add_line("exec.u256eq_unsafe");
         } else {
             self.add_line("eq");
         }
-        self.add_unknown(YulType::U32);
         self._consume_top_stack_values(2);
+        self.stop_accepting_overflow();
+
         self.begin_branch();
-        self._consume_top_stack_values(1);
         self.add_line("if.true");
         self.indent();
+        self.transpile_assignment(&ExprAssignment {
+            identifiers: vec![matched_var.identifier],
+            inferred_types: vec![Some(YulType::U32)],
+            rhs: Box::new(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                inferred_type: Some(YulType::U32),
+                value: U256::from(1 as u32),
+            }))),
+        });
         self.transpile_block(&op.block);
         self.end_branch();
         self.outdent();
@@ -762,7 +837,7 @@ impl Transpiler {
     }
 
     fn add_comment(&mut self, comment: &str) {
-        // dbg!(comment);
+        dbg!(comment);
         self.program = format!(
             "{}\n{}# {} #",
             self.program,
@@ -809,6 +884,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         program: "".to_string(),
         user_functions: HashMap::default(),
         branches: VecDeque::new(),
+        accept_overflow: false,
     };
     let ast = optimize_ast(expressions);
     transpiler.add_utility_functions();
