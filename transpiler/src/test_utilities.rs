@@ -13,6 +13,9 @@ pub enum MidenResult {
     U256(primitive_types::U256),
     U32(u32),
 }
+
+//Function to display transpile Yul code and display each step of the transpilation process in the terminal.
+//This function is only used to demonstrate what Scribe does in a easy to read format.
 pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     fn print_title(s: &str) {
         let s1 = format!("=== {} ===", s).blue().bold();
@@ -27,14 +30,7 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
 
     let parsed = parser::parse_yul_syntax(yul_code);
 
-    // print_title("AST");
-    // println!("{}", expressions_to_tree(&parsed));
-    // println!();
-
     let ast = optimize_ast(parsed);
-    // print_title("Optimized AST");
-    // println!("{}", expressions_to_tree(&ast));
-    // println!();
 
     let ast = infer_types(&ast);
     print_title("AST");
@@ -77,7 +73,8 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     }
 }
 
-//convert the miden output to U256
+//Converts the top 8 elements on the top of the stack to a U256 struct
+//This is used during testing to assert that the Miden output is the correct U256 value
 pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
     let u256_bytes = execuiton_trace
         .last_stack_state()

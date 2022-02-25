@@ -10,12 +10,15 @@ use crate::types::*;
 #[derive(Parser)]
 #[grammar = "./grammar.pest"]
 struct IdentParser;
-
 const DEFAULT_TYPE: YulType = YulType::U32;
 
-//function to parse yul syntax into miden opcodes
+//Takes in yul code as a string and parses the grammar, returning a Struct that represents a statement or expression in Yul
+//Yul grammar is parsed by matching rules, which can be found in the grammar.pest file
+//After a rule is matched, the statement or expression is unwrapped to parse nested rules.
+//For example, a the grammar for a decimal_number is @{ digit+ }, and a digit is { '0'..'9' }
+
+//To see examples for each Expr, check out types.rs
 pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
-    // Parse the entire file as a string
     let file = IdentParser::parse(Rule::file, syntax)
         .expect("unsuccessful parse")
         .next()
@@ -25,10 +28,10 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     let mut expressions: Vec<Expr> = vec![];
     for statement in file.clone().into_inner() {
         match statement.as_rule() {
-            //rule is statement
             Rule::statement => {
                 expressions.push(parse_statement(statement));
             }
+
             Rule::object => {
                 // TODO: create an object type
                 let mut parts = statement.into_inner();
@@ -38,13 +41,6 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
                 expressions.push(parse_statement(code));
             }
 
-            //rule is object
-
-            //rule is code
-
-            //rule is data
-
-            //rule is EOI
             Rule::EOI => (),
             r => {
                 dbg!(&statement);
@@ -55,18 +51,21 @@ pub fn parse_yul_syntax(syntax: &str) -> Vec<Expr> {
     expressions
 }
 
-//Function to parse a statement, match a rule defined in grammar.pest and return an Expr
+//Parses a Yul statement. This function matches a grammar rule and return an Expr struct
+//which is later added into the Abstract Syntax Tree
 fn parse_statement(expression: Pair<Rule>) -> Expr {
     let inner = expression.into_inner().next().unwrap();
     match inner.as_rule() {
-        //rule is expression
+        //Rule is expr
         Rule::expr => parse_expression(inner),
 
-        //rule is block
+        //Rule is block
         Rule::block => Expr::Block(parse_block(inner)),
+
+        // Rule is code
         Rule::code => Expr::Block(parse_block(inner.into_inner().next().unwrap())),
 
-        //rule is function definition
+        //If the rule is a function definition, parse the function name, parameters, returns and then return an Expr
         Rule::function_definition => {
             let mut parts = inner.into_inner();
             let function_name = parts.next().unwrap().as_str();
@@ -89,7 +88,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is assignment
+        //Rule is assignment
         Rule::assignment => {
             let mut parts = inner.into_inner();
             let identifiers = parse_identifier_list(parts.next().unwrap());
@@ -102,7 +101,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is if statement
+        //Rule is if statement
         Rule::if_statement => {
             let mut inners = inner.into_inner();
             let first_arg = inners.next().unwrap();
@@ -113,7 +112,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is switch
+        //Rule is switch
         Rule::switch => {
             let mut parts = inner.into_inner();
             let mut default_case = None;
@@ -137,7 +136,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        // // rule is case
+        //Rule is case
         Rule::case => {
             let mut parts = inner.into_inner();
             let literal = parts.next().unwrap();
@@ -149,7 +148,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is default
+        //Rule is default
         Rule::default => {
             let mut parts = inner.into_inner();
             let block = parts.next().unwrap();
@@ -158,7 +157,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is for loop
+        //Rule is for loop
         Rule::for_loop => {
             let mut parts = inner.into_inner();
             let init_block = parts.next().unwrap();
@@ -174,14 +173,16 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //rule is break
+        //Rule is break
         Rule::break_ => Expr::Break,
 
-        //rule is leave
+        //Rule is continue
         Rule::continue_ => Expr::Continue,
+
+        //Rule is leave
         Rule::leave => Expr::Leave,
 
-        //rule is variable declaration
+        //Rule is variable declaration
         Rule::variable_declaration => {
             let mut parts = inner.into_inner();
             let typed_identifiers: Vec<TypedIdentifier> =
@@ -204,6 +205,8 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
     }
 }
 
+//Parses an identifier list for function definitions or variable declarations.
+//TODO: explain how this gets handled in transpilation, variables stored in a hashmap during translation
 fn parse_identifier_list(rule: Pair<Rule>) -> Vec<Identifier> {
     let mut identifiers = Vec::new();
     for rule in rule.into_inner() {
@@ -213,6 +216,7 @@ fn parse_identifier_list(rule: Pair<Rule>) -> Vec<Identifier> {
     identifiers
 }
 
+//Parses a case statement into an Expr
 fn parse_case(rule: Pair<Rule>) -> ExprCase {
     let mut parts = rule.into_inner();
     let literal = parse_literal(parts.next().unwrap());
@@ -220,6 +224,9 @@ fn parse_case(rule: Pair<Rule>) -> ExprCase {
     ExprCase { block, literal }
 }
 
+//Parses a typed identifier list for function definitions or variable declarations. This is later used to determine
+//what type of operation to use for specific instructions (ex. u256add vs u32add).
+//Currently the two Yul types that are supported are u32 and u256
 fn parse_typed_identifier_list(rule: Pair<Rule>) -> Vec<TypedIdentifier> {
     let mut identifiers = Vec::new();
     for rules in rule.into_inner() {
@@ -233,11 +240,13 @@ fn parse_typed_identifier_list(rule: Pair<Rule>) -> Vec<TypedIdentifier> {
             identifier: identifier.to_string(),
             yul_type,
         })
-        // identifiers.push(part.as_str().to_string());
     }
     identifiers
 }
 
+//Parses a literal into an Expr
+//Literals can be a number literal, string literal, true/false literal or a hex literal.
+//Literals can also have an optional type in Yul.
 fn parse_literal(literal: Pair<Rule>) -> ExprLiteral {
     match parse_expression(literal.clone()) {
         Expr::Literal(literal) => literal,
@@ -249,17 +258,8 @@ fn parse_literal(literal: Pair<Rule>) -> ExprLiteral {
 fn parse_expression(expression: Pair<Rule>) -> Expr {
     let expression = expression.clone().into_inner().next().unwrap();
     match expression.as_rule() {
-        // Rule::expr => parse_expression(expression.into_inner().next().unwrap()),
-        //TODO: need to add type name?
-
-        //TODO: need to add type identifier list?
-
-        //TODO: need to add identifier list?
-
-        //if the matched rule is a literal
         Rule::literal => {
-            // We're parsing any literal, now we need to recurse because it could be a number,
-            // string, true/false, etc.
+            // Parsing literals need to recurse because it could be a number literal
             Expr::Literal(parse_literal(expression))
         }
         Rule::number_literal => parse_expression(expression),
@@ -324,6 +324,9 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
     }
 }
 
+//Parses an identifier into an Expr, which gets transpiled into a variable reference.
+//These variables need to be kept track of during transpilation in case their value changes during runtime,
+// which needs to be accounted for during transpilation.
 fn parse_identifier(identifier: Pair<Rule>) -> Expr {
     return Expr::Variable(ExprVariableReference {
         identifier: identifier.as_str().to_string(),
@@ -331,10 +334,10 @@ fn parse_identifier(identifier: Pair<Rule>) -> Expr {
     });
 }
 
+//Parses a block into an Expr
 fn parse_block(expression: Pair<Rule>) -> ExprBlock {
     let mut exprs: Vec<Expr> = Vec::new();
     for statement in expression.into_inner() {
-        // for comments, probably better solution here
         if statement.clone().into_inner().next().is_some() {
             exprs.push(parse_statement(statement));
         }
@@ -347,7 +350,6 @@ fn get_identifier(pair: Pair<Rule>) -> String {
     match pair.as_rule() {
         Rule::identifier => {
             return pair.as_str().to_string();
-            // return pair.into_inner().next().unwrap().to_string();
         }
         r => {
             panic!("This was supposed to be an identifier! {:?}", r);

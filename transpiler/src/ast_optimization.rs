@@ -2,6 +2,8 @@ use std::{collections::HashMap, vec};
 
 use crate::types::*;
 
+//TODO: Update this mod and comment the functions
+
 pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     // let mut assignment_visitor = VariableAssignmentVisitor::default();
     // let ast = walk_ast(ast, &mut assignment_visitor);
@@ -13,6 +15,8 @@ pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     ast
 }
 
+// Walks through each expression in the abstract syntax tree, optimizing the AST where possible. A new, optimized AST is returned
+//Which is then passed into the Miden generation logic.
 fn walk_ast<V: ExpressionVisitor>(ast: Vec<Expr>, visitor: &mut V) -> Vec<Expr> {
     let mut new_ast = vec![];
     for expr in ast {
@@ -27,6 +31,7 @@ trait ExpressionVisitor {
     fn visit_expr(&mut self, expr: Expr) -> Option<Expr>;
 }
 
+//TODO: Keeps track of constant variables
 #[derive(Default)]
 struct ConstVariableVisitor {
     const_variables: HashMap<String, ExprLiteral>,
@@ -35,6 +40,8 @@ struct ConstVariableVisitor {
 #[derive(Default)]
 struct ForLoopToRepeatVisitor {}
 
+//The variable assignment visitor keeps track of variables that are reused through the code and the last assignment.
+//Variables that do not change can be optimized by converting them into constants.
 #[derive(Default)]
 struct VariableAssignmentVisitor {
     assignment_counter: HashMap<String, u32>,
@@ -42,6 +49,7 @@ struct VariableAssignmentVisitor {
 }
 
 impl VariableAssignmentVisitor {
+    //Checks for variables that are only assigned once and returns a hashmap of the variables to convert into constants.
     fn get_const_variables(&self) -> HashMap<String, ExprLiteral> {
         self.assignment_counter
             .iter()
