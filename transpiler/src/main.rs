@@ -54,30 +54,38 @@ fn main() {
     let opts: Opts = Opts::parse();
     // opts.skip_setup = true;
 
+    //Match any command line arguments
     match opts.subcmd {
+        //If the program is run with "repl" as an argument, start the Miden repl in the terminal
         Some(SubCommand::Repl {
             functions_file,
             stack,
         }) => {
             start_repl(functions_file, stack);
         }
+        //If there are no command line arguments, run scribe on the yul contracts in the contracts directory and print the ouput in the terminal
         None => {
             let yul_contracts = read_yul_contracts();
 
+            //For each contract in Vec of YulFile
             for yul_code in yul_contracts {
+                //Print the YulFile contents
                 clear_screen();
                 print_title("Input File");
                 println!("{}", yul_code.file_contents);
                 pause();
+                //Parse the Yul code into a vec of Scribe expressions (Expr)
                 let inputs = vec![];
                 let parsed = parser::parse_yul_syntax(&yul_code.file_contents);
 
+                //Convert the vec of Expr into an abstract syntax tree
                 clear_screen();
                 print_title("Parsed Expressions");
                 println!("{}", expressions_to_tree(&parsed));
                 println!();
                 pause();
 
+                //Transpile the AST into Miden assembly
                 clear_screen();
                 let miden_code = miden_generator::transpile_program(parsed);
                 print_title("Generated Miden Assembly");
@@ -85,6 +93,7 @@ fn main() {
                 println!();
                 pause();
 
+                //Display the Miden output
                 clear_screen();
                 print_title("Miden Output");
                 let execution_value = executor::execute(miden_code, inputs).unwrap();
@@ -97,11 +106,13 @@ fn main() {
     }
 }
 
+//Struct to represent a YulFile
 pub struct YulFile {
     pub file_name: String,
     pub file_contents: String,
 }
 
+//Read in all of the Yul contracts from the contracts directory and return a Vec of Yul Files
 fn read_yul_contracts() -> Vec<YulFile> {
     let mut yul_files: Vec<YulFile> = Vec::new();
     let mut paths: Vec<_> = fs::read_dir("../contracts/")

@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use primitive_types::U256;
 
+//Function to output Miden assembly to convert a u256 struct, into eight 32bit segments and push them onto the stack
 pub fn convert_u256_to_pushes(x: &U256) -> String {
     let mut bytes = [0u8; 32];
     x.to_little_endian(&mut bytes);
