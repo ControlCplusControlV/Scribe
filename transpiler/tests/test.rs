@@ -44,7 +44,7 @@ fn integration_if() {
             if lt(x, y) {
                 x := 5
             }
-            x
+            y
             ",
         MidenResult::U32(5),
     );

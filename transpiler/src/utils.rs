@@ -21,3 +21,35 @@ pub fn convert_u256_to_pushes(x: &U256) -> String {
         .collect::<Vec<_>>()
         .join(" ")
 }
+
+pub fn split_u256_to_u32s(x: &U256) -> Vec<u32> {
+    let mut bytes = [0u8; 32];
+    x.to_little_endian(&mut bytes);
+    bytes
+        .iter()
+        .chunks(4)
+        .into_iter()
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .map(|bytes| {
+            let mut stack_value: u32 = 0;
+            for (i, bytes) in bytes.enumerate() {
+                stack_value = stack_value | ((*bytes as u32) << ((i) * 8)) as u32
+            }
+            stack_value
+        })
+        .collect::<Vec<_>>()
+}
+
+pub fn join_u32s_to_u256(x: Vec<u32>) -> U256 {
+    let u256_bytes = x
+        .iter()
+        .take(8)
+        .flat_map(|x| {
+            return x.to_be_bytes();
+        })
+        .collect::<Vec<_>>();
+
+    U256::from_little_endian(&u256_bytes)
+}

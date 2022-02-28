@@ -5,7 +5,7 @@ use quickcheck_macros::quickcheck;
 use scribe::{
     executor::execute,
     test_utilities::{miden_to_u256, MidenResult},
-    utils::convert_u256_to_pushes,
+    utils::{convert_u256_to_pushes, join_u32s_to_u256, split_u256_to_u32s},
 };
 
 #[derive(Clone, Debug)]
@@ -66,6 +66,13 @@ fn run_miden_function(
     }
 }
 
+#[ignore]
+#[quickcheck]
+fn split_and_join(x: U256) -> TestResult {
+    let res = join_u32s_to_u256(split_u256_to_u32s(&x.0));
+    TestResult::from_bool(x.0 == res)
+}
+
 #[quickcheck]
 fn addition(x: U256, y: U256) -> TestResult {
     let (expected, overflowed) = x.0.overflowing_add(y.0);
@@ -75,6 +82,23 @@ fn addition(x: U256, y: U256) -> TestResult {
     run_miden_function(
         "exec.u256add_unsafe",
         vec![x.0, y.0],
+        MidenResult::U256(expected),
+    )
+}
+
+#[quickcheck]
+fn multiplication(x: u64, y: u64) -> TestResult {
+    let (expected, overflowed) =
+        primitive_types::U256::from(x).overflowing_mul(primitive_types::U256::from(y));
+    if overflowed {
+        return TestResult::discard();
+    }
+    run_miden_function(
+        "exec.u256mul_unsafe",
+        vec![
+            primitive_types::U256::from(x),
+            primitive_types::U256::from(y),
+        ],
         MidenResult::U256(expected),
     )
 }
@@ -90,10 +114,20 @@ fn shl(x: U256) -> TestResult {
 }
 
 #[quickcheck]
-fn less_than(x: U256, y: U256) -> TestResult {
+fn less_than(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 < y.0;
     run_miden_function(
         "exec.u256lt_unsafe",
+        vec![x.0, y.0],
+        MidenResult::U32(if expected { 1 } else { 0 }),
+    )
+}
+
+#[quickcheck]
+fn greater_than(x: U256Small, y: U256Small) -> TestResult {
+    let expected = x.0 > y.0;
+    run_miden_function(
+        "exec.u256gt_unsafe",
         vec![x.0, y.0],
         MidenResult::U32(if expected { 1 } else { 0 }),
     )
@@ -114,16 +148,6 @@ fn greater_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 >= y.0;
     run_miden_function(
         "exec.u256gte_unsafe",
-        vec![x.0, y.0],
-        MidenResult::U32(if expected { 1 } else { 0 }),
-    )
-}
-
-#[quickcheck]
-fn greater_than(x: U256, y: U256) -> TestResult {
-    let expected = x.0 > y.0;
-    run_miden_function(
-        "exec.u256gt_unsafe",
         vec![x.0, y.0],
         MidenResult::U32(if expected { 1 } else { 0 }),
     )
