@@ -120,7 +120,7 @@ impl Transpiler {
     fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            self.push_identifier_to_top(
+            self.dup_identifier(
                 v.typed_identifier
                     .clone()
                     .expect("Need to deal w/ this case"),
@@ -194,7 +194,7 @@ impl Transpiler {
     // where it is then saved into memory. Under the hood, pop_stack_value_to_memory makes sure that the right value is replaced.
     //See pop_stack_value_to_memory for more details.
     fn update_identifier_in_memory(&mut self, typed_identifier: TypedIdentifier) {
-        self.push_identifier_to_top(typed_identifier);
+        self.dup_identifier(typed_identifier);
         self.pop_top_stack_value_to_memory();
     }
 
@@ -240,7 +240,7 @@ impl Transpiler {
 
     //not pushing but duping to the top, offset is just where the value starts
     //and depending on the type it has to dup 8 elements
-    fn push_identifier_to_top(&mut self, typed_identifier: TypedIdentifier) {
+    fn dup_identifier(&mut self, typed_identifier: TypedIdentifier) {
         let mut offset = 0;
         self.prepare_for_stack_values(&typed_identifier.yul_type);
         let stack_value = self
@@ -600,6 +600,10 @@ impl Transpiler {
 
     //Transpile an assignment
     //Ex. x = 1000 or x = 1000:u256
+    //Note that ExprAssignment has parameters of
+    // pub identifiers: Vec<String>, (ie. variable names)
+    // pub inferred_types: Vec<Option<YulType>>, (ie. data types)
+    // pub rhs: Box<Expr>, (right hand side of :=)
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
         // TODO: more than one identifier in assignment
         assert_eq!(op.identifiers.len(), 1);
@@ -611,18 +615,12 @@ impl Transpiler {
         if let Some(branch) = self.branches.front_mut() {
             branch.modified_identifiers.insert(typed_identifier.clone());
         }
-        // TODO: bring back equating references
-        // if let Expr::Variable(ExprVariableReference {
-        //     identifier: target_ident,
-        // }) = &*op.rhs
-        // {
-        //     let typed_source_identifier = self.get_typed_identifier(target_ident);
-        //     self.equate_reference(typed_identifier.clone(), typed_source_identifier.clone());
-        // } else {
+
+        //Transpiles the right hand side expression and pushes the expr to the top
         self.transpile_op(&op.rhs);
+        //Assigns the top stack value (right hand side of the expression) to the variable name passed in as typed_identifier
         self.top_is_var(typed_identifier);
         self.outdent();
-        // }
     }
 
     //Transpile a block. Loops through an ExprBlock which is a Vec of expressions and transpiles each expression.
@@ -693,63 +691,87 @@ impl Transpiler {
     }
 
     //Transpiles a switch statement
-    //FIXME: Still needs comments
+    // Note that ExprSwitch has four parts
+    // pub default_case: Option<ExprBlock>,
+    // pub inferred_type: Option<YulType>,
+    // pub expr: Box<Expr>,
+    // pub cases: Vec<ExprCase>,
     fn transpile_switch(&mut self, op: &ExprSwitch) {
         self.add_line("");
 
-        //bool for match
-        let switch_matched_pseudovar = TypedIdentifier {
+        //Define a variable to keep in the transpiler scoped identifiers that represents if the switch expression has been matched
+        let transpiler_switch_matched_bool = TypedIdentifier {
             identifier: "switch_matched".to_string(),
             yul_type: YulType::U32,
         };
-        //set the bool in scoped variables
+
+        //Add the switch_matched variable to the transpiler's known variables
         self.scoped_identifiers.insert(
-            switch_matched_pseudovar.identifier.clone(),
-            switch_matched_pseudovar.clone(),
+            transpiler_switch_matched_bool.identifier.clone(),
+            transpiler_switch_matched_bool.clone(),
         );
 
+        // //Push the switch matched variable to the transpiler stack
+        // self.stack.0.push(StackValue {
+        //     typed_identifier: Some(transpiler_switch_matched_bool.clone()),
+        //     yul_type: YulType::U32,
+        // });
+
+        //Push 0 on the Miden stack. This is the equivalent of pushing the switch_matched variable
         self.add_comment("keeping track of whether we've hit any cases");
-        //push 0 on miden stack
         self.add_line("push.0");
-        //push unknown on transpiler stack
+
+        //push an unknown on transpiler stack
         self.add_unknown(YulType::U32);
-        //declare that top value in stack is the match psuedo var bool
-        self.top_is_var(switch_matched_pseudovar.clone());
+        //declare that top value in stack is the switch_matched variable
+        self.top_is_var(transpiler_switch_matched_bool.clone());
 
-        //transpile the op which could be anything, pushes expr to the top (u32, u256)
+        //Transpile the ExprSwitch.expr (expression) and push the expression to the top of the transpiler stack
+        // The expression can be any Expr
+        //Ex.
+        //switch add(x,y)
+        //case 10 {x=34}
+        //case 11 {x=23}
+        //In the above example, ExprSwitch.expr is add(x,y)
         self.transpile_op(&op.expr);
-        // TODO: these have to be unique, some way to do that, incrementing?
 
-        //define case (expr) - not acutally defined, just to keep track of the variable
-        let switch_target_pseudovar = TypedIdentifier {
+        //Define a transpiler variable that will represent the switch expression Assign ExprSwitch.expr to this variable.
+        let transpiler_target_switch_expression = TypedIdentifier {
             identifier: "switch".to_string(),
             yul_type: op.inferred_type.unwrap(),
         };
 
-        //add case to scoped identifiers
+        //Add the target switch expression to the transpiler's known variables
         self.scoped_identifiers.insert(
-            switch_target_pseudovar.identifier.clone(),
-            switch_target_pseudovar.clone(),
+            transpiler_target_switch_expression.identifier.clone(),
+            transpiler_target_switch_expression.clone(),
         );
 
-        //set the value at top of stack from transpile op to the case (from define case) pseudovar
-        self.top_is_var(switch_target_pseudovar.clone());
+        //The value at the top of the stack is the switch expression that was transpiled from transpile_op(&op.expr).
+        //Declare the transpiler_target_switch_expression to be this value so that the transpiler knows what value the target switch is.
+        self.top_is_var(transpiler_target_switch_expression.clone());
 
+        //For each case in the ExprSwitch.cases in the ExprSwitch passed into transpile_switch()
         for (i, case) in op.cases.iter().enumerate() {
-            self.push_identifier_to_top(switch_target_pseudovar.clone());
+            //Dup the transpiler_target_switch_expression, which results in this value at the top of the stack
+            self.dup_identifier(transpiler_target_switch_expression.clone());
 
-            //assumes that target is at the top of the stack, and will go into the branch if matches, transpiles branch if match
-            //update match pseudovar (boolean) if match
+            //Now the transpiler stack state is [transpiler_target_switch_expression, transpiler_target_switch_expression]
+
+            //Transpile the case which includes the case literal and case block that will be evaluated if the literal is matched
+            //with the targeted switch expression. For more details, check out the transpile_case function.
             self.transpile_case(
                 &case,
                 &op,
-                switch_target_pseudovar.clone(),
-                switch_matched_pseudovar.clone(),
+                transpiler_target_switch_expression.clone(),
+                transpiler_switch_matched_bool.clone(),
             );
         }
+
+        //If there is a default case, transpile the default case
         if let Some(default_case) = &op.default_case {
             self.add_comment("default case");
-            self.push_identifier_to_top(switch_matched_pseudovar);
+            self.dup_identifier(transpiler_switch_matched_bool);
             self.add_line("not");
             self._consume_top_stack_values(1);
             self.add_line("if.true");
@@ -871,7 +893,7 @@ impl Transpiler {
     //see push identifier to top
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
         let typed_identifier = self.get_typed_identifier(&op.identifier);
-        self.push_identifier_to_top(typed_identifier.clone());
+        self.dup_identifier(typed_identifier.clone());
     }
 
     //TODO: stack management not quite working
@@ -897,7 +919,7 @@ impl Transpiler {
         self.transpile_block(&op.block);
         // self.target_stack(stack_target);
         for return_ident in &op.returns {
-            self.push_identifier_to_top(return_ident.clone());
+            self.dup_identifier(return_ident.clone());
         }
         self.drop_after(op.returns.len());
         let function_stack = self.stack.clone();
@@ -923,40 +945,65 @@ impl Transpiler {
     //TODO: update placeholder
     fn transpile_default(&mut self, op: &ExprDefault) {}
 
-    //FIXME: Still needs comments
-    //just transpile each case block
-    //TODO: update placeholder
+    //Transpile a case expression
+    // Note that ExprCase has two parameters
+    // pub literal: ExprLiteral, (this is the case statement)
+    // pub block: ExprBlock, (this is the code that is evaluated if the case is matched)
     fn transpile_case(
         &mut self,
         op: &ExprCase,
         switch: &ExprSwitch,
-        switch_var: TypedIdentifier,
-        matched_var: TypedIdentifier,
+        transpiler_target_switch_expression: TypedIdentifier,
+        transpiler_switch_matched_bool: TypedIdentifier,
     ) {
+        //Start to accept overflow, meaning when elements are pushed to the stack making the stack size greater than 16
+        // the values will not be saved to memory and the 16th element (at index 15) will be moved out of frame to the 17th element (at index 16)
         self.begin_accepting_overflow();
+
+        //Transpile the case literal and push it to the top of the stack.
+        //Ex. case 0 { result := 1 }
+        //In the above case, 0 is the case literal and the switch statement will evaluate against the number literal 0
+        //Now the transpiler stack state is [case_literal, transpiler_target_switch_expression]
         self.transpile_literal(&op.literal);
+
+        //If the type is u256, use u256eq_unsafe, otherwise use eq to evaluate equality between the case literal
+        // and the transpiler_target_switch_expression
         if switch.inferred_type == Some(YulType::U256) {
             self.add_line("exec.u256eq_unsafe");
         } else {
             self.add_line("eq");
         }
+        //Tell the transpiler to consume the top stack values, simulating how Miden will consume 2 after eq
         self._consume_top_stack_values(2);
+
+        //Stop accepting overflow, any values that are in the stack that exceed the stack frame are moved to memory.
         self.stop_accepting_overflow();
 
+        //Begin a new branch, for more detail on transpiler branches, see the Branch struct
         self.begin_branch();
+
+        //If the top stack value in Miden is 1 meaning that the eq (or 256eq) was true and the switch was matched
         self.add_line("if.true");
         self.indent();
+
+        //Assign the transpiler_switch_matched_bool the value of 1 in the transpiler
         self.transpile_assignment(&ExprAssignment {
-            identifiers: vec![matched_var.identifier],
+            identifiers: vec![transpiler_switch_matched_bool.identifier],
             inferred_types: vec![Some(YulType::U32)],
             rhs: Box::new(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                 inferred_type: Some(YulType::U32),
                 value: U256::from(1 as u32),
             }))),
         });
+
+        //Transpile the block that will be executed if the case is matched to the switch expression during Miden runtime.
+        //All cases blocks are transpiled because we can not know which case is matched during transpilation.
         self.transpile_block(&op.block);
+
+        //End the branch, restoring the transpiler stack state to the state before the case block, but with updated variable values
         self.end_branch();
         self.outdent();
+        //End the case in Miden assembly
         self.add_line("end");
     }
 
