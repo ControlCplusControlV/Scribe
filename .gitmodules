@@ -1,0 +1,3 @@
+[submodule "transpiler/miden"]
+	path = transpiler/miden
+	url = https://github.com/marcusbuffett/miden
