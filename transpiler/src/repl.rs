@@ -99,6 +99,7 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
                 .join("\n")
         );
         let result = execute(format!("{}\n{}", functions_miden, program.clone()), vec![]);
+
         let mut result_string = "".to_string();
         if program_lines.len() > 0 {
             match result {

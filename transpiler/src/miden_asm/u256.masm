@@ -698,3 +698,360 @@ proc.u256gt_unsafe
   swap
   drop
 end
+
+proc.mulstep
+  movdn.2
+  u32mul.full
+  swap.1
+  dup
+  movup.4
+  u32add
+  dup
+  movdn.2
+  swap
+  u32lt
+  movup.3
+  movup.2
+  dup.1
+  u32add
+  dup
+  movdn.2
+  swap
+  u32lt
+  swap
+  movdn.3
+  u32add
+  u32add
+end
+
+proc.mulstep4
+    movup.12
+    dup.1
+    movup.10
+    push.0 # start k at 0 #
+    exec.mulstep
+    swap
+    movdn.9
+    dup.1
+    movup.9
+    movup.13
+    swap.3
+    exec.mulstep
+    swap
+    movdn.8
+    dup.1
+    movup.8
+    movup.12
+    swap.3
+    exec.mulstep
+    swap
+    movdn.7
+    dup.1
+    movup.7
+    movup.11
+    swap.3
+    exec.mulstep
+    swap
+    movdn.6
+end
+
+proc.u256mul_unsafe.6
+    # Memory storing setup #
+      popw.local.0
+      # y[5-8] at 0 #
+      storew.local.1
+      # y[0-4] at 1 #
+      push.0 dropw
+      # y[0] at top of stack, followed by x[0-7] #
+      movdn.8
+      storew.local.2
+      # x[0-4] at 2 #
+      swapw
+      storew.local.3
+      # x[5-8] at 3 #
+      padw
+      storew.local.4
+      storew.local.5
+      # p at 4 and 5 #
+
+    # y[0] #
+      dropw
+      swapw
+      pushw.local.4
+      movdnw.2
+      movup.12
+
+      exec.mulstep4
+
+      movdn.9
+      movdn.9
+      swapw
+      popw.local.4
+      pushw.local.5
+      swapw
+      movup.9
+      movup.9
+
+      dup.1
+      movup.6
+      movup.10
+      swap.3
+      exec.mulstep
+      swap
+      movdn.5
+      dup.1
+      movup.5
+      movup.9
+      swap.3
+      exec.mulstep
+      swap
+      movdn.4
+      dup.1
+      movup.4
+      movup.8
+      swap.3
+      exec.mulstep
+      swap
+      movdn.3
+      swap
+      movup.2
+      movup.6
+      swap.3
+      exec.mulstep
+
+      drop
+      popw.local.5
+
+    # y[1] #
+      pushw.local.4
+      pushw.local.5
+      movup.7
+      dropw
+      pushw.local.3 pushw.local.2 # load the xs #
+      pushw.local.1
+      movup.2
+      movdn.3
+      push.0 dropw # only need y[1] #
+
+      exec.mulstep4
+
+      movdn.9
+      movdn.9
+      swapw
+      movdn.3
+      pushw.local.4
+      push.0 dropw # only need p[0] #
+      movdn.3
+      # save p[0-3] to memory, not needed any more #
+      popw.local.4
+
+      pushw.local.5
+      movup.3
+      drop
+      swapw
+      movup.9
+      movup.9
+
+      dup.1
+      movup.6
+      movup.9
+      swap.3
+      exec.mulstep
+      swap
+      movdn.7
+      dup.1
+      movup.5
+      movup.7
+      swap.3
+      exec.mulstep
+      swap
+      movdn.5
+      swap
+      movup.3
+      movup.4
+      swap.3
+      exec.mulstep
+
+      drop
+      swap
+      drop
+      popw.local.5
+
+
+    # y[2] #
+      pushw.local.4
+      pushw.local.5
+      movup.7
+      movup.7
+      dropw
+      pushw.local.3 pushw.local.2 # load the xs #
+      pushw.local.1
+      swap
+      movdn.3
+      push.0 dropw # only need y[1] #
+
+      exec.mulstep4
+
+      movdn.9
+      movdn.9
+      swapw
+      movdn.3
+      movdn.3
+      pushw.local.4
+      drop drop
+      movdn.3
+      movdn.3
+      popw.local.4
+
+      pushw.local.5
+      movup.3
+      movup.3
+      drop
+      drop
+      swapw
+      movup.9
+      movup.9
+
+      dup.1
+      movup.6
+      movup.9
+      swap.3
+      exec.mulstep
+      swap
+      movdn.7
+      dup.1
+      movup.5
+      movup.7
+      swap.3
+      exec.mulstep
+      swap
+      movdn.5
+      swap
+      movup.3
+      movup.4
+      swap.3
+      exec.mulstep
+      drop
+      swap
+      drop
+      popw.local.5
+
+
+    # y[3] #
+      pushw.local.4
+      pushw.local.5
+
+      movup.7 movup.7 movup.7
+      dropw
+      pushw.local.3 pushw.local.2
+
+      pushw.local.1
+      movdn.3
+      push.0 dropw
+
+      exec.mulstep4
+
+      movdn.9
+      movdn.9
+
+      swapw
+      movup.3
+      pushw.local.4
+      drop
+      movup.3
+
+      popw.local.4
+      pushw.local.5
+      movdn.3
+      push.0 dropw
+      swapw
+      movup.9
+      movup.9
+
+      swap
+      movup.5
+      movup.6
+      swap.3
+      exec.mulstep
+
+      drop
+      movdn.3
+      push.0 dropw
+
+    # y[4] #
+      pushw.local.3 pushw.local.2 # load the xs #
+      # OPTIM: don't need x[4-7] #, but can't use mulstep4 if we don't load #
+
+      pushw.local.0
+      push.0 dropw # y[4] #
+
+      exec.mulstep4
+      dropw drop drop # OPTIM: don't need x[4-7] #, but can't use mulstep4 if we don't load #
+
+    # y[5] #
+      pushw.local.3
+      pushw.local.0
+      movup.2 movdn.3
+      push.0 dropw
+      movup.7
+      dup.1
+      movup.6
+      push.0
+      exec.mulstep
+      swap
+      movdn.7
+      movup.4
+      dup.2
+      movup.7
+      swap.3
+      exec.mulstep
+      swap
+      movdn.5
+      swap
+      movup.3
+      movup.4
+      swap.3
+      exec.mulstep
+      drop
+      swap
+      drop
+
+    # y[6] #
+      pushw.local.3
+      pushw.local.0
+      swap
+      movdn.3
+      push.0 dropw
+      movup.6
+      dup.1
+      movup.6
+      push.0
+      exec.mulstep
+      swap
+      movdn.6
+      swap
+      movup.4
+      movup.5
+      swap.3
+      exec.mulstep
+      drop
+      movdn.2
+      drop drop
+
+    # y[7] #
+      pushw.local.3
+      pushw.local.0
+
+      movdn.3 push.0 dropw
+      movup.4
+      movup.5
+      movdn.2
+      push.0
+      exec.mulstep
+      drop
+      movdn.3
+      drop drop drop
+
+      pushw.local.4
+      swapw
+end

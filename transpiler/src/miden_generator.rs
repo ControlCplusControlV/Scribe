@@ -217,13 +217,13 @@ impl Transpiler {
     fn push_from_memory_to_top_of_stack(&mut self, address: u32, yul_type: &YulType) {
         match yul_type {
             YulType::U32 => {
-                self.add_line(&format!("mem.push.{}", address));
+                self.add_line(&format!("pushw.mem.{}", address));
                 self.add_line("dup");
                 self.add_line("dropw");
             }
             YulType::U256 => {
-                self.add_line(&format!("mem.push.{}", address + 1));
-                self.add_line(&format!("mem.push.{}", address + 0));
+                self.add_line(&format!("pushw.mem.{}", address + 1));
+                self.add_line(&format!("pushw.mem.{}", address + 0));
             }
         }
         self.stack.0.insert(
@@ -417,11 +417,11 @@ impl Transpiler {
             YulType::U32 => {
                 self.add_line("padw");
                 self.add_line("drop");
-                self.add_line(&format!("mem.pop.{}", address));
+                self.add_line(&format!("popw.mem.{}", address));
             }
             YulType::U256 => {
-                self.add_line(&format!("mem.pop.{}", address));
-                self.add_line(&format!("mem.pop.{}", address + 1));
+                self.add_line(&format!("popw.mem.{}", address));
+                self.add_line(&format!("popw.mem.{}", address + 1));
             }
         }
         self.newline();
@@ -759,7 +759,7 @@ impl Transpiler {
             op.function_name.as_ref(),
         ) {
             //u256 operations
-            (Some(YulType::U256), "add" | "sub" | "and" | "or" | "xor") => {
+            (Some(YulType::U256), "add" | "mul" | "sub" | "and" | "or" | "xor") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
