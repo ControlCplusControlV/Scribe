@@ -73,6 +73,7 @@ fn split_and_join(x: U256) -> TestResult {
     TestResult::from_bool(x.0 == res)
 }
 
+#[ignore]
 #[quickcheck]
 fn addition(x: U256, y: U256) -> TestResult {
     let (expected, overflowed) = x.0.overflowing_add(y.0);
@@ -104,6 +105,7 @@ fn multiplication(x: u64, y: u64) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn shl(x: U256) -> TestResult {
     let expected = x.0 << 1 as u32;
@@ -114,6 +116,7 @@ fn shl(x: U256) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn less_than(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 < y.0;
@@ -124,6 +127,7 @@ fn less_than(x: U256Small, y: U256Small) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn greater_than(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 > y.0;
@@ -134,6 +138,7 @@ fn greater_than(x: U256Small, y: U256Small) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn less_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 <= y.0;
@@ -144,6 +149,7 @@ fn less_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn greater_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
     let expected = x.0 >= y.0;
@@ -154,6 +160,7 @@ fn greater_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn shr(x: U256) -> TestResult {
     let expected = x.0 >> 1 as u32;
@@ -164,6 +171,7 @@ fn shr(x: U256) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn auto_and(x: U256, y: U256) -> TestResult {
     let expected = x.0 & y.0;
