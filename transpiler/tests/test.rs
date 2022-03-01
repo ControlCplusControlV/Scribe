@@ -152,3 +152,15 @@ fn integration_lots_of_vars() {
         MidenResult::U256(U256::from(1)),
     );
 }
+
+#[test]
+fn integration_mstore() {
+    run_example(
+        "
+        let x1:u32 := 1
+        mstore(42, x1)
+        mload(42)
+            ",
+        MidenResult::U256(U256::from(1)),
+    );
+}

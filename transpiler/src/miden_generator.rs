@@ -815,6 +815,30 @@ impl Transpiler {
                 self.add_unknown(YulType::U256);
                 return;
             }
+            (Some(YulType::U32), "mstore") => {
+                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                    inferred_type: _,
+                    value: address,
+                }))) = op.exprs.first()
+                {
+                    println!("The first arg to mstore is {}", address);
+                    todo!("mstore stuff");
+                } else {
+                    panic!("We don't support mstore from arbitrary expressions yet")
+                }
+            }
+            (Some(YulType::U32), "mload") => {
+                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                    inferred_type: _,
+                    value: address,
+                }))) = op.exprs.first()
+                {
+                    println!("The first arg to mload is {}", address);
+                    todo!("mload stuff");
+                } else {
+                    panic!("We don't support mstore from arbitrary expressions yet")
+                }
+            }
 
             (Some(YulType::U256), "iszero" | "eq" | "lt") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
