@@ -3,7 +3,7 @@ object "Benchmark One" {
     
     let c := 10
 
-    let n := 0x3 
+    let n := 0x4
 
     let sum := 0
 
@@ -46,7 +46,7 @@ object "Benchmark One" {
                 }
             }
         }
-     case 3 {
+        case 3 {
             let x := 100 // Find sqrt of x
             // Start off with z at 1.
             let z := 1
@@ -100,7 +100,23 @@ object "Benchmark One" {
             if lt(zRoundDown, z) {
                 z := zRoundDown
             }
-      }
+        }
+        case 4 {
+            let x := 100
+            let y := 100
+            let z := 100
+
+            mstore(200, x)
+            mstore(201, y)
+            mstore(202, z)
+
+            let a := mload(200)
+            let b := mload(201)
+            let c := mload(202)
+
+            let f := add(a,b)
+            let finalResult := add(f,c)
+        }
     }
   }
 }
