@@ -1,6 +1,6 @@
 ---
 source: src/parser.rs
-assertion_line: 467
+assertion_line: 498
 expression: "parse_to_tree(\"\n            function allocate_unbounded()  {\n                let memPtr := mload(64)\n            }\")"
 
 ---
@@ -9,6 +9,6 @@ AST
   ├╼ params
   ├╼ returns
   └╼ body
-    └╼ declare - memPtr:u32
-      └╼ mload(u32): u32
-        └╼ 64:u32
+    └╼ declare - memPtr:u256
+      └╼ mload(u256): u256
+        └╼ 64:u256

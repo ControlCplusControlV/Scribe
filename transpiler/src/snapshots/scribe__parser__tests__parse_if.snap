@@ -1,15 +1,15 @@
 ---
 source: src/parser.rs
-assertion_line: 406
+assertion_line: 437
 expression: "parse_to_tree(\"\n            if lt(i, 2) {\n               mstore(i, 1)\n            }\n            \")"
 
 ---
 AST
 └╼ if statement
   └╼ conditional
-    ├╼ lt(unknown, unknown): 
+    ├╼ lt(unknown, u256): 
     │ ├╼ var - i:unknown
-    │ └╼ 2:unknown
-    └╼ mstore(unknown, unknown): 
+    │ └╼ 2:u256
+    └╼ mstore(unknown, u256): 
       ├╼ var - i:unknown
-      └╼ 1:unknown
+      └╼ 1:u256

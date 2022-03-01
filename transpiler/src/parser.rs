@@ -10,7 +10,7 @@ use crate::types::*;
 #[derive(Parser)]
 #[grammar = "./grammar.pest"]
 struct IdentParser;
-const DEFAULT_TYPE: YulType = YulType::U32;
+const DEFAULT_TYPE: YulType = YulType::U256;
 
 //Takes in yul code as a string and parses the grammar, returning a Struct that represents a statement or expression in Yul
 //Yul grammar is parsed by matching rules, which can be found in the grammar.pest file

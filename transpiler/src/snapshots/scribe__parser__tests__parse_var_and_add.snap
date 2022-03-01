@@ -1,11 +1,11 @@
 ---
 source: src/parser.rs
-assertion_line: 361
+assertion_line: 396
 expression: "parse_to_tree(\"let x := add(1,2)\")"
 
 ---
 AST
-└╼ declare - x:u32
-  └╼ add(u32, u32): u32
-    ├╼ 1:u32
-    └╼ 2:u32
+└╼ declare - x:u256
+  └╼ add(u256, u256): u256
+    ├╼ 1:u256
+    └╼ 2:u256

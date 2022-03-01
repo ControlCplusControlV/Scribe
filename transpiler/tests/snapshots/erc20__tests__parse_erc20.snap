@@ -16,12 +16,12 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - _1:u32, _2:u32
+├╼ declare - _1:u256, _2:u256
 │ └╼ copy_arguments_for_constructor_44_object_ERC20_587(): 
 ├╼ constructor_ERC20_587(): 
 │ ├╼ var - _1:unknown
 │ └╼ var - _2:unknown
-├╼ declare - _3:u32
+├╼ declare - _3:u256
 │ └╼ allocate_unbounded(): 
 ├╼ codecopy(): 
 │ ├╼ var - _3:unknown
@@ -36,7 +36,7 @@ AST
 ├╼ function definition - allocate_unbounded
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ mload(): 
@@ -50,9 +50,9 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - round_up_to_mul_of_32
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ and(): 
@@ -76,11 +76,11 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - finalize_allocation
 │ ├╼ params
-│ │ ├╼ memPtr:u32
-│ │ └╼ size:u32
+│ │ ├╼ memPtr:u256
+│ │ └╼ size:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - newFreePtr:u32
+│   ├╼ declare - newFreePtr:u256
 │   │ └╼ add(): 
 │   │   ├╼ var - memPtr:unknown
 │   │   └╼ round_up_to_mul_of_32(): 
@@ -100,9 +100,9 @@ AST
 │     └╼ var - newFreePtr:unknown
 ├╼ function definition - allocate_memory
 │ ├╼ params
-│ │ └╼ size:u32
+│ │ └╼ size:u256
 │ ├╼ returns
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ allocate_unbounded(): 
@@ -139,9 +139,9 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - array_allocation_size_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ length:u32
+│ │ └╼ length:u256
 │ ├╼ returns
-│ │ └╼ size:u32
+│ │ └╼ size:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -158,12 +158,12 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - copy_memory_to_memory
 │ ├╼ params
-│ │ ├╼ src:u32
-│ │ ├╼ dst:u32
-│ │ └╼ length:u32
+│ │ ├╼ src:u256
+│ │ ├╼ dst:u256
+│ │ └╼ length:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - i:u32
+│   ├╼ declare - i:u256
 │   │ └╼ 0:unknown
 │   ├╼ for loop
 │   │ ├╼ init block
@@ -196,11 +196,11 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - abi_decode_available_length_t_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ src:u32
-│ │ ├╼ length:u32
-│ │ └╼ end:u32
+│ │ ├╼ src:u256
+│ │ ├╼ length:u256
+│ │ └╼ end:u256
 │ ├╼ returns
-│ │ └╼ array:u32
+│ │ └╼ array:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ allocate_memory(): 
@@ -209,7 +209,7 @@ AST
 │   ├╼ mstore(): 
 │   │ ├╼ var - array:unknown
 │   │ └╼ var - length:unknown
-│   ├╼ declare - dst:u32
+│   ├╼ declare - dst:u256
 │   │ └╼ add(): 
 │   │   ├╼ var - array:unknown
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
@@ -227,10 +227,10 @@ AST
 │     └╼ var - length:unknown
 ├╼ function definition - abi_decode_t_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ offset:u32
-│ │ └╼ end:u32
+│ │ ├╼ offset:u256
+│ │ └╼ end:u256
 │ ├╼ returns
-│ │ └╼ array:u32
+│ │ └╼ array:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -241,7 +241,7 @@ AST
 │   │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   │   │   └╼ var - end:unknown
 │   │   └╼ revert_error_1b9f4a0a5773e33b91aa01db23bf8c55fce1411167c872835e7fa00a4f17d46d(): 
-│   ├╼ declare - length:u32
+│   ├╼ declare - length:u256
 │   │ └╼ mload(): 
 │   │   └╼ var - offset:unknown
 │   └╼ assign - 
@@ -253,11 +253,11 @@ AST
 │       └╼ var - end:unknown
 ├╼ function definition - abi_decode_tuple_t_string_memory_ptrt_string_memory_ptr_fromMemory
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
-│ │ ├╼ value0:u32
-│ │ └╼ value1:u32
+│ │ ├╼ value0:u256
+│ │ └╼ value1:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -267,7 +267,7 @@ AST
 │   │   │ │ └╼ var - headStart:unknown
 │   │   │ └╼ 64:unknown
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ mload(): 
 │   │   └╼ add(): 
 │   │     ├╼ var - headStart:unknown
@@ -284,7 +284,7 @@ AST
 │   │   │ ├╼ var - headStart:unknown
 │   │   │ └╼ var - offset:unknown
 │   │   └╼ var - dataEnd:unknown
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ mload(): 
 │   │   └╼ add(): 
 │   │     ├╼ var - headStart:unknown
@@ -304,17 +304,17 @@ AST
 ├╼ function definition - copy_arguments_for_constructor_44_object_ERC20_587
 │ ├╼ params
 │ ├╼ returns
-│ │ ├╼ ret_param_0:u32
-│ │ └╼ ret_param_1:u32
+│ │ ├╼ ret_param_0:u256
+│ │ └╼ ret_param_1:u256
 │ └╼ body
-│   ├╼ declare - programSize:u32
+│   ├╼ declare - programSize:u256
 │   │ └╼ datasize(): 
 │   │   └╼ ERC20_587
-│   ├╼ declare - argSize:u32
+│   ├╼ declare - argSize:u256
 │   │ └╼ sub(): 
 │   │   ├╼ codesize(): 
 │   │   └╼ var - programSize:unknown
-│   ├╼ declare - memoryDataOffset:u32
+│   ├╼ declare - memoryDataOffset:u256
 │   │ └╼ allocate_memory(): 
 │   │   └╼ var - argSize:unknown
 │   ├╼ codecopy(): 
@@ -342,9 +342,9 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - array_length_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ length:u32
+│ │ └╼ length:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ mload(): 
@@ -364,15 +364,15 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - extract_byte_array_length
 │ ├╼ params
-│ │ └╼ data:u32
+│ │ └╼ data:u256
 │ ├╼ returns
-│ │ └╼ length:u32
+│ │ └╼ length:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ div(): 
 │   │   ├╼ var - data:unknown
 │   │   └╼ 2:unknown
-│   ├╼ declare - outOfPlaceEncoding:u32
+│   ├╼ declare - outOfPlaceEncoding:u256
 │   │ └╼ and(): 
 │   │   ├╼ var - data:unknown
 │   │   └╼ 1:unknown
@@ -394,9 +394,9 @@ AST
 │       └╼ panic_error_0x22(): 
 ├╼ function definition - array_dataslot_t_string_storage
 │ ├╼ params
-│ │ └╼ ptr:u32
+│ │ └╼ ptr:u256
 │ ├╼ returns
-│ │ └╼ data:u32
+│ │ └╼ data:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ var - ptr:unknown
@@ -409,9 +409,9 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - divide_by_32_ceil
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ div(): 
@@ -421,10 +421,10 @@ AST
 │       └╼ 32:unknown
 ├╼ function definition - shift_left_dynamic
 │ ├╼ params
-│ │ ├╼ bits:u32
-│ │ └╼ value:u32
+│ │ ├╼ bits:u256
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ newValue:u32
+│ │ └╼ newValue:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ shl(): 
@@ -432,17 +432,17 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - update_byte_slice_dynamic32
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ ├╼ shiftBytes:u32
-│ │ └╼ toInsert:u32
+│ │ ├╼ value:u256
+│ │ ├╼ shiftBytes:u256
+│ │ └╼ toInsert:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
-│   ├╼ declare - shiftBits:u32
+│   ├╼ declare - shiftBits:u256
 │   │ └╼ mul(): 
 │   │   ├╼ var - shiftBytes:unknown
 │   │   └╼ 8:unknown
-│   ├╼ declare - mask:u32
+│   ├╼ declare - mask:u256
 │   │ └╼ shift_left_dynamic(): 
 │   │   ├╼ var - shiftBits:unknown
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
@@ -463,25 +463,25 @@ AST
 │         └╼ var - mask:unknown
 ├╼ function definition - cleanup_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - identity
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - convert_t_uint256_to_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint256(): 
@@ -490,20 +490,20 @@ AST
 │           └╼ var - value:unknown
 ├╼ function definition - prepare_store_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - update_storage_value_t_uint256_to_t_uint256
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ ├╼ offset:u32
-│ │ └╼ value_0:u32
+│ │ ├╼ slot:u256
+│ │ ├╼ offset:u256
+│ │ └╼ value_0:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - convertedValue_0:u32
+│   ├╼ declare - convertedValue_0:u256
 │   │ └╼ convert_t_uint256_to_t_uint256(): 
 │   │   └╼ var - value_0:unknown
 │   └╼ sstore(): 
@@ -517,17 +517,17 @@ AST
 ├╼ function definition - zero_value_for_split_t_uint256
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 0:unknown
 ├╼ function definition - storage_set_to_zero_t_uint256
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ offset:u32
+│ │ ├╼ slot:u256
+│ │ └╼ offset:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - zero_0:u32
+│   ├╼ declare - zero_0:u256
 │   │ └╼ zero_value_for_split_t_uint256(): 
 │   └╼ update_storage_value_t_uint256_to_t_uint256(): 
 │     ├╼ var - slot:unknown
@@ -535,8 +535,8 @@ AST
 │     └╼ var - zero_0:unknown
 ├╼ function definition - clear_storage_range_t_bytes1
 │ ├╼ params
-│ │ ├╼ start:u32
-│ │ └╼ end:u32
+│ │ ├╼ start:u256
+│ │ └╼ end:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ for loop
@@ -556,9 +556,9 @@ AST
 │         └╼ 0:unknown
 ├╼ function definition - clean_up_bytearray_end_slots_t_string_storage
 │ ├╼ params
-│ │ ├╼ array:u32
-│ │ ├╼ len:u32
-│ │ └╼ startIndex:u32
+│ │ ├╼ array:u256
+│ │ ├╼ len:u256
+│ │ └╼ startIndex:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
@@ -566,10 +566,10 @@ AST
 │       ├╼ gt(): 
 │       │ ├╼ var - len:unknown
 │       │ └╼ 31:unknown
-│       ├╼ declare - dataArea:u32
+│       ├╼ declare - dataArea:u256
 │       │ └╼ array_dataslot_t_string_storage(): 
 │       │   └╼ var - array:unknown
-│       ├╼ declare - deleteStart:u32
+│       ├╼ declare - deleteStart:u256
 │       │ └╼ add(): 
 │       │   ├╼ var - dataArea:unknown
 │       │   └╼ divide_by_32_ceil(): 
@@ -589,10 +589,10 @@ AST
 │             └╼ var - len:unknown
 ├╼ function definition - shift_right_unsigned_dynamic
 │ ├╼ params
-│ │ ├╼ bits:u32
-│ │ └╼ value:u32
+│ │ ├╼ bits:u256
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ newValue:u32
+│ │ └╼ newValue:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ shr(): 
@@ -600,12 +600,12 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - mask_bytes_dynamic
 │ ├╼ params
-│ │ ├╼ data:u32
-│ │ └╼ bytes:u32
+│ │ ├╼ data:u256
+│ │ └╼ bytes:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
-│   ├╼ declare - mask:u32
+│   ├╼ declare - mask:u256
 │   │ └╼ not(): 
 │   │   └╼ shift_right_unsigned_dynamic(): 
 │   │     ├╼ mul(): 
@@ -619,10 +619,10 @@ AST
 │       └╼ var - mask:unknown
 ├╼ function definition - extract_used_part_and_set_length_of_short_byte_array
 │ ├╼ params
-│ │ ├╼ data:u32
-│ │ └╼ len:u32
+│ │ ├╼ data:u256
+│ │ └╼ len:u256
 │ ├╼ returns
-│ │ └╼ used:u32
+│ │ └╼ used:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ mask_bytes_dynamic(): 
@@ -636,11 +636,11 @@ AST
 │         └╼ var - len:unknown
 ├╼ function definition - copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ src:u32
+│ │ ├╼ slot:u256
+│ │ └╼ src:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - newLen:u32
+│   ├╼ declare - newLen:u256
 │   │ └╼ array_length_t_string_memory_ptr(): 
 │   │   └╼ var - src:unknown
 │   ├╼ if statement
@@ -649,7 +649,7 @@ AST
 │   │   │ ├╼ var - newLen:unknown
 │   │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   │   └╼ panic_error_0x41(): 
-│   ├╼ declare - oldLen:u32
+│   ├╼ declare - oldLen:u256
 │   │ └╼ extract_byte_array_length(): 
 │   │   └╼ sload(): 
 │   │     └╼ var - slot:unknown
@@ -657,7 +657,7 @@ AST
 │   │ ├╼ var - slot:unknown
 │   │ ├╼ var - oldLen:unknown
 │   │ └╼ var - newLen:unknown
-│   ├╼ declare - srcOffset:u32
+│   ├╼ declare - srcOffset:u256
 │   │ └╼ 0:unknown
 │   ├╼ assign - 
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
@@ -666,15 +666,15 @@ AST
 │     │ ├╼ var - newLen:unknown
 │     │ └╼ 31:unknown
 │     └╼ case
-│       ├╼ declare - loopEnd:u32
+│       ├╼ declare - loopEnd:u256
 │       │ └╼ and(): 
 │       │   ├╼ var - newLen:unknown
 │       │   └╼ not(): 
 │       │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - dstPtr:u32
+│       ├╼ declare - dstPtr:u256
 │       │ └╼ array_dataslot_t_string_storage(): 
 │       │   └╼ var - slot:unknown
-│       ├╼ declare - i:u32
+│       ├╼ declare - i:u256
 │       │ └╼ 0:unknown
 │       ├╼ for loop
 │       │ ├╼ init block
@@ -707,7 +707,7 @@ AST
 │       │   ├╼ lt(): 
 │       │   │ ├╼ var - loopEnd:unknown
 │       │   │ └╼ var - newLen:unknown
-│       │   ├╼ declare - lastValue:u32
+│       │   ├╼ declare - lastValue:u256
 │       │   │ └╼ mload(): 
 │       │   │   └╼ add(): 
 │       │   │     ├╼ var - src:unknown
@@ -728,8 +728,8 @@ AST
 │           └╼ 1:unknown
 ├╼ function definition - update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ value_0:u32
+│ │ ├╼ slot:u256
+│ │ └╼ value_0:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ copy_byte_array_to_storage_from_t_string_memory_ptr_to_t_string_storage(): 
@@ -737,32 +737,32 @@ AST
 │     └╼ var - value_0:unknown
 ├╼ function definition - constructor_ERC20_587
 │ ├╼ params
-│ │ ├╼ var_name__30_mpos:u32
-│ │ └╼ var_symbol__32_mpos:u32
+│ │ ├╼ var_name__30_mpos:u256
+│ │ └╼ var_symbol__32_mpos:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ constructor_IERC20Metadata_712(): 
-│   ├╼ declare - _4_mpos:u32
+│   ├╼ declare - _4_mpos:u256
 │   │ └╼ var - var_name__30_mpos:unknown
-│   ├╼ declare - expr_36_mpos:u32
+│   ├╼ declare - expr_36_mpos:u256
 │   │ └╼ var - _4_mpos:unknown
 │   ├╼ update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage(): 
 │   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   │ └╼ var - expr_36_mpos:unknown
-│   ├╼ declare - _5_slot:u32
+│   ├╼ declare - _5_slot:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_37_slot:u32
+│   ├╼ declare - expr_37_slot:u256
 │   │ └╼ var - _5_slot:unknown
-│   ├╼ declare - _6_mpos:u32
+│   ├╼ declare - _6_mpos:u256
 │   │ └╼ var - var_symbol__32_mpos:unknown
-│   ├╼ declare - expr_40_mpos:u32
+│   ├╼ declare - expr_40_mpos:u256
 │   │ └╼ var - _6_mpos:unknown
 │   ├╼ update_storage_value_offset_0t_string_memory_ptr_to_t_string_storage(): 
 │   │ ├╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   │ └╼ var - expr_40_mpos:unknown
-│   ├╼ declare - _7_slot:u32
+│   ├╼ declare - _7_slot:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   └╼ declare - expr_41_slot:u32
+│   └╼ declare - expr_41_slot:u256
 │     └╼ var - _7_slot:unknown
 ├╼ function definition - constructor_IERC20Metadata_712
 │ ├╼ params
@@ -790,7 +790,7 @@ AST
 │ └╼ lt(): 
 │   ├╼ calldatasize(): 
 │   └╼ 4:unknown
-├╼ declare - selector:u32
+├╼ declare - selector:u256
 │ └╼ shift_right_224_unsigned(): 
 │   └╼ calldataload(): 
 │     └╼ 0:unknown
@@ -805,11 +805,11 @@ AST
 ├╼ abi_decode_tuple_(): 
 │ ├╼ 4:unknown
 │ └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_name_54(): 
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -824,17 +824,17 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32
+├╼ declare - param_0:u256, param_1:u256
 │ └╼ abi_decode_tuple_t_addresst_uint256(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_approve_166(): 
 │   ├╼ var - param_0:unknown
 │   └╼ var - param_1:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -852,11 +852,11 @@ AST
 ├╼ abi_decode_tuple_(): 
 │ ├╼ 4:unknown
 │ └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_totalSupply_84(): 
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -871,18 +871,18 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32, param_2:u32
+├╼ declare - param_0:u256, param_1:u256, param_2:u256
 │ └╼ abi_decode_tuple_t_addresst_addresst_uint256(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_transferFrom_199(): 
 │   ├╼ var - param_0:unknown
 │   ├╼ var - param_1:unknown
 │   └╼ var - param_2:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -900,11 +900,11 @@ AST
 ├╼ abi_decode_tuple_(): 
 │ ├╼ 4:unknown
 │ └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_decimals_74(): 
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_uint8__to_t_uint8__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -919,17 +919,17 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32
+├╼ declare - param_0:u256, param_1:u256
 │ └╼ abi_decode_tuple_t_addresst_uint256(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_increaseAllowance_229(): 
 │   ├╼ var - param_0:unknown
 │   └╼ var - param_1:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -944,16 +944,16 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32
+├╼ declare - param_0:u256
 │ └╼ abi_decode_tuple_t_address(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_balanceOf_98(): 
 │   └╼ var - param_0:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -971,11 +971,11 @@ AST
 ├╼ abi_decode_tuple_(): 
 │ ├╼ 4:unknown
 │ └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_symbol_64(): 
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -990,17 +990,17 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32
+├╼ declare - param_0:u256, param_1:u256
 │ └╼ abi_decode_tuple_t_addresst_uint256(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_decreaseAllowance_271(): 
 │   ├╼ var - param_0:unknown
 │   └╼ var - param_1:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -1015,17 +1015,17 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32
+├╼ declare - param_0:u256, param_1:u256
 │ └╼ abi_decode_tuple_t_addresst_uint256(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_transfer_123(): 
 │   ├╼ var - param_0:unknown
 │   └╼ var - param_1:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_bool__to_t_bool__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -1040,17 +1040,17 @@ AST
 │ └╼ conditional
 │   ├╼ callvalue(): 
 │   └╼ revert_error_ca66f745a3ce8ff40e2ccaf1ad45db7774001b90d25810abd9040049be7bf4bb(): 
-├╼ declare - param_0:u32, param_1:u32
+├╼ declare - param_0:u256, param_1:u256
 │ └╼ abi_decode_tuple_t_addresst_address(): 
 │   ├╼ 4:unknown
 │   └╼ calldatasize(): 
-├╼ declare - ret_0:u32
+├╼ declare - ret_0:u256
 │ └╼ fun_allowance_141(): 
 │   ├╼ var - param_0:unknown
 │   └╼ var - param_1:unknown
-├╼ declare - memPos:u32
+├╼ declare - memPos:u256
 │ └╼ allocate_unbounded(): 
-├╼ declare - memEnd:u32
+├╼ declare - memEnd:u256
 │ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack(): 
 │   ├╼ var - memPos:unknown
 │   └╼ var - ret_0:unknown
@@ -1063,9 +1063,9 @@ AST
 ├╼ revert_error_42b3090547df1d2001c96683413b8cf91c1b902ef5e3cb8d9f6f304cf7446f74(): 
 ├╼ function definition - shift_right_224_unsigned
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ newValue:u32
+│ │ └╼ newValue:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ shr(): 
@@ -1074,7 +1074,7 @@ AST
 ├╼ function definition - allocate_unbounded
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ mload(): 
@@ -1095,8 +1095,8 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - abi_decode_tuple_
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
@@ -1109,19 +1109,19 @@ AST
 │       └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
 ├╼ function definition - array_length_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ length:u32
+│ │ └╼ length:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ mload(): 
 │       └╼ var - value:unknown
 ├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ ├╼ pos:u32
-│ │ └╼ length:u32
+│ │ ├╼ pos:u256
+│ │ └╼ length:u256
 │ ├╼ returns
-│ │ └╼ updated_pos:u32
+│ │ └╼ updated_pos:u256
 │ └╼ body
 │   ├╼ mstore(): 
 │   │ ├╼ var - pos:unknown
@@ -1132,12 +1132,12 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - copy_memory_to_memory
 │ ├╼ params
-│ │ ├╼ src:u32
-│ │ ├╼ dst:u32
-│ │ └╼ length:u32
+│ │ ├╼ src:u256
+│ │ ├╼ dst:u256
+│ │ └╼ length:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - i:u32
+│   ├╼ declare - i:u256
 │   │ └╼ 0:unknown
 │   ├╼ for loop
 │   │ ├╼ init block
@@ -1170,9 +1170,9 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - round_up_to_mul_of_32
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ and(): 
@@ -1183,12 +1183,12 @@ AST
 │         └╼ 31:unknown
 ├╼ function definition - abi_encode_t_string_memory_ptr_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
-│   ├╼ declare - length:u32
+│   ├╼ declare - length:u256
 │   │ └╼ array_length_t_string_memory_ptr(): 
 │   │   └╼ var - value:unknown
 │   ├╼ assign - 
@@ -1208,10 +1208,10 @@ AST
 │         └╼ var - length:unknown
 ├╼ function definition - abi_encode_tuple_t_string_memory_ptr__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ value0:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ value0:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -1237,9 +1237,9 @@ AST
 │     └╼ 0:unknown
 ├╼ function definition - cleanup_t_uint160
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ and(): 
@@ -1247,16 +1247,16 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - cleanup_t_address
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint160(): 
 │       └╼ var - value:unknown
 ├╼ function definition - validator_revert_t_address
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
@@ -1271,10 +1271,10 @@ AST
 │         └╼ 0:unknown
 ├╼ function definition - abi_decode_t_address
 │ ├╼ params
-│ │ ├╼ offset:u32
-│ │ └╼ end:u32
+│ │ ├╼ offset:u256
+│ │ └╼ end:u256
 │ ├╼ returns
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ calldataload(): 
@@ -1283,15 +1283,15 @@ AST
 │     └╼ var - value:unknown
 ├╼ function definition - cleanup_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - validator_revert_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
@@ -1306,10 +1306,10 @@ AST
 │         └╼ 0:unknown
 ├╼ function definition - abi_decode_t_uint256
 │ ├╼ params
-│ │ ├╼ offset:u32
-│ │ └╼ end:u32
+│ │ ├╼ offset:u256
+│ │ └╼ end:u256
 │ ├╼ returns
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ calldataload(): 
@@ -1318,11 +1318,11 @@ AST
 │     └╼ var - value:unknown
 ├╼ function definition - abi_decode_tuple_t_addresst_uint256
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
-│ │ ├╼ value0:u32
-│ │ └╼ value1:u32
+│ │ ├╼ value0:u256
+│ │ └╼ value1:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1332,7 +1332,7 @@ AST
 │   │   │ │ └╼ var - headStart:unknown
 │   │   │ └╼ 64:unknown
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 0:unknown
 │   ├╼ assign - 
 │   │ └╼ abi_decode_t_address(): 
@@ -1340,7 +1340,7 @@ AST
 │   │   │ ├╼ var - headStart:unknown
 │   │   │ └╼ var - offset:unknown
 │   │   └╼ var - dataEnd:unknown
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 32:unknown
 │   └╼ assign - 
 │     └╼ abi_decode_t_uint256(): 
@@ -1350,9 +1350,9 @@ AST
 │       └╼ var - dataEnd:unknown
 ├╼ function definition - cleanup_t_bool
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ iszero(): 
@@ -1360,8 +1360,8 @@ AST
 │         └╼ var - value:unknown
 ├╼ function definition - abi_encode_t_bool_to_t_bool_fromStack
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ mstore(): 
@@ -1370,10 +1370,10 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - abi_encode_tuple_t_bool__to_t_bool__fromStack
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ value0:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ value0:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -1386,8 +1386,8 @@ AST
 │       └╼ 0:unknown
 ├╼ function definition - abi_encode_t_uint256_to_t_uint256_fromStack
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ mstore(): 
@@ -1396,10 +1396,10 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - abi_encode_tuple_t_uint256__to_t_uint256__fromStack
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ value0:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ value0:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -1412,12 +1412,12 @@ AST
 │       └╼ 0:unknown
 ├╼ function definition - abi_decode_tuple_t_addresst_addresst_uint256
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
-│ │ ├╼ value0:u32
-│ │ ├╼ value1:u32
-│ │ └╼ value2:u32
+│ │ ├╼ value0:u256
+│ │ ├╼ value1:u256
+│ │ └╼ value2:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1427,7 +1427,7 @@ AST
 │   │   │ │ └╼ var - headStart:unknown
 │   │   │ └╼ 96:unknown
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 0:unknown
 │   ├╼ assign - 
 │   │ └╼ abi_decode_t_address(): 
@@ -1435,7 +1435,7 @@ AST
 │   │   │ ├╼ var - headStart:unknown
 │   │   │ └╼ var - offset:unknown
 │   │   └╼ var - dataEnd:unknown
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 32:unknown
 │   ├╼ assign - 
 │   │ └╼ abi_decode_t_address(): 
@@ -1443,7 +1443,7 @@ AST
 │   │   │ ├╼ var - headStart:unknown
 │   │   │ └╼ var - offset:unknown
 │   │   └╼ var - dataEnd:unknown
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 64:unknown
 │   └╼ assign - 
 │     └╼ abi_decode_t_uint256(): 
@@ -1453,9 +1453,9 @@ AST
 │       └╼ var - dataEnd:unknown
 ├╼ function definition - cleanup_t_uint8
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ and(): 
@@ -1463,8 +1463,8 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - abi_encode_t_uint8_to_t_uint8_fromStack
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ mstore(): 
@@ -1473,10 +1473,10 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - abi_encode_tuple_t_uint8__to_t_uint8__fromStack
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ value0:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ value0:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -1489,10 +1489,10 @@ AST
 │       └╼ 0:unknown
 ├╼ function definition - abi_decode_tuple_t_address
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
-│ │ └╼ value0:u32
+│ │ └╼ value0:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1502,7 +1502,7 @@ AST
 │   │   │ │ └╼ var - headStart:unknown
 │   │   │ └╼ 32:unknown
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 0:unknown
 │   └╼ assign - 
 │     └╼ abi_decode_t_address(): 
@@ -1512,11 +1512,11 @@ AST
 │       └╼ var - dataEnd:unknown
 ├╼ function definition - abi_decode_tuple_t_addresst_address
 │ ├╼ params
-│ │ ├╼ headStart:u32
-│ │ └╼ dataEnd:u32
+│ │ ├╼ headStart:u256
+│ │ └╼ dataEnd:u256
 │ ├╼ returns
-│ │ ├╼ value0:u32
-│ │ └╼ value1:u32
+│ │ ├╼ value0:u256
+│ │ └╼ value1:u256
 │ └╼ body
 │   ├╼ if statement
 │   │ └╼ conditional
@@ -1526,7 +1526,7 @@ AST
 │   │   │ │ └╼ var - headStart:unknown
 │   │   │ └╼ 64:unknown
 │   │   └╼ revert_error_dbdddcbe895c83990c08b3492a0e83918d802a52331272ac6fdb6a7c4aea3b1b(): 
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 0:unknown
 │   ├╼ assign - 
 │   │ └╼ abi_decode_t_address(): 
@@ -1534,7 +1534,7 @@ AST
 │   │   │ ├╼ var - headStart:unknown
 │   │   │ └╼ var - offset:unknown
 │   │   └╼ var - dataEnd:unknown
-│   ├╼ declare - offset:u32
+│   ├╼ declare - offset:u256
 │   │ └╼ 32:unknown
 │   └╼ assign - 
 │     └╼ abi_decode_t_address(): 
@@ -1552,7 +1552,7 @@ AST
 ├╼ function definition - zero_value_for_split_t_string_memory_ptr
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 96:unknown
@@ -1571,15 +1571,15 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - extract_byte_array_length
 │ ├╼ params
-│ │ └╼ data:u32
+│ │ └╼ data:u256
 │ ├╼ returns
-│ │ └╼ length:u32
+│ │ └╼ length:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ div(): 
 │   │   ├╼ var - data:unknown
 │   │   └╼ 2:unknown
-│   ├╼ declare - outOfPlaceEncoding:u32
+│   ├╼ declare - outOfPlaceEncoding:u256
 │   │ └╼ and(): 
 │   │   ├╼ var - data:unknown
 │   │   └╼ 1:unknown
@@ -1601,10 +1601,10 @@ AST
 │       └╼ panic_error_0x22(): 
 ├╼ function definition - array_storeLengthForEncoding_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ pos:u32
-│ │ └╼ length:u32
+│ │ ├╼ pos:u256
+│ │ └╼ length:u256
 │ ├╼ returns
-│ │ └╼ updated_pos:u32
+│ │ └╼ updated_pos:u256
 │ └╼ body
 │   ├╼ mstore(): 
 │   │ ├╼ var - pos:unknown
@@ -1615,9 +1615,9 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - array_dataslot_t_string_storage
 │ ├╼ params
-│ │ └╼ ptr:u32
+│ │ └╼ ptr:u256
 │ ├╼ returns
-│ │ └╼ data:u32
+│ │ └╼ data:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ var - ptr:unknown
@@ -1630,15 +1630,15 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - abi_encode_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
-│   ├╼ declare - slotValue:u32
+│   ├╼ declare - slotValue:u256
 │   │ └╼ sload(): 
 │   │   └╼ var - value:unknown
-│   ├╼ declare - length:u32
+│   ├╼ declare - length:u256
 │   │ └╼ extract_byte_array_length(): 
 │   │   └╼ var - slotValue:unknown
 │   ├╼ assign - 
@@ -1661,10 +1661,10 @@ AST
 │     │     ├╼ var - pos:unknown
 │     │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │     └╼ case
-│       ├╼ declare - dataPos:u32
+│       ├╼ declare - dataPos:u256
 │       │ └╼ array_dataslot_t_string_storage(): 
 │       │   └╼ var - value:unknown
-│       ├╼ declare - i:u32
+│       ├╼ declare - i:u256
 │       │ └╼ 0:unknown
 │       ├╼ for loop
 │       │ ├╼ init block
@@ -1694,10 +1694,10 @@ AST
 │           └╼ var - i:unknown
 ├╼ function definition - abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ ├╼ value0:u32
-│ │ └╼ pos:u32
+│ │ ├╼ value0:u256
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ updatedPos:u32
+│ │ └╼ updatedPos:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ abi_encode_t_string_storage_to_t_string_memory_ptr(): 
@@ -1718,11 +1718,11 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - finalize_allocation
 │ ├╼ params
-│ │ ├╼ memPtr:u32
-│ │ └╼ size:u32
+│ │ ├╼ memPtr:u256
+│ │ └╼ size:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - newFreePtr:u32
+│   ├╼ declare - newFreePtr:u256
 │   │ └╼ add(): 
 │   │   ├╼ var - memPtr:unknown
 │   │   └╼ round_up_to_mul_of_32(): 
@@ -1742,13 +1742,13 @@ AST
 │     └╼ var - newFreePtr:unknown
 ├╼ function definition - copy_array_from_storage_to_memory_t_string_storage
 │ ├╼ params
-│ │ └╼ slot:u32
+│ │ └╼ slot:u256
 │ ├╼ returns
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ allocate_unbounded(): 
-│   ├╼ declare - end:u32
+│   ├╼ declare - end:u256
 │   │ └╼ abi_encodeUpdatedPos_t_string_storage_to_t_string_memory_ptr(): 
 │   │   ├╼ var - slot:unknown
 │   │   └╼ var - memPtr:unknown
@@ -1759,9 +1759,9 @@ AST
 │       └╼ var - memPtr:unknown
 ├╼ function definition - convert_array_t_string_storage_to_t_string_memory_ptr
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ copy_array_from_storage_to_memory_t_string_storage(): 
@@ -1769,15 +1769,15 @@ AST
 ├╼ function definition - fun_name_54
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__49_mpos:u32
+│ │ └╼ var__49_mpos:u256
 │ └╼ body
-│   ├╼ declare - zero_t_string_memory_ptr_1_mpos:u32
+│   ├╼ declare - zero_t_string_memory_ptr_1_mpos:u256
 │   │ └╼ zero_value_for_split_t_string_memory_ptr(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_string_memory_ptr_1_mpos:unknown
-│   ├╼ declare - _2_slot:u32
+│   ├╼ declare - _2_slot:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_51_slot:u32
+│   ├╼ declare - expr_51_slot:u256
 │   │ └╼ var - _2_slot:unknown
 │   ├╼ assign - 
 │   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr(): 
@@ -1786,15 +1786,15 @@ AST
 ├╼ function definition - fun_symbol_64
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__59_mpos:u32
+│ │ └╼ var__59_mpos:u256
 │ └╼ body
-│   ├╼ declare - zero_t_string_memory_ptr_3_mpos:u32
+│   ├╼ declare - zero_t_string_memory_ptr_3_mpos:u256
 │   │ └╼ zero_value_for_split_t_string_memory_ptr(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_string_memory_ptr_3_mpos:unknown
-│   ├╼ declare - _4_slot:u32
+│   ├╼ declare - _4_slot:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_61_slot:u32
+│   ├╼ declare - expr_61_slot:u256
 │   │ └╼ var - _4_slot:unknown
 │   ├╼ assign - 
 │   │ └╼ convert_array_t_string_storage_to_t_string_memory_ptr(): 
@@ -1803,31 +1803,31 @@ AST
 ├╼ function definition - zero_value_for_split_t_uint8
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 0:unknown
 ├╼ function definition - cleanup_t_rational_18_by_1
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - identity
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - convert_t_rational_18_by_1_to_t_uint8
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint8(): 
@@ -1837,13 +1837,13 @@ AST
 ├╼ function definition - fun_decimals_74
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__69:u32
+│ │ └╼ var__69:u256
 │ └╼ body
-│   ├╼ declare - zero_t_uint8_5:u32
+│   ├╼ declare - zero_t_uint8_5:u256
 │   │ └╼ zero_value_for_split_t_uint8(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_uint8_5:unknown
-│   ├╼ declare - expr_71:u32
+│   ├╼ declare - expr_71:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ convert_t_rational_18_by_1_to_t_uint8(): 
@@ -1852,15 +1852,15 @@ AST
 ├╼ function definition - zero_value_for_split_t_uint256
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 0:unknown
 ├╼ function definition - shift_right_0_unsigned
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ newValue:u32
+│ │ └╼ newValue:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ shr(): 
@@ -1868,17 +1868,17 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - cleanup_from_storage_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - extract_from_storage_value_offset_0t_uint256
 │ ├╼ params
-│ │ └╼ slot_value:u32
+│ │ └╼ slot_value:u256
 │ ├╼ returns
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_from_storage_t_uint256(): 
@@ -1886,9 +1886,9 @@ AST
 │         └╼ var - slot_value:unknown
 ├╼ function definition - read_from_storage_split_offset_0_t_uint256
 │ ├╼ params
-│ │ └╼ slot:u32
+│ │ └╼ slot:u256
 │ ├╼ returns
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ extract_from_storage_value_offset_0t_uint256(): 
@@ -1897,25 +1897,25 @@ AST
 ├╼ function definition - fun_totalSupply_84
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__79:u32
+│ │ └╼ var__79:u256
 │ └╼ body
-│   ├╼ declare - zero_t_uint256_6:u32
+│   ├╼ declare - zero_t_uint256_6:u256
 │   │ └╼ zero_value_for_split_t_uint256(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_uint256_6:unknown
-│   ├╼ declare - _7:u32
+│   ├╼ declare - _7:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_81:u32
+│   ├╼ declare - expr_81:u256
 │   │ └╼ var - _7:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_81:unknown
 │   └╼ leave
 ├╼ function definition - convert_t_uint160_to_t_uint160
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint160(): 
@@ -1924,28 +1924,28 @@ AST
 │           └╼ var - value:unknown
 ├╼ function definition - convert_t_uint160_to_t_address
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ convert_t_uint160_to_t_uint160(): 
 │       └╼ var - value:unknown
 ├╼ function definition - convert_t_address_to_t_address
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ convert_t_uint160_to_t_address(): 
 │       └╼ var - value:unknown
 ├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ key:u32
+│ │ ├╼ slot:u256
+│ │ └╼ key:u256
 │ ├╼ returns
-│ │ └╼ dataSlot:u32
+│ │ └╼ dataSlot:u256
 │ └╼ body
 │   ├╼ mstore(): 
 │   │ ├╼ 0:unknown
@@ -1960,30 +1960,30 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - fun_balanceOf_98
 │ ├╼ params
-│ │ └╼ var_account_87:u32
+│ │ └╼ var_account_87:u256
 │ ├╼ returns
-│ │ └╼ var__91:u32
+│ │ └╼ var__91:u256
 │ └╼ body
-│   ├╼ declare - zero_t_uint256_8:u32
+│   ├╼ declare - zero_t_uint256_8:u256
 │   │ └╼ zero_value_for_split_t_uint256(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_uint256_8:unknown
-│   ├╼ declare - _9:u32
+│   ├╼ declare - _9:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_93:u32
+│   ├╼ declare - expr_93:u256
 │   │ └╼ var - _9:unknown
-│   ├╼ declare - _10:u32
+│   ├╼ declare - _10:u256
 │   │ └╼ var - var_account_87:unknown
-│   ├╼ declare - expr_94:u32
+│   ├╼ declare - expr_94:u256
 │   │ └╼ var - _10:unknown
-│   ├╼ declare - _11:u32
+│   ├╼ declare - _11:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_93:unknown
 │   │   └╼ var - expr_94:unknown
-│   ├╼ declare - _12:u32
+│   ├╼ declare - _12:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _11:unknown
-│   ├╼ declare - expr_95:u32
+│   ├╼ declare - expr_95:u256
 │   │ └╼ var - _12:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_95:unknown
@@ -1991,52 +1991,52 @@ AST
 ├╼ function definition - zero_value_for_split_t_bool
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 0:unknown
 ├╼ function definition - fun_transfer_123
 │ ├╼ params
-│ │ ├╼ var_to_101:u32
-│ │ └╼ var_amount_103:u32
+│ │ ├╼ var_to_101:u256
+│ │ └╼ var_amount_103:u256
 │ ├╼ returns
-│ │ └╼ var__107:u32
+│ │ └╼ var__107:u256
 │ └╼ body
-│   ├╼ declare - zero_t_bool_13:u32
+│   ├╼ declare - zero_t_bool_13:u256
 │   │ └╼ zero_value_for_split_t_bool(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_bool_13:unknown
-│   ├╼ declare - expr_112:u32
+│   ├╼ declare - expr_112:u256
 │   │ └╼ fun__msgSender_599(): 
-│   ├╼ declare - var_owner_110:u32
+│   ├╼ declare - var_owner_110:u256
 │   │ └╼ var - expr_112:unknown
-│   ├╼ declare - _14:u32
+│   ├╼ declare - _14:u256
 │   │ └╼ var - var_owner_110:unknown
-│   ├╼ declare - expr_115:u32
+│   ├╼ declare - expr_115:u256
 │   │ └╼ var - _14:unknown
-│   ├╼ declare - _15:u32
+│   ├╼ declare - _15:u256
 │   │ └╼ var - var_to_101:unknown
-│   ├╼ declare - expr_116:u32
+│   ├╼ declare - expr_116:u256
 │   │ └╼ var - _15:unknown
-│   ├╼ declare - _16:u32
+│   ├╼ declare - _16:u256
 │   │ └╼ var - var_amount_103:unknown
-│   ├╼ declare - expr_117:u32
+│   ├╼ declare - expr_117:u256
 │   │ └╼ var - _16:unknown
 │   ├╼ fun__transfer_348(): 
 │   │ ├╼ var - expr_115:unknown
 │   │ ├╼ var - expr_116:unknown
 │   │ └╼ var - expr_117:unknown
-│   ├╼ declare - expr_120:u32
+│   ├╼ declare - expr_120:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_120:unknown
 │   └╼ leave
 ├╼ function definition - mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ key:u32
+│ │ ├╼ slot:u256
+│ │ └╼ key:u256
 │ ├╼ returns
-│ │ └╼ dataSlot:u32
+│ │ └╼ dataSlot:u256
 │ └╼ body
 │   ├╼ mstore(): 
 │   │ ├╼ 0:unknown
@@ -2051,132 +2051,132 @@ AST
 │       └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - fun_allowance_141
 │ ├╼ params
-│ │ ├╼ var_owner_126:u32
-│ │ └╼ var_spender_128:u32
+│ │ ├╼ var_owner_126:u256
+│ │ └╼ var_spender_128:u256
 │ ├╼ returns
-│ │ └╼ var__132:u32
+│ │ └╼ var__132:u256
 │ └╼ body
-│   ├╼ declare - zero_t_uint256_17:u32
+│   ├╼ declare - zero_t_uint256_17:u256
 │   │ └╼ zero_value_for_split_t_uint256(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_uint256_17:unknown
-│   ├╼ declare - _18:u32
+│   ├╼ declare - _18:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_134:u32
+│   ├╼ declare - expr_134:u256
 │   │ └╼ var - _18:unknown
-│   ├╼ declare - _19:u32
+│   ├╼ declare - _19:u256
 │   │ └╼ var - var_owner_126:unknown
-│   ├╼ declare - expr_135:u32
+│   ├╼ declare - expr_135:u256
 │   │ └╼ var - _19:unknown
-│   ├╼ declare - _20:u32
+│   ├╼ declare - _20:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(): 
 │   │   ├╼ var - expr_134:unknown
 │   │   └╼ var - expr_135:unknown
-│   ├╼ declare - _21:u32
+│   ├╼ declare - _21:u256
 │   │ └╼ var - _20:unknown
-│   ├╼ declare - expr_136:u32
+│   ├╼ declare - expr_136:u256
 │   │ └╼ var - _21:unknown
-│   ├╼ declare - _22:u32
+│   ├╼ declare - _22:u256
 │   │ └╼ var - var_spender_128:unknown
-│   ├╼ declare - expr_137:u32
+│   ├╼ declare - expr_137:u256
 │   │ └╼ var - _22:unknown
-│   ├╼ declare - _23:u32
+│   ├╼ declare - _23:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_136:unknown
 │   │   └╼ var - expr_137:unknown
-│   ├╼ declare - _24:u32
+│   ├╼ declare - _24:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _23:unknown
-│   ├╼ declare - expr_138:u32
+│   ├╼ declare - expr_138:u256
 │   │ └╼ var - _24:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_138:unknown
 │   └╼ leave
 ├╼ function definition - fun_approve_166
 │ ├╼ params
-│ │ ├╼ var_spender_144:u32
-│ │ └╼ var_amount_146:u32
+│ │ ├╼ var_spender_144:u256
+│ │ └╼ var_amount_146:u256
 │ ├╼ returns
-│ │ └╼ var__150:u32
+│ │ └╼ var__150:u256
 │ └╼ body
-│   ├╼ declare - zero_t_bool_25:u32
+│   ├╼ declare - zero_t_bool_25:u256
 │   │ └╼ zero_value_for_split_t_bool(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_bool_25:unknown
-│   ├╼ declare - expr_155:u32
+│   ├╼ declare - expr_155:u256
 │   │ └╼ fun__msgSender_599(): 
-│   ├╼ declare - var_owner_153:u32
+│   ├╼ declare - var_owner_153:u256
 │   │ └╼ var - expr_155:unknown
-│   ├╼ declare - _26:u32
+│   ├╼ declare - _26:u256
 │   │ └╼ var - var_owner_153:unknown
-│   ├╼ declare - expr_158:u32
+│   ├╼ declare - expr_158:u256
 │   │ └╼ var - _26:unknown
-│   ├╼ declare - _27:u32
+│   ├╼ declare - _27:u256
 │   │ └╼ var - var_spender_144:unknown
-│   ├╼ declare - expr_159:u32
+│   ├╼ declare - expr_159:u256
 │   │ └╼ var - _27:unknown
-│   ├╼ declare - _28:u32
+│   ├╼ declare - _28:u256
 │   │ └╼ var - var_amount_146:unknown
-│   ├╼ declare - expr_160:u32
+│   ├╼ declare - expr_160:u256
 │   │ └╼ var - _28:unknown
 │   ├╼ fun__approve_521(): 
 │   │ ├╼ var - expr_158:unknown
 │   │ ├╼ var - expr_159:unknown
 │   │ └╼ var - expr_160:unknown
-│   ├╼ declare - expr_163:u32
+│   ├╼ declare - expr_163:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_163:unknown
 │   └╼ leave
 ├╼ function definition - fun_transferFrom_199
 │ ├╼ params
-│ │ ├╼ var_from_169:u32
-│ │ ├╼ var_to_171:u32
-│ │ └╼ var_amount_173:u32
+│ │ ├╼ var_from_169:u256
+│ │ ├╼ var_to_171:u256
+│ │ └╼ var_amount_173:u256
 │ ├╼ returns
-│ │ └╼ var__177:u32
+│ │ └╼ var__177:u256
 │ └╼ body
-│   ├╼ declare - zero_t_bool_29:u32
+│   ├╼ declare - zero_t_bool_29:u256
 │   │ └╼ zero_value_for_split_t_bool(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_bool_29:unknown
-│   ├╼ declare - expr_182:u32
+│   ├╼ declare - expr_182:u256
 │   │ └╼ fun__msgSender_599(): 
-│   ├╼ declare - var_spender_180:u32
+│   ├╼ declare - var_spender_180:u256
 │   │ └╼ var - expr_182:unknown
-│   ├╼ declare - _30:u32
+│   ├╼ declare - _30:u256
 │   │ └╼ var - var_from_169:unknown
-│   ├╼ declare - expr_185:u32
+│   ├╼ declare - expr_185:u256
 │   │ └╼ var - _30:unknown
-│   ├╼ declare - _31:u32
+│   ├╼ declare - _31:u256
 │   │ └╼ var - var_spender_180:unknown
-│   ├╼ declare - expr_186:u32
+│   ├╼ declare - expr_186:u256
 │   │ └╼ var - _31:unknown
-│   ├╼ declare - _32:u32
+│   ├╼ declare - _32:u256
 │   │ └╼ var - var_amount_173:unknown
-│   ├╼ declare - expr_187:u32
+│   ├╼ declare - expr_187:u256
 │   │ └╼ var - _32:unknown
 │   ├╼ fun__spendAllowance_564(): 
 │   │ ├╼ var - expr_185:unknown
 │   │ ├╼ var - expr_186:unknown
 │   │ └╼ var - expr_187:unknown
-│   ├╼ declare - _33:u32
+│   ├╼ declare - _33:u256
 │   │ └╼ var - var_from_169:unknown
-│   ├╼ declare - expr_191:u32
+│   ├╼ declare - expr_191:u256
 │   │ └╼ var - _33:unknown
-│   ├╼ declare - _34:u32
+│   ├╼ declare - _34:u256
 │   │ └╼ var - var_to_171:unknown
-│   ├╼ declare - expr_192:u32
+│   ├╼ declare - expr_192:u256
 │   │ └╼ var - _34:unknown
-│   ├╼ declare - _35:u32
+│   ├╼ declare - _35:u256
 │   │ └╼ var - var_amount_173:unknown
-│   ├╼ declare - expr_193:u32
+│   ├╼ declare - expr_193:u256
 │   │ └╼ var - _35:unknown
 │   ├╼ fun__transfer_348(): 
 │   │ ├╼ var - expr_191:unknown
 │   │ ├╼ var - expr_192:unknown
 │   │ └╼ var - expr_193:unknown
-│   ├╼ declare - expr_196:u32
+│   ├╼ declare - expr_196:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_196:unknown
@@ -2196,10 +2196,10 @@ AST
 │     └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 ├╼ function definition - checked_add_t_uint256
 │ ├╼ params
-│ │ ├╼ x:u32
-│ │ └╼ y:u32
+│ │ ├╼ x:u256
+│ │ └╼ y:u256
 │ ├╼ returns
-│ │ └╼ sum:u32
+│ │ └╼ sum:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ cleanup_t_uint256(): 
@@ -2221,61 +2221,61 @@ AST
 │       └╼ var - y:unknown
 ├╼ function definition - fun_increaseAllowance_229
 │ ├╼ params
-│ │ ├╼ var_spender_202:u32
-│ │ └╼ var_addedValue_204:u32
+│ │ ├╼ var_spender_202:u256
+│ │ └╼ var_addedValue_204:u256
 │ ├╼ returns
-│ │ └╼ var__207:u32
+│ │ └╼ var__207:u256
 │ └╼ body
-│   ├╼ declare - zero_t_bool_36:u32
+│   ├╼ declare - zero_t_bool_36:u256
 │   │ └╼ zero_value_for_split_t_bool(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_bool_36:unknown
-│   ├╼ declare - expr_212:u32
+│   ├╼ declare - expr_212:u256
 │   │ └╼ fun__msgSender_599(): 
-│   ├╼ declare - var_owner_210:u32
+│   ├╼ declare - var_owner_210:u256
 │   │ └╼ var - expr_212:unknown
-│   ├╼ declare - _37:u32
+│   ├╼ declare - _37:u256
 │   │ └╼ var - var_owner_210:unknown
-│   ├╼ declare - expr_215:u32
+│   ├╼ declare - expr_215:u256
 │   │ └╼ var - _37:unknown
-│   ├╼ declare - _38:u32
+│   ├╼ declare - _38:u256
 │   │ └╼ var - var_spender_202:unknown
-│   ├╼ declare - expr_216:u32
+│   ├╼ declare - expr_216:u256
 │   │ └╼ var - _38:unknown
-│   ├╼ declare - _39:u32
+│   ├╼ declare - _39:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_217:u32
+│   ├╼ declare - expr_217:u256
 │   │ └╼ var - _39:unknown
-│   ├╼ declare - _40:u32
+│   ├╼ declare - _40:u256
 │   │ └╼ var - var_owner_210:unknown
-│   ├╼ declare - expr_218:u32
+│   ├╼ declare - expr_218:u256
 │   │ └╼ var - _40:unknown
-│   ├╼ declare - _41:u32
+│   ├╼ declare - _41:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(): 
 │   │   ├╼ var - expr_217:unknown
 │   │   └╼ var - expr_218:unknown
-│   ├╼ declare - _42:u32
+│   ├╼ declare - _42:u256
 │   │ └╼ var - _41:unknown
-│   ├╼ declare - expr_219:u32
+│   ├╼ declare - expr_219:u256
 │   │ └╼ var - _42:unknown
-│   ├╼ declare - _43:u32
+│   ├╼ declare - _43:u256
 │   │ └╼ var - var_spender_202:unknown
-│   ├╼ declare - expr_220:u32
+│   ├╼ declare - expr_220:u256
 │   │ └╼ var - _43:unknown
-│   ├╼ declare - _44:u32
+│   ├╼ declare - _44:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_219:unknown
 │   │   └╼ var - expr_220:unknown
-│   ├╼ declare - _45:u32
+│   ├╼ declare - _45:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _44:unknown
-│   ├╼ declare - expr_221:u32
+│   ├╼ declare - expr_221:u256
 │   │ └╼ var - _45:unknown
-│   ├╼ declare - _46:u32
+│   ├╼ declare - _46:u256
 │   │ └╼ var - var_addedValue_204:unknown
-│   ├╼ declare - expr_222:u32
+│   ├╼ declare - expr_222:u256
 │   │ └╼ var - _46:unknown
-│   ├╼ declare - expr_223:u32
+│   ├╼ declare - expr_223:u256
 │   │ └╼ checked_add_t_uint256(): 
 │   │   ├╼ var - expr_221:unknown
 │   │   └╼ var - expr_222:unknown
@@ -2283,14 +2283,14 @@ AST
 │   │ ├╼ var - expr_215:unknown
 │   │ ├╼ var - expr_216:unknown
 │   │ └╼ var - expr_223:unknown
-│   ├╼ declare - expr_226:u32
+│   ├╼ declare - expr_226:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_226:unknown
 │   └╼ leave
 ├╼ function definition - store_literal_in_memory_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -2305,9 +2305,9 @@ AST
 │     └╼  zero
 ├╼ function definition - abi_encode_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -2321,9 +2321,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -2341,19 +2341,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -2365,10 +2365,10 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - wrapping_sub_t_uint256
 │ ├╼ params
-│ │ ├╼ x:u32
-│ │ └╼ y:u32
+│ │ ├╼ x:u256
+│ │ └╼ y:u256
 │ ├╼ returns
-│ │ └╼ diff:u32
+│ │ └╼ diff:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint256(): 
@@ -2377,59 +2377,59 @@ AST
 │         └╼ var - y:unknown
 ├╼ function definition - fun_decreaseAllowance_271
 │ ├╼ params
-│ │ ├╼ var_spender_232:u32
-│ │ └╼ var_subtractedValue_234:u32
+│ │ ├╼ var_spender_232:u256
+│ │ └╼ var_subtractedValue_234:u256
 │ ├╼ returns
-│ │ └╼ var__237:u32
+│ │ └╼ var__237:u256
 │ └╼ body
-│   ├╼ declare - zero_t_bool_47:u32
+│   ├╼ declare - zero_t_bool_47:u256
 │   │ └╼ zero_value_for_split_t_bool(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_bool_47:unknown
-│   ├╼ declare - expr_242:u32
+│   ├╼ declare - expr_242:u256
 │   │ └╼ fun__msgSender_599(): 
-│   ├╼ declare - var_owner_240:u32
+│   ├╼ declare - var_owner_240:u256
 │   │ └╼ var - expr_242:unknown
-│   ├╼ declare - _48:u32
+│   ├╼ declare - _48:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_246:u32
+│   ├╼ declare - expr_246:u256
 │   │ └╼ var - _48:unknown
-│   ├╼ declare - _49:u32
+│   ├╼ declare - _49:u256
 │   │ └╼ var - var_owner_240:unknown
-│   ├╼ declare - expr_247:u32
+│   ├╼ declare - expr_247:u256
 │   │ └╼ var - _49:unknown
-│   ├╼ declare - _50:u32
+│   ├╼ declare - _50:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(): 
 │   │   ├╼ var - expr_246:unknown
 │   │   └╼ var - expr_247:unknown
-│   ├╼ declare - _51:u32
+│   ├╼ declare - _51:u256
 │   │ └╼ var - _50:unknown
-│   ├╼ declare - expr_248:u32
+│   ├╼ declare - expr_248:u256
 │   │ └╼ var - _51:unknown
-│   ├╼ declare - _52:u32
+│   ├╼ declare - _52:u256
 │   │ └╼ var - var_spender_232:unknown
-│   ├╼ declare - expr_249:u32
+│   ├╼ declare - expr_249:u256
 │   │ └╼ var - _52:unknown
-│   ├╼ declare - _53:u32
+│   ├╼ declare - _53:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_248:unknown
 │   │   └╼ var - expr_249:unknown
-│   ├╼ declare - _54:u32
+│   ├╼ declare - _54:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _53:unknown
-│   ├╼ declare - expr_250:u32
+│   ├╼ declare - expr_250:u256
 │   │ └╼ var - _54:unknown
-│   ├╼ declare - var_currentAllowance_245:u32
+│   ├╼ declare - var_currentAllowance_245:u256
 │   │ └╼ var - expr_250:unknown
-│   ├╼ declare - _55:u32
+│   ├╼ declare - _55:u256
 │   │ └╼ var - var_currentAllowance_245:unknown
-│   ├╼ declare - expr_253:u32
+│   ├╼ declare - expr_253:u256
 │   │ └╼ var - _55:unknown
-│   ├╼ declare - _56:u32
+│   ├╼ declare - _56:u256
 │   │ └╼ var - var_subtractedValue_234:unknown
-│   ├╼ declare - expr_254:u32
+│   ├╼ declare - expr_254:u256
 │   │ └╼ var - _56:unknown
-│   ├╼ declare - expr_255:u32
+│   ├╼ declare - expr_255:u256
 │   │ └╼ iszero(): 
 │   │   └╼ lt(): 
 │   │     ├╼ cleanup_t_uint256(): 
@@ -2438,23 +2438,23 @@ AST
 │   │       └╼ var - expr_254:unknown
 │   ├╼ require_helper_t_stringliteral_f8b476f7d28209d77d4a4ac1fe36b9f8259aa1bb6bddfa6e89de7e51615cf8a8(): 
 │   │ └╼ var - expr_255:unknown
-│   ├╼ declare - _57:u32
+│   ├╼ declare - _57:u256
 │   │ └╼ var - var_owner_240:unknown
-│   ├╼ declare - expr_260:u32
+│   ├╼ declare - expr_260:u256
 │   │ └╼ var - _57:unknown
-│   ├╼ declare - _58:u32
+│   ├╼ declare - _58:u256
 │   │ └╼ var - var_spender_232:unknown
-│   ├╼ declare - expr_261:u32
+│   ├╼ declare - expr_261:u256
 │   │ └╼ var - _58:unknown
-│   ├╼ declare - _59:u32
+│   ├╼ declare - _59:u256
 │   │ └╼ var - var_currentAllowance_245:unknown
-│   ├╼ declare - expr_262:u32
+│   ├╼ declare - expr_262:u256
 │   │ └╼ var - _59:unknown
-│   ├╼ declare - _60:u32
+│   ├╼ declare - _60:u256
 │   │ └╼ var - var_subtractedValue_234:unknown
-│   ├╼ declare - expr_263:u32
+│   ├╼ declare - expr_263:u256
 │   │ └╼ var - _60:unknown
-│   ├╼ declare - expr_264:u32
+│   ├╼ declare - expr_264:u256
 │   │ └╼ wrapping_sub_t_uint256(): 
 │   │   ├╼ var - expr_262:unknown
 │   │   └╼ var - expr_263:unknown
@@ -2462,24 +2462,24 @@ AST
 │   │ ├╼ var - expr_260:unknown
 │   │ ├╼ var - expr_261:unknown
 │   │ └╼ var - expr_264:unknown
-│   ├╼ declare - expr_268:u32
+│   ├╼ declare - expr_268:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ var - expr_268:unknown
 │   └╼ leave
 ├╼ function definition - cleanup_t_rational_0_by_1
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ cleaned:u32
+│ │ └╼ cleaned:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - convert_t_rational_0_by_1_to_t_uint160
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint160(): 
@@ -2488,16 +2488,16 @@ AST
 │           └╼ var - value:unknown
 ├╼ function definition - convert_t_rational_0_by_1_to_t_address
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ convert_t_rational_0_by_1_to_t_uint160(): 
 │       └╼ var - value:unknown
 ├╼ function definition - store_literal_in_memory_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -2512,9 +2512,9 @@ AST
 │     └╼ dress
 ├╼ function definition - abi_encode_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -2528,9 +2528,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -2548,19 +2548,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -2572,7 +2572,7 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - store_literal_in_memory_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -2587,9 +2587,9 @@ AST
 │     └╼ ess
 ├╼ function definition - abi_encode_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -2603,9 +2603,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -2623,19 +2623,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -2647,7 +2647,7 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - store_literal_in_memory_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -2662,9 +2662,9 @@ AST
 │     └╼ alance
 ├╼ function definition - abi_encode_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -2678,9 +2678,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -2698,19 +2698,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -2722,9 +2722,9 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - shift_left_0
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ newValue:u32
+│ │ └╼ newValue:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ shl(): 
@@ -2732,12 +2732,12 @@ AST
 │       └╼ var - value:unknown
 ├╼ function definition - update_byte_slice_32_shift_0
 │ ├╼ params
-│ │ ├╼ value:u32
-│ │ └╼ toInsert:u32
+│ │ ├╼ value:u256
+│ │ └╼ toInsert:u256
 │ ├╼ returns
-│ │ └╼ result:u32
+│ │ └╼ result:u256
 │ └╼ body
-│   ├╼ declare - mask:u32
+│   ├╼ declare - mask:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
 │   ├╼ assign - 
 │   │ └╼ shift_left_0(): 
@@ -2755,9 +2755,9 @@ AST
 │         └╼ var - mask:unknown
 ├╼ function definition - convert_t_uint256_to_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ converted:u32
+│ │ └╼ converted:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ cleanup_t_uint256(): 
@@ -2766,19 +2766,19 @@ AST
 │           └╼ var - value:unknown
 ├╼ function definition - prepare_store_t_uint256
 │ ├╼ params
-│ │ └╼ value:u32
+│ │ └╼ value:u256
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ var - value:unknown
 ├╼ function definition - update_storage_value_offset_0t_uint256_to_t_uint256
 │ ├╼ params
-│ │ ├╼ slot:u32
-│ │ └╼ value_0:u32
+│ │ ├╼ slot:u256
+│ │ └╼ value_0:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - convertedValue_0:u32
+│   ├╼ declare - convertedValue_0:u256
 │   │ └╼ convert_t_uint256_to_t_uint256(): 
 │   │   └╼ var - value_0:unknown
 │   └╼ sstore(): 
@@ -2790,21 +2790,21 @@ AST
 │         └╼ var - convertedValue_0:unknown
 ├╼ function definition - fun__transfer_348
 │ ├╼ params
-│ │ ├╼ var_from_274:u32
-│ │ ├╼ var_to_276:u32
-│ │ └╼ var_amount_278:u32
+│ │ ├╼ var_from_274:u256
+│ │ ├╼ var_to_276:u256
+│ │ └╼ var_amount_278:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - _61:u32
+│   ├╼ declare - _61:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_282:u32
+│   ├╼ declare - expr_282:u256
 │   │ └╼ var - _61:unknown
-│   ├╼ declare - expr_285:u32
+│   ├╼ declare - expr_285:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_286:u32
+│   ├╼ declare - expr_286:u256
 │   │ └╼ convert_t_rational_0_by_1_to_t_address(): 
 │   │   └╼ var - expr_285:unknown
-│   ├╼ declare - expr_287:u32
+│   ├╼ declare - expr_287:u256
 │   │ └╼ iszero(): 
 │   │   └╼ eq(): 
 │   │     ├╼ cleanup_t_address(): 
@@ -2813,16 +2813,16 @@ AST
 │   │       └╼ var - expr_286:unknown
 │   ├╼ require_helper_t_stringliteral_baecc556b46f4ed0f2b4cb599d60785ac8563dd2dc0a5bf12edea1c39e5e1fea(): 
 │   │ └╼ var - expr_287:unknown
-│   ├╼ declare - _62:u32
+│   ├╼ declare - _62:u256
 │   │ └╼ var - var_to_276:unknown
-│   ├╼ declare - expr_292:u32
+│   ├╼ declare - expr_292:u256
 │   │ └╼ var - _62:unknown
-│   ├╼ declare - expr_295:u32
+│   ├╼ declare - expr_295:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_296:u32
+│   ├╼ declare - expr_296:u256
 │   │ └╼ convert_t_rational_0_by_1_to_t_address(): 
 │   │   └╼ var - expr_295:unknown
-│   ├╼ declare - expr_297:u32
+│   ├╼ declare - expr_297:u256
 │   │ └╼ iszero(): 
 │   │   └╼ eq(): 
 │   │     ├╼ cleanup_t_address(): 
@@ -2831,50 +2831,50 @@ AST
 │   │       └╼ var - expr_296:unknown
 │   ├╼ require_helper_t_stringliteral_0557e210f7a69a685100a7e4e3d0a7024c546085cee28910fd17d0b081d9516f(): 
 │   │ └╼ var - expr_297:unknown
-│   ├╼ declare - _63:u32
+│   ├╼ declare - _63:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_302:u32
+│   ├╼ declare - expr_302:u256
 │   │ └╼ var - _63:unknown
-│   ├╼ declare - _64:u32
+│   ├╼ declare - _64:u256
 │   │ └╼ var - var_to_276:unknown
-│   ├╼ declare - expr_303:u32
+│   ├╼ declare - expr_303:u256
 │   │ └╼ var - _64:unknown
-│   ├╼ declare - _65:u32
+│   ├╼ declare - _65:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_304:u32
+│   ├╼ declare - expr_304:u256
 │   │ └╼ var - _65:unknown
 │   ├╼ fun__beforeTokenTransfer_575(): 
 │   │ ├╼ var - expr_302:unknown
 │   │ ├╼ var - expr_303:unknown
 │   │ └╼ var - expr_304:unknown
-│   ├╼ declare - _66:u32
+│   ├╼ declare - _66:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_309:u32
+│   ├╼ declare - expr_309:u256
 │   │ └╼ var - _66:unknown
-│   ├╼ declare - _67:u32
+│   ├╼ declare - _67:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_310:u32
+│   ├╼ declare - expr_310:u256
 │   │ └╼ var - _67:unknown
-│   ├╼ declare - _68:u32
+│   ├╼ declare - _68:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_309:unknown
 │   │   └╼ var - expr_310:unknown
-│   ├╼ declare - _69:u32
+│   ├╼ declare - _69:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _68:unknown
-│   ├╼ declare - expr_311:u32
+│   ├╼ declare - expr_311:u256
 │   │ └╼ var - _69:unknown
-│   ├╼ declare - var_fromBalance_308:u32
+│   ├╼ declare - var_fromBalance_308:u256
 │   │ └╼ var - expr_311:unknown
-│   ├╼ declare - _70:u32
+│   ├╼ declare - _70:u256
 │   │ └╼ var - var_fromBalance_308:unknown
-│   ├╼ declare - expr_314:u32
+│   ├╼ declare - expr_314:u256
 │   │ └╼ var - _70:unknown
-│   ├╼ declare - _71:u32
+│   ├╼ declare - _71:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_315:u32
+│   ├╼ declare - expr_315:u256
 │   │ └╼ var - _71:unknown
-│   ├╼ declare - expr_316:u32
+│   ├╼ declare - expr_316:u256
 │   │ └╼ iszero(): 
 │   │   └╼ lt(): 
 │   │     ├╼ cleanup_t_uint256(): 
@@ -2883,84 +2883,84 @@ AST
 │   │       └╼ var - expr_315:unknown
 │   ├╼ require_helper_t_stringliteral_4107e8a8b9e94bf8ff83080ddec1c0bffe897ebc2241b89d44f66b3d274088b6(): 
 │   │ └╼ var - expr_316:unknown
-│   ├╼ declare - _72:u32
+│   ├╼ declare - _72:u256
 │   │ └╼ var - var_fromBalance_308:unknown
-│   ├╼ declare - expr_323:u32
+│   ├╼ declare - expr_323:u256
 │   │ └╼ var - _72:unknown
-│   ├╼ declare - _73:u32
+│   ├╼ declare - _73:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_324:u32
+│   ├╼ declare - expr_324:u256
 │   │ └╼ var - _73:unknown
-│   ├╼ declare - expr_325:u32
+│   ├╼ declare - expr_325:u256
 │   │ └╼ wrapping_sub_t_uint256(): 
 │   │   ├╼ var - expr_323:unknown
 │   │   └╼ var - expr_324:unknown
-│   ├╼ declare - _74:u32
+│   ├╼ declare - _74:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_320:u32
+│   ├╼ declare - expr_320:u256
 │   │ └╼ var - _74:unknown
-│   ├╼ declare - _75:u32
+│   ├╼ declare - _75:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_321:u32
+│   ├╼ declare - expr_321:u256
 │   │ └╼ var - _75:unknown
-│   ├╼ declare - _76:u32
+│   ├╼ declare - _76:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_320:unknown
 │   │   └╼ var - expr_321:unknown
 │   ├╼ update_storage_value_offset_0t_uint256_to_t_uint256(): 
 │   │ ├╼ var - _76:unknown
 │   │ └╼ var - expr_325:unknown
-│   ├╼ declare - expr_326:u32
+│   ├╼ declare - expr_326:u256
 │   │ └╼ var - expr_325:unknown
-│   ├╼ declare - _77:u32
+│   ├╼ declare - _77:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_332:u32
+│   ├╼ declare - expr_332:u256
 │   │ └╼ var - _77:unknown
-│   ├╼ declare - _78:u32
+│   ├╼ declare - _78:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_329:u32
+│   ├╼ declare - expr_329:u256
 │   │ └╼ var - _78:unknown
-│   ├╼ declare - _79:u32
+│   ├╼ declare - _79:u256
 │   │ └╼ var - var_to_276:unknown
-│   ├╼ declare - expr_330:u32
+│   ├╼ declare - expr_330:u256
 │   │ └╼ var - _79:unknown
-│   ├╼ declare - _80:u32
+│   ├╼ declare - _80:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_329:unknown
 │   │   └╼ var - expr_330:unknown
-│   ├╼ declare - _81:u32
+│   ├╼ declare - _81:u256
 │   │ └╼ read_from_storage_split_offset_0_t_uint256(): 
 │   │   └╼ var - _80:unknown
-│   ├╼ declare - expr_333:u32
+│   ├╼ declare - expr_333:u256
 │   │ └╼ checked_add_t_uint256(): 
 │   │   ├╼ var - _81:unknown
 │   │   └╼ var - expr_332:unknown
 │   ├╼ update_storage_value_offset_0t_uint256_to_t_uint256(): 
 │   │ ├╼ var - _80:unknown
 │   │ └╼ var - expr_333:unknown
-│   ├╼ declare - _82:u32
+│   ├╼ declare - _82:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_336:u32
+│   ├╼ declare - expr_336:u256
 │   │ └╼ var - _82:unknown
-│   ├╼ declare - _83:u32
+│   ├╼ declare - _83:u256
 │   │ └╼ var - var_to_276:unknown
-│   ├╼ declare - expr_337:u32
+│   ├╼ declare - expr_337:u256
 │   │ └╼ var - _83:unknown
-│   ├╼ declare - _84:u32
+│   ├╼ declare - _84:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_338:u32
+│   ├╼ declare - expr_338:u256
 │   │ └╼ var - _84:unknown
-│   ├╼ declare - _85:u32
+│   ├╼ declare - _85:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - _86:u32
+│   ├╼ declare - _86:u256
 │   │ └╼ convert_t_address_to_t_address(): 
 │   │   └╼ var - expr_336:unknown
-│   ├╼ declare - _87:u32
+│   ├╼ declare - _87:u256
 │   │ └╼ convert_t_address_to_t_address(): 
 │   │   └╼ var - expr_337:unknown
-│   ├╼ declare - _88:u32
+│   ├╼ declare - _88:u256
 │   │ └╼ allocate_unbounded(): 
-│   ├╼ declare - _89:u32
+│   ├╼ declare - _89:u256
 │   │ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack(): 
 │   │   ├╼ var - _88:unknown
 │   │   └╼ var - expr_338:unknown
@@ -2972,17 +2972,17 @@ AST
 │   │ ├╼ var - _85:unknown
 │   │ ├╼ var - _86:unknown
 │   │ └╼ var - _87:unknown
-│   ├╼ declare - _90:u32
+│   ├╼ declare - _90:u256
 │   │ └╼ var - var_from_274:unknown
-│   ├╼ declare - expr_342:u32
+│   ├╼ declare - expr_342:u256
 │   │ └╼ var - _90:unknown
-│   ├╼ declare - _91:u32
+│   ├╼ declare - _91:u256
 │   │ └╼ var - var_to_276:unknown
-│   ├╼ declare - expr_343:u32
+│   ├╼ declare - expr_343:u256
 │   │ └╼ var - _91:unknown
-│   ├╼ declare - _92:u32
+│   ├╼ declare - _92:u256
 │   │ └╼ var - var_amount_278:unknown
-│   ├╼ declare - expr_344:u32
+│   ├╼ declare - expr_344:u256
 │   │ └╼ var - _92:unknown
 │   └╼ fun__afterTokenTransfer_586(): 
 │     ├╼ var - expr_342:unknown
@@ -2990,7 +2990,7 @@ AST
 │     └╼ var - expr_344:unknown
 ├╼ function definition - store_literal_in_memory_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -3005,9 +3005,9 @@ AST
 │     └╼ ress
 ├╼ function definition - abi_encode_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -3021,9 +3021,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -3041,19 +3041,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -3065,7 +3065,7 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - store_literal_in_memory_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   ├╼ mstore(): 
@@ -3080,9 +3080,9 @@ AST
 │     └╼ ss
 ├╼ function definition - abi_encode_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -3096,9 +3096,9 @@ AST
 │       └╼ 64:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -3116,19 +3116,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -3140,21 +3140,21 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - fun__approve_521
 │ ├╼ params
-│ │ ├╼ var_owner_479:u32
-│ │ ├╼ var_spender_481:u32
-│ │ └╼ var_amount_483:u32
+│ │ ├╼ var_owner_479:u256
+│ │ ├╼ var_spender_481:u256
+│ │ └╼ var_amount_483:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - _93:u32
+│   ├╼ declare - _93:u256
 │   │ └╼ var - var_owner_479:unknown
-│   ├╼ declare - expr_487:u32
+│   ├╼ declare - expr_487:u256
 │   │ └╼ var - _93:unknown
-│   ├╼ declare - expr_490:u32
+│   ├╼ declare - expr_490:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_491:u32
+│   ├╼ declare - expr_491:u256
 │   │ └╼ convert_t_rational_0_by_1_to_t_address(): 
 │   │   └╼ var - expr_490:unknown
-│   ├╼ declare - expr_492:u32
+│   ├╼ declare - expr_492:u256
 │   │ └╼ iszero(): 
 │   │   └╼ eq(): 
 │   │     ├╼ cleanup_t_address(): 
@@ -3163,16 +3163,16 @@ AST
 │   │       └╼ var - expr_491:unknown
 │   ├╼ require_helper_t_stringliteral_c953f4879035ed60e766b34720f656aab5c697b141d924c283124ecedb91c208(): 
 │   │ └╼ var - expr_492:unknown
-│   ├╼ declare - _94:u32
+│   ├╼ declare - _94:u256
 │   │ └╼ var - var_spender_481:unknown
-│   ├╼ declare - expr_497:u32
+│   ├╼ declare - expr_497:u256
 │   │ └╼ var - _94:unknown
-│   ├╼ declare - expr_500:u32
+│   ├╼ declare - expr_500:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_501:u32
+│   ├╼ declare - expr_501:u256
 │   │ └╼ convert_t_rational_0_by_1_to_t_address(): 
 │   │   └╼ var - expr_500:unknown
-│   ├╼ declare - expr_502:u32
+│   ├╼ declare - expr_502:u256
 │   │ └╼ iszero(): 
 │   │   └╼ eq(): 
 │   │     ├╼ cleanup_t_address(): 
@@ -3181,62 +3181,62 @@ AST
 │   │       └╼ var - expr_501:unknown
 │   ├╼ require_helper_t_stringliteral_24883cc5fe64ace9d0df1893501ecb93c77180f0ff69cca79affb3c316dc8029(): 
 │   │ └╼ var - expr_502:unknown
-│   ├╼ declare - _95:u32
+│   ├╼ declare - _95:u256
 │   │ └╼ var - var_amount_483:unknown
-│   ├╼ declare - expr_511:u32
+│   ├╼ declare - expr_511:u256
 │   │ └╼ var - _95:unknown
-│   ├╼ declare - _96:u32
+│   ├╼ declare - _96:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_506:u32
+│   ├╼ declare - expr_506:u256
 │   │ └╼ var - _96:unknown
-│   ├╼ declare - _97:u32
+│   ├╼ declare - _97:u256
 │   │ └╼ var - var_owner_479:unknown
-│   ├╼ declare - expr_507:u32
+│   ├╼ declare - expr_507:u256
 │   │ └╼ var - _97:unknown
-│   ├╼ declare - _98:u32
+│   ├╼ declare - _98:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_mapping$_t_address_$_t_uint256_$_$_of_t_address(): 
 │   │   ├╼ var - expr_506:unknown
 │   │   └╼ var - expr_507:unknown
-│   ├╼ declare - _99:u32
+│   ├╼ declare - _99:u256
 │   │ └╼ var - _98:unknown
-│   ├╼ declare - expr_509:u32
+│   ├╼ declare - expr_509:u256
 │   │ └╼ var - _99:unknown
-│   ├╼ declare - _100:u32
+│   ├╼ declare - _100:u256
 │   │ └╼ var - var_spender_481:unknown
-│   ├╼ declare - expr_508:u32
+│   ├╼ declare - expr_508:u256
 │   │ └╼ var - _100:unknown
-│   ├╼ declare - _101:u32
+│   ├╼ declare - _101:u256
 │   │ └╼ mapping_index_access_t_mapping$_t_address_$_t_uint256_$_of_t_address(): 
 │   │   ├╼ var - expr_509:unknown
 │   │   └╼ var - expr_508:unknown
 │   ├╼ update_storage_value_offset_0t_uint256_to_t_uint256(): 
 │   │ ├╼ var - _101:unknown
 │   │ └╼ var - expr_511:unknown
-│   ├╼ declare - expr_512:u32
+│   ├╼ declare - expr_512:u256
 │   │ └╼ var - expr_511:unknown
-│   ├╼ declare - _102:u32
+│   ├╼ declare - _102:u256
 │   │ └╼ var - var_owner_479:unknown
-│   ├╼ declare - expr_515:u32
+│   ├╼ declare - expr_515:u256
 │   │ └╼ var - _102:unknown
-│   ├╼ declare - _103:u32
+│   ├╼ declare - _103:u256
 │   │ └╼ var - var_spender_481:unknown
-│   ├╼ declare - expr_516:u32
+│   ├╼ declare - expr_516:u256
 │   │ └╼ var - _103:unknown
-│   ├╼ declare - _104:u32
+│   ├╼ declare - _104:u256
 │   │ └╼ var - var_amount_483:unknown
-│   ├╼ declare - expr_517:u32
+│   ├╼ declare - expr_517:u256
 │   │ └╼ var - _104:unknown
-│   ├╼ declare - _105:u32
+│   ├╼ declare - _105:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - _106:u32
+│   ├╼ declare - _106:u256
 │   │ └╼ convert_t_address_to_t_address(): 
 │   │   └╼ var - expr_515:unknown
-│   ├╼ declare - _107:u32
+│   ├╼ declare - _107:u256
 │   │ └╼ convert_t_address_to_t_address(): 
 │   │   └╼ var - expr_516:unknown
-│   ├╼ declare - _108:u32
+│   ├╼ declare - _108:u256
 │   │ └╼ allocate_unbounded(): 
-│   ├╼ declare - _109:u32
+│   ├╼ declare - _109:u256
 │   │ └╼ abi_encode_tuple_t_uint256__to_t_uint256__fromStack(): 
 │   │   ├╼ var - _108:unknown
 │   │   └╼ var - expr_517:unknown
@@ -3250,7 +3250,7 @@ AST
 │     └╼ var - _107:unknown
 ├╼ function definition - store_literal_in_memory_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe
 │ ├╼ params
-│ │ └╼ memPtr:u32
+│ │ └╼ memPtr:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ mstore(): 
@@ -3260,9 +3260,9 @@ AST
 │     └╼ ERC20: insufficient allowance
 ├╼ function definition - abi_encode_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe_to_t_string_memory_ptr_fromStack
 │ ├╼ params
-│ │ └╼ pos:u32
+│ │ └╼ pos:u256
 │ ├╼ returns
-│ │ └╼ end:u32
+│ │ └╼ end:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ array_storeLengthForEncoding_t_string_memory_ptr_fromStack(): 
@@ -3276,9 +3276,9 @@ AST
 │       └╼ 32:unknown
 ├╼ function definition - abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack
 │ ├╼ params
-│ │ └╼ headStart:u32
+│ │ └╼ headStart:u256
 │ ├╼ returns
-│ │ └╼ tail:u32
+│ │ └╼ tail:u256
 │ └╼ body
 │   ├╼ assign - 
 │   │ └╼ add(): 
@@ -3296,19 +3296,19 @@ AST
 │       └╼ var - tail:unknown
 ├╼ function definition - require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe
 │ ├╼ params
-│ │ └╼ condition:u32
+│ │ └╼ condition:u256
 │ ├╼ returns
 │ └╼ body
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ iszero(): 
 │       │ └╼ var - condition:unknown
-│       ├╼ declare - memPtr:u32
+│       ├╼ declare - memPtr:u256
 │       │ └╼ allocate_unbounded(): 
 │       ├╼ mstore(): 
 │       │ ├╼ var - memPtr:unknown
 │       │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│       ├╼ declare - end:u32
+│       ├╼ declare - end:u256
 │       │ └╼ abi_encode_tuple_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe__to_t_string_memory_ptr__fromStack(): 
 │       │   └╼ add(): 
 │       │     ├╼ var - memPtr:unknown
@@ -3320,32 +3320,32 @@ AST
 │           └╼ var - memPtr:unknown
 ├╼ function definition - fun__spendAllowance_564
 │ ├╼ params
-│ │ ├╼ var_owner_524:u32
-│ │ ├╼ var_spender_526:u32
-│ │ └╼ var_amount_528:u32
+│ │ ├╼ var_owner_524:u256
+│ │ ├╼ var_spender_526:u256
+│ │ └╼ var_amount_528:u256
 │ ├╼ returns
 │ └╼ body
-│   ├╼ declare - _110:u32
+│   ├╼ declare - _110:u256
 │   │ └╼ var - var_owner_524:unknown
-│   ├╼ declare - expr_534:u32
+│   ├╼ declare - expr_534:u256
 │   │ └╼ var - _110:unknown
-│   ├╼ declare - _111:u32
+│   ├╼ declare - _111:u256
 │   │ └╼ var - var_spender_526:unknown
-│   ├╼ declare - expr_535:u32
+│   ├╼ declare - expr_535:u256
 │   │ └╼ var - _111:unknown
-│   ├╼ declare - expr_536:u32
+│   ├╼ declare - expr_536:u256
 │   │ └╼ fun_allowance_141(): 
 │   │   ├╼ var - expr_534:unknown
 │   │   └╼ var - expr_535:unknown
-│   ├╼ declare - var_currentAllowance_532:u32
+│   ├╼ declare - var_currentAllowance_532:u256
 │   │ └╼ var - expr_536:unknown
-│   ├╼ declare - _112:u32
+│   ├╼ declare - _112:u256
 │   │ └╼ var - var_currentAllowance_532:unknown
-│   ├╼ declare - expr_538:u32
+│   ├╼ declare - expr_538:u256
 │   │ └╼ var - _112:unknown
-│   ├╼ declare - expr_543:u32
+│   ├╼ declare - expr_543:u256
 │   │ └╼ 115792089237316195423570985008687907853269984665640564039457584007913129639935:unknown
-│   ├╼ declare - expr_544:u32
+│   ├╼ declare - expr_544:u256
 │   │ └╼ iszero(): 
 │   │   └╼ eq(): 
 │   │     ├╼ cleanup_t_uint256(): 
@@ -3355,15 +3355,15 @@ AST
 │   └╼ if statement
 │     └╼ conditional
 │       ├╼ var - expr_544:unknown
-│       ├╼ declare - _113:u32
+│       ├╼ declare - _113:u256
 │       │ └╼ var - var_currentAllowance_532:unknown
-│       ├╼ declare - expr_546:u32
+│       ├╼ declare - expr_546:u256
 │       │ └╼ var - _113:unknown
-│       ├╼ declare - _114:u32
+│       ├╼ declare - _114:u256
 │       │ └╼ var - var_amount_528:unknown
-│       ├╼ declare - expr_547:u32
+│       ├╼ declare - expr_547:u256
 │       │ └╼ var - _114:unknown
-│       ├╼ declare - expr_548:u32
+│       ├╼ declare - expr_548:u256
 │       │ └╼ iszero(): 
 │       │   └╼ lt(): 
 │       │     ├╼ cleanup_t_uint256(): 
@@ -3372,23 +3372,23 @@ AST
 │       │       └╼ var - expr_547:unknown
 │       ├╼ require_helper_t_stringliteral_3b6607e091cba9325f958656d2b5e0622ab7dc0eac71a26ac788cb25bc19f4fe(): 
 │       │ └╼ var - expr_548:unknown
-│       ├╼ declare - _115:u32
+│       ├╼ declare - _115:u256
 │       │ └╼ var - var_owner_524:unknown
-│       ├╼ declare - expr_553:u32
+│       ├╼ declare - expr_553:u256
 │       │ └╼ var - _115:unknown
-│       ├╼ declare - _116:u32
+│       ├╼ declare - _116:u256
 │       │ └╼ var - var_spender_526:unknown
-│       ├╼ declare - expr_554:u32
+│       ├╼ declare - expr_554:u256
 │       │ └╼ var - _116:unknown
-│       ├╼ declare - _117:u32
+│       ├╼ declare - _117:u256
 │       │ └╼ var - var_currentAllowance_532:unknown
-│       ├╼ declare - expr_555:u32
+│       ├╼ declare - expr_555:u256
 │       │ └╼ var - _117:unknown
-│       ├╼ declare - _118:u32
+│       ├╼ declare - _118:u256
 │       │ └╼ var - var_amount_528:unknown
-│       ├╼ declare - expr_556:u32
+│       ├╼ declare - expr_556:u256
 │       │ └╼ var - _118:unknown
-│       ├╼ declare - expr_557:u32
+│       ├╼ declare - expr_557:u256
 │       │ └╼ wrapping_sub_t_uint256(): 
 │       │   ├╼ var - expr_555:unknown
 │       │   └╼ var - expr_556:unknown
@@ -3398,35 +3398,35 @@ AST
 │         └╼ var - expr_557:unknown
 ├╼ function definition - fun__beforeTokenTransfer_575
 │ ├╼ params
-│ │ ├╼ var_from_567:u32
-│ │ ├╼ var_to_569:u32
-│ │ └╼ var_amount_571:u32
+│ │ ├╼ var_from_567:u256
+│ │ ├╼ var_to_569:u256
+│ │ └╼ var_amount_571:u256
 │ ├╼ returns
 │ └╼ body
 ├╼ function definition - fun__afterTokenTransfer_586
 │ ├╼ params
-│ │ ├╼ var_from_578:u32
-│ │ ├╼ var_to_580:u32
-│ │ └╼ var_amount_582:u32
+│ │ ├╼ var_from_578:u256
+│ │ ├╼ var_to_580:u256
+│ │ └╼ var_amount_582:u256
 │ ├╼ returns
 │ └╼ body
 ├╼ function definition - zero_value_for_split_t_address
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ ret:u32
+│ │ └╼ ret:u256
 │ └╼ body
 │   └╼ assign - 
 │     └╼ 0:unknown
 ├╼ function definition - fun__msgSender_599
 │ ├╼ params
 │ ├╼ returns
-│ │ └╼ var__593:u32
+│ │ └╼ var__593:u256
 │ └╼ body
-│   ├╼ declare - zero_t_address_119:u32
+│   ├╼ declare - zero_t_address_119:u256
 │   │ └╼ zero_value_for_split_t_address(): 
 │   ├╼ assign - 
 │   │ └╼ var - zero_t_address_119:unknown
-│   ├╼ declare - expr_596:u32
+│   ├╼ declare - expr_596:u256
 │   │ └╼ caller(): 
 │   ├╼ assign - 
 │   │ └╼ var - expr_596:unknown

@@ -1,10 +1,10 @@
 ---
 source: src/parser.rs
-assertion_line: 360
+assertion_line: 391
 expression: "parse_to_tree(\"add(1,2)\")"
 
 ---
 AST
-└╼ add(unknown, unknown): 
-  ├╼ 1:unknown
-  └╼ 2:unknown
+└╼ add(u256, u256): 
+  ├╼ 1:u256
+  └╼ 2:u256

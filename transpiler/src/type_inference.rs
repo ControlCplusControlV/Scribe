@@ -212,7 +212,11 @@ impl TypeInferrer {
                 cases,
             }) => {
                 let new_expr = self.walk_expr(*expr.clone());
-                let inferred_type = self.evaluated_types.first().unwrap_or(&None).clone();
+                let inferred_type = self
+                    .evaluated_types
+                    .first()
+                    .unwrap_or(&Some(YulType::U256))
+                    .clone();
                 let expected_types = self.evaluated_types.clone();
                 let cases = cases
                     .into_iter()
@@ -243,7 +247,11 @@ impl TypeInferrer {
                 value,
                 inferred_type: _,
             }) => {
-                let inferred_type = self.expected_types.first().unwrap_or(&None).clone();
+                let inferred_type = self
+                    .expected_types
+                    .first()
+                    .unwrap_or(&Some(YulType::U256))
+                    .clone();
                 self.evaluated_types = vec![inferred_type.clone()];
                 ExprLiteral::Number(ExprLiteralNumber {
                     value,

@@ -237,6 +237,9 @@ impl Transpiler {
     }
 
     //FIXME: Still needs comments
+
+    //not pushing but duping to the top, offset is just where the value starts
+    //and depending on the type it has to dup 8 elements
     fn push_identifier_to_top(&mut self, typed_identifier: TypedIdentifier) {
         let mut offset = 0;
         self.prepare_for_stack_values(&typed_identifier.yul_type);
@@ -265,6 +268,8 @@ impl Transpiler {
                 self.dup_from_offset(offset, stack_value.yul_type);
                 self.outdent()
             }
+
+            //If it cant find the identifier in the stack it will load it from memory
             None => {
                 self.load_identifier_from_memory(typed_identifier);
             }
@@ -691,31 +696,50 @@ impl Transpiler {
     //FIXME: Still needs comments
     fn transpile_switch(&mut self, op: &ExprSwitch) {
         self.add_line("");
+
+        //bool for match
         let switch_matched_pseudovar = TypedIdentifier {
             identifier: "switch_matched".to_string(),
             yul_type: YulType::U32,
         };
+        //set the bool in scoped variables
         self.scoped_identifiers.insert(
             switch_matched_pseudovar.identifier.clone(),
             switch_matched_pseudovar.clone(),
         );
+
         self.add_comment("keeping track of whether we've hit any cases");
+        //push 0 on miden stack
         self.add_line("push.0");
+        //push unknown on transpiler stack
         self.add_unknown(YulType::U32);
+        //declare that top value in stack is the match psuedo var bool
         self.top_is_var(switch_matched_pseudovar.clone());
+
+        //transpile the op which could be anything, pushes expr to the top (u32, u256)
         self.transpile_op(&op.expr);
         // TODO: these have to be unique, some way to do that, incrementing?
+
+        //define case (expr) - not acutally defined, just to keep track of the variable
         let switch_target_pseudovar = TypedIdentifier {
             identifier: "switch".to_string(),
             yul_type: op.inferred_type.unwrap(),
         };
+
+        //add case to scoped identifiers
         self.scoped_identifiers.insert(
             switch_target_pseudovar.identifier.clone(),
             switch_target_pseudovar.clone(),
         );
+
+        //set the value at top of stack from transpile op to the case (from define case) pseudovar
         self.top_is_var(switch_target_pseudovar.clone());
+
         for (i, case) in op.cases.iter().enumerate() {
             self.push_identifier_to_top(switch_target_pseudovar.clone());
+
+            //assumes that target is at the top of the stack, and will go into the branch if matches, transpiles branch if match
+            //update match pseudovar (boolean) if match
             self.transpile_case(
                 &case,
                 &op,
@@ -844,6 +868,7 @@ impl Transpiler {
     }
 
     //FIXME: Still needs comments
+    //see push identifier to top
     fn transpile_variable_reference(&mut self, op: &ExprVariableReference) {
         let typed_identifier = self.get_typed_identifier(&op.identifier);
         self.push_identifier_to_top(typed_identifier.clone());
@@ -899,6 +924,7 @@ impl Transpiler {
     fn transpile_default(&mut self, op: &ExprDefault) {}
 
     //FIXME: Still needs comments
+    //just transpile each case block
     //TODO: update placeholder
     fn transpile_case(
         &mut self,
