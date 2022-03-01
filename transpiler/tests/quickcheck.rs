@@ -86,6 +86,7 @@ fn addition(x: U256, y: U256) -> TestResult {
     )
 }
 
+#[ignore]
 #[quickcheck]
 fn multiplication(x: u64, y: u64) -> TestResult {
     let (expected, overflowed) =
