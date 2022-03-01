@@ -89,6 +89,9 @@ impl std::fmt::Debug for Stack {
 
 //Implementations to manage the transpilation process to Miden assembly.
 //Ex. Stack management, memory management, branching, indendtation, adding comments
+
+//FIXME: Add a note about how the transpiler variables, stack ect do not cross over with miden. They are just to keep track of
+//what the miden stack/memory will look like so we essentially need to states, one for miden and one for the transpiler
 impl Transpiler {
     fn equate_reference(&mut self, x: TypedIdentifier, y: TypedIdentifier) {
         panic!("This no longer works, should fix for optimizations");
@@ -953,7 +956,7 @@ impl Transpiler {
         &mut self,
         op: &ExprCase,
         switch: &ExprSwitch,
-        transpiler_target_switch_expression: TypedIdentifier,
+        _transpiler_target_switch_expression: TypedIdentifier,
         transpiler_switch_matched_bool: TypedIdentifier,
     ) {
         //Start to accept overflow, meaning when elements are pushed to the stack making the stack size greater than 16
@@ -986,7 +989,7 @@ impl Transpiler {
         self.add_line("if.true");
         self.indent();
 
-        //Assign the transpiler_switch_matched_bool the value of 1 in the transpiler
+        //Assign the transpiler_switch_matched_bool the value of 1 in the in Miden
         self.transpile_assignment(&ExprAssignment {
             identifiers: vec![transpiler_switch_matched_bool.identifier],
             inferred_types: vec![Some(YulType::U32)],
