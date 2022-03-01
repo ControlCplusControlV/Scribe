@@ -34,11 +34,14 @@ enum SubCommand {
     },
 }
 
+//Display a "title" in bold when running Scribe examples in the terminal
 fn print_title(s: &str) {
     let s1 = format!("=== {} ===", s).blue().bold();
     println!("{}", s1);
     println!(" ");
 }
+
+//Wait for the user to press enter to continue when running Scribe examples in the terminal
 fn pause() {
     let mut stdout = stdout();
     stdout.write(b"Press Enter to continue...").unwrap();
@@ -46,6 +49,7 @@ fn pause() {
     stdin().read(&mut [0]).unwrap();
 }
 
+//Clear the terminal when running Scribe examples
 fn clear_screen() {
     print!("{esc}c", esc = 27 as char);
 }
@@ -119,15 +123,21 @@ fn read_yul_contracts() -> Vec<YulFile> {
         .unwrap()
         .map(|r| r.unwrap())
         .collect();
+
+    //Sort the files by file name
     paths.sort_by_key(|dir| dir.path());
+
+    //For each file, read in the contents and push a YulFile to the yul_files Vec
     for path in paths {
         let contents = fs::read_to_string(path.path())
-            .expect("Something went wrong readingfrom the contracts directory");
+            .expect("Something went wrong reading from the contracts directory");
 
         yul_files.push(YulFile {
             file_name: path.path().display().to_string(),
             file_contents: contents,
         });
     }
+
+    //Return the yul files
     yul_files
 }

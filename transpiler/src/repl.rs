@@ -5,6 +5,70 @@ use rustyline::Editor;
 use std::fs;
 use std::path::Path;
 
+//The Scribe Read–eval–print loop or repl for short is a Miden shell that allows for quick and easy debugging with Miden assembly!
+//To use the repl, simply type "scribe repl" when in the transpiler crate and the repl will launch.
+//Now that you have the repl launched, there are a bunch of awesome things you can do like execute any Miden instruction, use procedures,
+//undo executed instructions, check the stack at anytime and more! Check out the list of commands that you can use below. After exiting the
+// repl, a history.txt file will be saved
+
+//Miden Instructions
+//  Any Miden instruction included in the Miden Assembly HackMD is valid. (Ex. push.0, drop, dropw, swap, cswap, shr, mem.load.n, ect.)
+//  You can input instructions one by one or multiple instructions in one input.
+//  Ex.
+//  push.1
+//  push.2
+//  push.3
+//  Is the same as
+//  push.1 push.2 push.3
+
+//`stack`
+//  Use the `stack` command to check the state of the stack at anytime. When you start the repl, the stack will be empty.
+//  Try pushing some values and checking the stack!
+//  Ex.
+//  push.1 push.2 push.3
+//  stack
+//  >> 3 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+//`undo`
+//  Use the `undo` command at anytime to revert to the last state of the stack before a command or Miden instruction. You can use `undo`
+//  as many times as you want to restore the state of a stack n instructions ago.
+//  Ex. push.1 push.2 push.3
+//  stack
+//  >> 3 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0
+//  push.4
+//  stack
+//  >> 4 3 2 1 0 0 0 0 0 0 0 0 0 0 0 0
+//  push.5
+//  stack
+//  >> 5 4 3 2 1 0 0 0 0 0 0 0 0 0 0 0
+//  undo
+//  stack
+//  >> 4 3 2 1 0 0 0 0 0 0 0 0 0 0 0 0
+//  undo
+//  stack
+//  >> 3 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+//`program`
+//  Use the `program` command at anytime to see the full Miden assembly that you have input to that point as a Miden program
+//  Ex.
+//  push.1
+//  push.2
+//  push.3
+//  add
+//  add
+//  program
+// >>
+//  begin
+//      push.1
+//      push.2
+//      push.3
+//      add
+//      add
+//  end
+
+//`help`
+// Use the `help` command at any time to see a list of available commands.
+
 pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) {
     let mut program_lines: Vec<String> = Vec::new();
     let mut functions_miden = "".to_string();
