@@ -989,7 +989,7 @@ impl Transpiler {
         self.add_line("if.true");
         self.indent();
 
-        //Assign the transpiler_switch_matched_bool the value of 1 in the in Miden
+        //Assign the transpiler_switch_matched_bool the value of 1 in the transpiler and in the in Miden assembly
         self.transpile_assignment(&ExprAssignment {
             identifiers: vec![transpiler_switch_matched_bool.identifier],
             inferred_types: vec![Some(YulType::U32)],
