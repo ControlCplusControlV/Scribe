@@ -2,6 +2,7 @@ use std::{collections::HashMap, vec};
 
 use crate::types::*;
 
+//Function to
 pub fn infer_types(ast: &Vec<Expr>) -> Vec<Expr> {
     let mut inferrer = TypeInferrer::default();
     inferrer.walk_ast(ast)
@@ -14,6 +15,7 @@ struct TypeInferrer {
     evaluated_types: Vec<Option<YulType>>,
 }
 
+//FIXME: needs comments still
 impl TypeInferrer {
     fn walk_ast(&mut self, ast: &Vec<Expr>) -> Vec<Expr> {
         let mut new_ast = vec![];
