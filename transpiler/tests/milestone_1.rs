@@ -217,7 +217,6 @@ fn u256_match_no_default() {
     );
 }
 
-#[ignore]
 #[test]
 fn u256_match_default_with_match() {
     run_example(
