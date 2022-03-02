@@ -1,4 +1,5 @@
 use colored::*;
+use scribe::type_inference::infer_types;
 use std::path::Path;
 
 use scribe::executor;
@@ -80,18 +81,19 @@ fn main() {
                 pause();
                 //Parse the Yul code into a vec of Scribe expressions (Expr)
                 let inputs = vec![];
-                let parsed = parser::parse_yul_syntax(&yul_code.file_contents);
+                let ast = parser::parse_yul_syntax(&yul_code.file_contents);
+                let ast = infer_types(&ast);
 
                 //Convert the vec of Expr into an abstract syntax tree
                 clear_screen();
                 print_title("Parsed Expressions");
-                println!("{}", expressions_to_tree(&parsed));
+                println!("{}", expressions_to_tree(&ast));
                 println!();
                 pause();
 
                 //Transpile the AST into Miden assembly
                 clear_screen();
-                let miden_code = miden_generator::transpile_program(parsed);
+                let miden_code = miden_generator::transpile_program(ast);
                 print_title("Generated Miden Assembly");
                 println!("{}", miden_code);
                 println!();
@@ -102,8 +104,14 @@ fn main() {
                 print_title("Miden Output");
                 let execution_value = executor::execute(miden_code, inputs).unwrap();
                 let stack = execution_value.last_stack_state();
-                let last_stack_value = stack.first().unwrap();
-                println!("{}", last_stack_value);
+                println!(
+                    "{}",
+                    stack
+                        .iter()
+                        .map(|f| format!("{}", f.to_string()))
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                );
                 pause();
             }
         }
