@@ -336,6 +336,23 @@ fn u256_shr() {
     );
 }
 
+#[test]
+fn mstore_mload() {
+    run_example(
+        "
+            let x:u256 := 700
+            mstore(100,x)
+            mload(100)
+        ",
+        MidenResult::U256(
+            U256::from_dec_str(
+                "700",
+            )
+            .unwrap(),
+        ),
+    );
+}
+
 #[ignore]
 #[test]
 fn u256_sqrt() {
