@@ -353,6 +353,18 @@ fn mstore_mload() {
     );
 }
 
+#[test]
+fn mstore_mload_u32() {
+    run_example(
+        "
+            let x:u32 := 700
+            mstore(100,x)
+            mload(100)
+        ",
+        MidenResult::U32(700),
+    );
+}
+
 #[ignore]
 #[test]
 fn u256_sqrt() {
