@@ -42,7 +42,7 @@ use the much cheaper miden u32 operations. Scribe will default to `u256`.
 | div      |   ✅   |  ❌   | |
 | and      |   ✅   |  ✅   | |
 | or      |   ✅   |  ✅   | |
-| xor      |   ✅   |  ❌   | |
+| xor      |   ✅   |  ✅   | |
 | mstore      |   ✅   |  ✅  | Only supports literals for the memory address |
 | mload      |   ✅   |  ✅  | Only supports literals for the memory address |
 | iszero      |   ✅   |  ✅  | |
