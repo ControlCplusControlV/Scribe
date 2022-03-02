@@ -75,54 +75,45 @@ proc.u256shr_unsafe
 end
 
 proc.u256sub_unsafe
+    movup.15
+    movup.8
+    u32sub.unsafe
+    movup.8
+    add
+    movup.14
+    swap
+    u32sub.unsafe
+    movup.8
+    add
+    movup.13
+    swap
+    u32sub.unsafe
+    movup.8
+    add
+    movup.12
+    swap
+    u32sub.unsafe
+    movup.8
+    add
+    movup.11
+    swap
+    u32sub.unsafe
+    movup.8
+    add
+    movup.10
+    swap
+    u32sub.unsafe
+    movup.8
+    add
+    movup.9
+    swap
+    u32sub.unsafe
+    movup.8
+    add
     movup.8
     swap
-    push.0
-    add
-    u32sub.unsafe
-    movup.9
-    movup.3
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.4
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.5
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.6
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.7
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.8
-    movup.2
-    add
-    u32sub.unsafe
-    movup.9
-    movup.9
-    movup.2
-    add
     u32sub.unsafe
     drop
-    swap
-    movup.2
-    movup.3
-    movup.4
-    movup.5
-    movup.6
-    movup.7
 end
 
 

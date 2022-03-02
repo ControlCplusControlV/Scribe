@@ -52,9 +52,13 @@ fn run_miden_function(
     let execution_value = result.unwrap();
     match expected {
         MidenResult::U256(expected) => {
+            let output_stack = execution_value.last_stack_state().clone();
             let stack_result = miden_to_u256(execution_value);
             println!("Expected: {}", expected);
             println!("Output  : {}", stack_result);
+            println!("E Stack: {}", expected);
+            println!("O Stack  : {:?}", output_stack.map(|x| x.as_int()));
+            println!("E Stack  : {:?}", split_u256_to_u32s(&expected));
             TestResult::from_bool(stack_result == expected)
         }
         MidenResult::U32(expected) => {
@@ -190,7 +194,7 @@ fn quickcheck_subtraction(x: U256, y: U256) -> TestResult {
         return TestResult::discard();
     }
     run_miden_function(
-        "exec.u256subc_unsafe",
+        "exec.u256sub_unsafe",
         vec![x.0, y.0],
         MidenResult::U256(expected),
     )
@@ -201,4 +205,20 @@ fn quickcheck_subtraction(x: U256, y: U256) -> TestResult {
 fn quickcheck_literals(x: U256) -> TestResult {
     let expected = x.0;
     run_miden_function("", vec![x.0], MidenResult::U256(expected))
+}
+
+#[test]
+fn subtraction_with_addition_overflow() {
+    let x = join_u32s_to_u256(vec![0, 0, 0, 0, 0, 4, 0, 1]);
+    let y = join_u32s_to_u256(vec![0, 0, 0, 0, 0, 0, u32::max_value(), 2]);
+    dbg!(x, y);
+    let expected = x - y;
+    dbg!(expected);
+    let test_result = run_miden_function(
+        "exec.u256sub_unsafe",
+        vec![x, y],
+        MidenResult::U256(expected),
+    );
+    dbg!(&test_result);
+    assert!(!test_result.is_failure());
 }

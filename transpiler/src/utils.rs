@@ -51,5 +51,5 @@ pub fn join_u32s_to_u256(x: Vec<u32>) -> U256 {
         })
         .collect::<Vec<_>>();
 
-    U256::from_little_endian(&u256_bytes)
+    U256::from_big_endian(&u256_bytes)
 }
