@@ -17,6 +17,7 @@ struct Transpiler {
     scoped_identifiers: HashMap<String, TypedIdentifier>,
     branches: VecDeque<Branch>,
     accept_overflow: bool,
+    memory_offset: u64,
 }
 
 //A branch is a temporary represnetation of a stack to keep track of where variables are
@@ -815,26 +816,30 @@ impl Transpiler {
                 self.add_unknown(YulType::U256);
                 return;
             }
-            (Some(YulType::U32), "mstore") => {
+            (Some(YulType::U256), "mstore") => {
                 if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                     inferred_type: _,
                     value: address,
                 }))) = op.exprs.first()
                 {
-                    println!("The first arg to mstore is {}", address);
-                    todo!("mstore stuff");
+                    let store_addr:u64 = self.memory_offset + (address.as_u64() * 2);
+                    self.add_line(&format!("popw.mem.{}", store_addr));
+                    self.add_line(&format!("popw.mem.{}", store_addr+1)); // As each 256 bit value takes up 2 words
+                    self._consume_top_stack_values(1);
                 } else {
                     panic!("We don't support mstore from arbitrary expressions yet")
                 }
             }
-            (Some(YulType::U32), "mload") => {
+            (Some(YulType::U256), "mload") => {
                 if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                     inferred_type: _,
                     value: address,
                 }))) = op.exprs.first()
                 {
-                    println!("The first arg to mload is {}", address);
-                    todo!("mload stuff");
+                    let load_addr:u64 = self.memory_offset + (address.as_u64() * 2);
+                    self.add_line(&format!("pushw.mem.{}", load_addr+1)); // As each 256 bit value takes up 2 words
+                    self.add_line(&format!("pushw.mem.{}", load_addr));
+                    self.add_unknown(YulType::U256);
                 } else {
                     panic!("We don't support mstore from arbitrary expressions yet")
                 }
@@ -1105,6 +1110,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         user_functions: HashMap::default(),
         branches: VecDeque::new(),
         accept_overflow: false,
+        memory_offset: 0,
     };
     //optimize the abstract syntax tree
     let ast = optimize_ast(expressions);
