@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use primitive_types::U256;
@@ -94,15 +93,6 @@ impl std::fmt::Debug for Stack {
 //FIXME: Add a note about how the transpiler variables, stack ect do not cross over with miden. They are just to keep track of
 //what the miden stack/memory will look like so we essentially need to states, one for miden and one for the transpiler
 impl Transpiler {
-    fn equate_reference(&mut self, x: TypedIdentifier, y: TypedIdentifier) {
-        panic!("This no longer works, should fix for optimizations");
-        // if x.yul_type != y.yul_type {
-        //     panic!("Should never be assigning a {:?} to a {:?}", x, y);
-        // }
-        // let stack_value = self.stack.0.iter_mut().find(|sv| sv.contains(&y)).unwrap();
-        // stack_value.insert(x);
-    }
-
     //Function to indent the Miden assembly by four spaces.
     //Ex.
     // if.true
@@ -167,23 +157,22 @@ impl Transpiler {
         self.outdent();
     }
 
-    //When the stack size is greater than 16 elements, if the transpiler pushed the value directly on the stack
-    //the 16th element would move to the 17th index, which is out of the stack frame making it inaccessible.
-    //Instead, the transpiler will move the value at the 16th index to the transpiler's virtual memory to keep the stack at 16 elements.
-    //This temporary virtual memory is only used during transpilation to keep track of variables outside of
-    //the stack from and does not affect Miden memory.
-
-    //Function to tell the transpiler to allow the stack size to exceed 16 elements
+    //Generally we keep all stack values accessible (aka, only use the first 16 slots). This will
+    //temporarily disable that protection, for cases where we know we're going to be consuming the
+    //values on top of the stack, before other values need to be accessed
     fn begin_accepting_overflow(&mut self) {
         self.accept_overflow = true;
     }
 
-    //Function to tell the transpiler not to allow the stack size to exceed 16 elements and save values into the transpiler's virtual memory.
+    //Re-enable our overflow protection (saving values that go below the 16 accesible slots, to
+    //memory)
     fn stop_accepting_overflow(&mut self) {
         self.accept_overflow = true;
     }
 
-    //TODO:
+    //Add an unkown value onto our stack, for example if we evaluate `add(1,2)`, we know there's a
+    //new value on the stack but it isn't assigned to a variable yet. This is often followed by a
+    //top_is_var
     fn add_unknown(&mut self, yul_type: YulType) {
         self.stack.0.insert(
             0,
@@ -198,8 +187,56 @@ impl Transpiler {
     // where it is then saved into memory. Under the hood, pop_stack_value_to_memory makes sure that the right value is replaced.
     //See pop_stack_value_to_memory for more details.
     fn update_identifier_in_memory(&mut self, typed_identifier: TypedIdentifier) {
-        self.dup_identifier(typed_identifier);
+        self.move_identifier_to_top(typed_identifier, false);
         self.pop_top_stack_value_to_memory();
+    }
+
+    //Fetches an identifier from either memory or the stack, and moves it to the top. Will dup from
+    //the stack if dup is true, otherwise will move up
+    fn move_identifier_to_top(&mut self, typed_identifier: TypedIdentifier, dup: bool) {
+        let mut offset = 0;
+        let mut index = 0;
+        self.prepare_for_stack_values(&typed_identifier.yul_type);
+        let stack_value = self
+            .stack
+            .0
+            .iter()
+            .find(|sv| {
+                if sv.typed_identifier.as_ref() == Some(&typed_identifier) {
+                    return true;
+                }
+                offset += sv.yul_type.miden_stack_width();
+                index += 1;
+                return false;
+            })
+            .cloned();
+        match stack_value {
+            Some(stack_value) => {
+                self.add_comment(&format!(
+                    "pushing {} to the top",
+                    typed_identifier.identifier
+                ));
+                self.indent();
+                if dup {
+                    self.stack
+                        .0
+                        .insert(0, StackValue::from(&typed_identifier.clone()));
+                    self.dup_from_offset(offset, stack_value.yul_type);
+                } else {
+                    let sv = self.stack.0.remove(index);
+                    self.stack
+                        .0
+                        .insert(0, StackValue::from(&typed_identifier.clone()));
+                    self.dup_from_offset(offset, stack_value.yul_type);
+                }
+                self.outdent()
+            }
+
+            //If it cant find the identifier in the stack it will load it from memory
+            None => {
+                self.load_identifier_from_memory(typed_identifier);
+            }
+        }
     }
 
     //Function to load a variable's value from memory and push it to the top of the stack
@@ -215,15 +252,12 @@ impl Transpiler {
     }
 
     //Push a value from memory to the top of the stack.
-    //If the element is a u32, it takes up one 32bit element of one memory address. Since each memory address has four 32bit elements,
-    //dup and dropw are used to remove padding from the stack.
-    //When the element is a u256, it takes up two addresses completely, and the two address can simply be pushed onto the stack, taking up eight elements.
+    //If the element is a u32, it takes up one 32bit element of one memory address. When the
+    //element is a u256, it takes up two addresses completely.
     fn push_from_memory_to_top_of_stack(&mut self, address: u32, yul_type: &YulType) {
         match yul_type {
             YulType::U32 => {
-                self.add_line(&format!("pushw.mem.{}", address));
-                self.add_line("dup");
-                self.add_line("dropw");
+                self.add_line(&format!("push.mem.{}", address));
             }
             YulType::U256 => {
                 self.add_line(&format!("pushw.mem.{}", address + 1));
@@ -243,41 +277,9 @@ impl Transpiler {
     //FIXME: Still needs comments
 
     //not pushing but duping to the top, offset is just where the value starts
-    //and depending on the type it has to dup 8 elements
+    //and depending on the type it may have to dup 8 elements
     fn dup_identifier(&mut self, typed_identifier: TypedIdentifier) {
-        let mut offset = 0;
-        self.prepare_for_stack_values(&typed_identifier.yul_type);
-        let stack_value = self
-            .stack
-            .0
-            .iter()
-            .find(|sv| {
-                if sv.typed_identifier.as_ref() == Some(&typed_identifier) {
-                    return true;
-                }
-                offset += sv.yul_type.miden_stack_width();
-                return false;
-            })
-            .cloned();
-        match stack_value {
-            Some(stack_value) => {
-                self.stack
-                    .0
-                    .insert(0, StackValue::from(&typed_identifier.clone()));
-                self.add_comment(&format!(
-                    "pushing {} to the top",
-                    typed_identifier.identifier
-                ));
-                self.indent();
-                self.dup_from_offset(offset, stack_value.yul_type);
-                self.outdent()
-            }
-
-            //If it cant find the identifier in the stack it will load it from memory
-            None => {
-                self.load_identifier_from_memory(typed_identifier);
-            }
-        }
+        self.move_identifier_to_top(typed_identifier, true);
     }
 
     //TODO: explain the function and then explain what an offset is
@@ -308,7 +310,7 @@ impl Transpiler {
         };
     }
 
-    //Function to push a u32 value on the stack
+    //Function to push a u32 value on both the miden stack and our stack
     fn push(&mut self, value: U256) {
         self.prepare_for_stack_values(&YulType::U32);
         self.stack.0.insert(
@@ -323,13 +325,15 @@ impl Transpiler {
         self.newline();
     }
 
-    //Function to check the stack size and determine whether or not the push will put values on the stack or into memory
-    //See comments on accept_overflow for more details on when the transpiler uses memory vs the stack
+    //Function to check the stack size and determine whether or not the push will overflow into
+    //inaccesible stack slots (17+). If it would push values past the 16th slot, those values are
+    //saved into memory. See comments on accept_overflow for more details on when the
+    //transpiler uses memory vs the stack
     fn prepare_for_stack_values(&mut self, yul_type: &YulType) {
         if self.accept_overflow {
             return;
         }
-        while self.get_size_of_stack() + yul_type.miden_stack_width() > 16 {
+        while self.get_size_of_stack() + yul_type.miden_stack_width() > 15 {
             self.add_comment(&format!(
                 "stack would be too large after {}, popping to memory",
                 yul_type,
@@ -391,9 +395,9 @@ impl Transpiler {
     }
 
     //Function to remove the top stack value from the stack and save it into memory.
-    //If the variable is already stored in memory, the transpiler will update the value. Else, the transpiler will get the next available
-    // memory address. In the case of a u32, padw is used to push four 0s and one is dropped to pop the top word into memory.
-    //If the value is a u256, mem.pop.address and mem.pop.address+1 can be used to pop two words into into memory
+    //If the variable is already stored in memory, the transpiler will update the value. Else, the
+    //transpiler will get the next available memory address. If the value is a u256,
+    //mem.pop.address and mem.pop.address+1 can be used to pop two words into memory
     fn pop_top_stack_value_to_memory(&mut self) -> u32 {
         let stack_value = self.stack.0.first().unwrap().clone();
 
@@ -424,9 +428,7 @@ impl Transpiler {
         self.stack.0.remove(0);
         match stack_value.yul_type {
             YulType::U32 => {
-                self.add_line("padw");
-                self.add_line("drop");
-                self.add_line(&format!("popw.mem.{}", address));
+                self.add_line(&format!("pop.mem.{}", address));
             }
             YulType::U256 => {
                 self.add_line(&format!("popw.mem.{}", address));
@@ -437,12 +439,7 @@ impl Transpiler {
         address
     }
 
-    //Function to get the next available memory address
-    fn get_next_open_memory_address(&mut self) {
-        self.next_open_memory_address;
-    }
-
-    //Return the size of the stack.
+    //Return the size of the stack, accounting for u256 values taking up 8 values.
     fn get_size_of_stack(&self) -> u32 {
         self.stack
             .0
@@ -466,29 +463,11 @@ impl Transpiler {
         self.newline();
     }
 
-    //Consume n stack values from the top of the stack
+    //Consume n stack values from the top of our stack. This doesn't affect miden's stack.
     fn _consume_top_stack_values(&mut self, n: u32) {
         for _ in 0..n {
             self.stack.0.remove(0);
         }
-    }
-
-    //Duplicate the top stack value. If the YulType is u32, the first 32bit element is simply dupped.
-    //If the Yultype is u256, dupw.1 is called twice.
-    fn dup_top_stack_value(&mut self) {
-        self.add_comment(&format!("duping top stack value"));
-        let stack_value = self.stack.0.get(0).unwrap().clone();
-        match stack_value.yul_type {
-            YulType::U32 => {
-                self.add_line("dup");
-            }
-            YulType::U256 => {
-                self.add_line("dupw.1");
-                self.add_line("dupw.1");
-            }
-        }
-        self.stack.0.insert(0, stack_value.clone());
-        self.newline();
     }
 
     //Drop the top value from the stack. Similar to other functions, if the YulType is u32, drop is called.
@@ -557,7 +536,7 @@ impl Transpiler {
 
     //Modifies the stack to include values from developer written functions in Yul
     //For example, if someone were to write a function called return_two_numbers() that returns two values,
-    // when that function is called, we have to modify our stack by pushing those two numbers to the top of the stack.
+    //when that function is called, we have to modify our stack by pushing those two numbers to the top of the stack.
     fn add_function_stack(&mut self, function_stack: &Stack) {
         let mut new_stack = Stack::default();
         new_stack.0.append(&mut self.stack.0.clone());
@@ -578,18 +557,13 @@ impl Transpiler {
     //Ex. let x := 1000 or let x:u256 := 1000
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         assert_eq!(op.typed_identifiers.len(), 1);
-        // let address = self.next_open_memory_address;
         for typed_identifier in &op.typed_identifiers {
             self.scoped_identifiers.insert(
                 typed_identifier.identifier.clone(),
                 typed_identifier.clone(),
             );
         }
-        // self.next_open_memory_address += 1;
-        // TODO: multiple declarations not working
         assert_eq!(op.typed_identifiers.len(), 1);
-        // TODO: should use memory probably
-        // self.variables.insert(op.identifier.clone(), address);
         self.add_comment(&format!(
             "Assigning to {}",
             op.typed_identifiers.first().unwrap().identifier
@@ -715,14 +689,9 @@ impl Transpiler {
             transpiler_switch_matched_bool.clone(),
         );
 
-        // //Push the switch matched variable to the transpiler stack
-        // self.stack.0.push(StackValue {
-        //     typed_identifier: Some(transpiler_switch_matched_bool.clone()),
-        //     yul_type: YulType::U32,
-        // });
-
         //Push 0 on the Miden stack. This is the equivalent of pushing the switch_matched variable
         self.add_comment("keeping track of whether we've hit any cases");
+        self.prepare_for_stack_values(&YulType::U32);
         self.add_line("push.0");
 
         //push an unknown on transpiler stack
@@ -887,7 +856,7 @@ impl Transpiler {
                 return;
             }
 
-            //other operations
+            // binary u32 math and boolean ops
             (
                 Some(YulType::U32) | None,
                 "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
@@ -898,7 +867,6 @@ impl Transpiler {
                 return;
             }
 
-            //iszero
             (Some(YulType::U32) | None, "iszero") => {
                 self.add_line("push.0");
                 self.add_line("eq");
@@ -955,7 +923,6 @@ impl Transpiler {
         self.dup_identifier(typed_identifier.clone());
     }
 
-    //TODO: stack management not quite working
     //Transpiles a function declaration
     //First, the transpiler gets the stack values that the function will push onto the Miden stack and the function parameters
     //are added to the transpiler's scoped_identifiers. The function is compiled into a procedure and the block is transpiled.
@@ -972,11 +939,9 @@ impl Transpiler {
             self.scoped_identifiers
                 .insert(param.identifier.clone(), param.clone());
         }
-        // let stack_target = self.stack.clone();
         self.add_line(&format!("proc.{}", op.function_name));
         self.indent();
         self.transpile_block(&op.block);
-        // self.target_stack(stack_target);
         for return_ident in &op.returns {
             self.dup_identifier(return_ident.clone());
         }
@@ -1000,9 +965,6 @@ impl Transpiler {
 
     //TODO: update placeholder
     fn transpile_continue(&mut self) {}
-
-    //TODO: update placeholder
-    fn transpile_default(&mut self, op: &ExprDefault) {}
 
     //Transpile a case expression
     // Note that ExprCase has two parameters
@@ -1066,6 +1028,7 @@ impl Transpiler {
         self.add_line("end");
     }
 
+    // Adds a line to the miden program output, properly indented
     fn add_line(&mut self, line: &str) {
         self.program = format!(
             "{}\n{}{}",
@@ -1091,7 +1054,6 @@ impl Transpiler {
         )
     }
 
-    // TODO: re-order AST to have all functions first
     //Function to transpile expressions into Miden instructions
     //See the transpilation function for each expression for more detail on each case
     fn transpile_op(&mut self, expr: &Expr) {
@@ -1145,7 +1107,8 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     transpiler.add_utility_functions();
     transpiler.add_line("# end std lib #");
 
-    //transpile function declarations first so that they can be called in the Miden program
+    //transpile function declarations first so that the procs are generated before we begin
+    //transpiling the body of the miden program
     for expr in &ast {
         match expr {
             Expr::FunctionDefinition(op) => transpiler.transpile_function_declaration(&op),

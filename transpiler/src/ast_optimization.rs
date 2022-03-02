@@ -266,11 +266,6 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
             Expr::Continue => todo!(),
             Expr::Leave => todo!(),
 
-            //TODO: Expr is default
-            Expr::Default(ExprDefault { block }) => Expr::Default(ExprDefault {
-                block: ExprBlock { exprs: vec![] },
-            }),
-
             //Expr is repeat
             Expr::Repeat(ExprRepeat {
                 interior_block,
