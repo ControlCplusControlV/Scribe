@@ -15,7 +15,6 @@ pub enum Expr {
     Block(ExprBlock),
     Switch(ExprSwitch),
     Case(ExprCase),
-    Default(ExprDefault),
     Variable(ExprVariableReference),
     Repeat(ExprRepeat),
     Break,
@@ -122,16 +121,6 @@ pub struct ExprSwitch {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ExprCase {
     pub literal: ExprLiteral,
-    pub block: ExprBlock,
-}
-
-//Struct to represent a default block during a switch statement
-//Ex.
-// default {
-//     result := add(1,2)
-// }
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct ExprDefault {
     pub block: ExprBlock,
 }
 
@@ -452,11 +441,6 @@ impl Expr {
             //--------------------------------------------------------
             //is leave
             Expr::Leave => tree.add_leaf("leave"),
-
-            //--------------------------------------------------------
-            //is default
-            //TODO: add body
-            Expr::Default(ExprDefault { block }) => {}
         }
     }
 }

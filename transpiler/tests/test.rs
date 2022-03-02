@@ -126,6 +126,34 @@ fn integration_case() {
 }
 
 #[test]
+fn integration_lots_of_vars_u32() {
+    run_example(
+        "
+        let x1:u32 := 1
+        let x2:u32 := 2
+        let x3:u32 := 3
+        let x4:u32 := 4
+        let x5:u32 := 5
+        let x6:u32 := 6
+        let x7:u32 := 7
+        let x8:u32 := 8
+        let x9:u32 := 9
+        let x10:u32 := 10
+        let x11:u32 := 11
+        let x12:u32 := 12
+        let x13:u32 := 13
+        let x14:u32 := 14
+        let x15:u32 := 15
+        let x16:u32 := 16
+        let x17:u32 := 17
+        let x18:u32 := 18
+        x1
+            ",
+        MidenResult::U32(1),
+    );
+}
+
+#[test]
 fn integration_lots_of_vars() {
     run_example(
         "
