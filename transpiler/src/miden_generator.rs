@@ -845,6 +845,33 @@ impl Transpiler {
                 }
             }
 
+            (Some(YulType::U32), "mstore") => {
+                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                    inferred_type: _,
+                    value: address,
+                }))) = op.exprs.first()
+                {
+                    let store_addr:u64 = self.memory_offset + (address.as_u64() * 2);
+                    self.add_line(&format!("pop.mem.{}", store_addr));
+                    self._consume_top_stack_values(1);
+                } else {
+                    panic!("We don't support mstore from arbitrary expressions yet")
+                }
+            }
+            (Some(YulType::U32), "mload") => {
+                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
+                    inferred_type: _,
+                    value: address,
+                }))) = op.exprs.first()
+                {
+                    let load_addr:u64 = self.memory_offset + (address.as_u64() * 2);
+                    self.add_line(&format!("push.mem.{}", load_addr)); // As each 256 bit value takes up 2 words
+                    self.add_unknown(YulType::U32);
+                } else {
+                    panic!("We don't support mstore from arbitrary expressions yet")
+                }
+            }
+
             (Some(YulType::U256), "iszero" | "eq" | "lt") => {
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
