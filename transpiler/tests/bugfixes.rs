@@ -1,4 +1,3 @@
-
 use scribe::test_utilities::{run_example, MidenResult};
 #[test]
 fn test_is_zero() {
@@ -12,7 +11,6 @@ fn test_is_zero() {
     );
 }
 
-#[ignore]
 #[test]
 fn test_is_zero_u256() {
     run_example(
