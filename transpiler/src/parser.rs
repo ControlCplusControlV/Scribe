@@ -148,15 +148,6 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             })
         }
 
-        //Rule is default
-        Rule::default => {
-            let mut parts = inner.into_inner();
-            let block = parts.next().unwrap();
-            Expr::Default(ExprDefault {
-                block: parse_block(block),
-            })
-        }
-
         //Rule is for loop
         Rule::for_loop => {
             let mut parts = inner.into_inner();

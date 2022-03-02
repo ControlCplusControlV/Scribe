@@ -144,10 +144,6 @@ impl TypeInferrer {
             Expr::Continue => todo!(),
             Expr::Leave => todo!(),
 
-            Expr::Default(ExprDefault { block }) => Expr::Default(ExprDefault {
-                block: ExprBlock { exprs: vec![] },
-            }),
-
             //Expr is repeat
             Expr::Repeat(ExprRepeat {
                 interior_block,
