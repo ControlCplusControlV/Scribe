@@ -166,7 +166,7 @@ impl Transpiler {
     //Re-enable our overflow protection (saving values that go below the 16 accesible slots, to
     //memory)
     fn stop_accepting_overflow(&mut self) {
-        self.accept_overflow = true;
+        self.accept_overflow = false;
     }
 
     //Add an unkown value onto our stack, for example if we evaluate `add(1,2)`, we know there's a
