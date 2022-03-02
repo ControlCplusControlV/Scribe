@@ -1,0 +1,5 @@
+#V2
+ push.10\n    push.20\n    push.30\n    push.40\n    push.50\n    push.60\n    push.70\n    push.80\n    push.1\n    push.2\n    push.3\n    push.4\n    push.5\n    push.6\n    push.7\n    push.8
+u256add_unsafe
+exec.u256add_unsafe
+ movup.8\n    swap\n    push.0\n    add\n    u32sub.unsafe\n    movup.9\n    movup.3\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.4\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.5\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.6\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.7\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.8\n    movup.2\n    add\n    u32sub.unsafe\n    movup.9\n    movup.9\n    movup.2\n    add\n    u32sub.unsafe\n    drop\n    swap\n    movup.2\n    movup.3\n    movup.4\n    movup.5\n    movup.6\n    movup.7
