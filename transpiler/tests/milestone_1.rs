@@ -407,10 +407,10 @@ fn sum_memory_u256() {
             mstore(104,x)
             mstore(105,x)
             let offset:u32 := 100
-            let size:u32 := 5
+            let size:u32 := 6
             sum_from_memory(offset, size)
         ",
-        MidenResult::U256(U256::from(5)),
+        MidenResult::U256(U256::from(6)),
     );
 }
 
