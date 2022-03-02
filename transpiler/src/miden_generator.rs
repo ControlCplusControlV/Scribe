@@ -332,7 +332,7 @@ impl Transpiler {
         if self.accept_overflow {
             return;
         }
-        while self.get_size_of_stack() + yul_type.miden_stack_width() > 15 {
+        while self.get_size_of_stack() + yul_type.miden_stack_width() > 16 {
             self.add_comment(&format!(
                 "stack would be too large after {}, popping to memory",
                 yul_type,

@@ -102,6 +102,7 @@ fn integration_fib() {
     );
 }
 
+#[ignore]
 #[test]
 fn integration_case() {
     run_example(
@@ -181,6 +182,7 @@ fn integration_lots_of_vars() {
     );
 }
 
+#[ignore]
 #[test]
 fn integration_mstore() {
     run_example(

@@ -10,10 +10,96 @@
 # 📜 Scribe 📜
 ![Testing](https://github.com/ControlCplusControlV/Scribe/actions/workflows/rust.yml/badge.svg)
 
-Scribe is a compact Yul transpiler written in Rust that targets the Polygon Miden VM. Scribe works by compiling Yul down to Miden opcodes, allowing developers to write smart contracts in Yul and run them on Polygon Miden. Since Yul is the intermediate language for Solidity, Vyper and Yul+ Scribe is a great foundation for various smart contract languages to compile code to run on Polygon Miden.
+Scribe is a compact Yul transpiler written in Rust that targets the Polygon
+Miden VM. Scribe works by compiling Yul down to Miden opcodes, allowing
+developers to write smart contracts in Yul and run them on Polygon Miden. Since
+Yul is the intermediate language for Solidity, Vyper and Yul+ Scribe is a great
+foundation for various smart contract languages to compile code to run on
+Polygon Miden.
 
-Currently, Scribe is able to transpile Yul syntax including blocks, for loops, if statements,  number literals, variable declarations, assignments, and function calls. We are still in the process of adding recognition for function definitions, break/continue, true literals, false literals, switch/case statements, leave statements, string literals and hex numbers.
+## Status
 
+### Parsing
+
+All yul syntax is parsed, including the new typed identifier list syntax.
+
+Data blocks are not transpiled. Objects are naively transpiled as a series of statements.
+
+### Types
+
+Because u256 operations are so expensive in miden, scribe will check whether
+variables and parameters are typed, and if they're `u32` values, then we can
+use the much cheaper miden u32 operations. Scribe will default to `u256`.
+
+
+### Supported yul functions
+
+| Function | u32 | u256 | notes |
+|----------|------|-----| ---- | 
+| add      | ✅    | ✅ | |
+| mul      |  ✅    |  ✅  | |
+| sub      |   ✅   |  ✅   | |
+| div      |   ✅   |  ❌   | |
+| and      |   ✅   |  ✅   | |
+| or      |   ✅   |  ✅   | |
+| xor      |   ✅   |  ❌   | |
+| mstore      |   ✅   |  ✅  | Only supports literals for the memory address |
+| mload      |   ✅   |  ✅  | Only supports literals for the memory address |
+| iszero      |   ✅   |  ✅  | |
+| eq      |   ✅   |  ✅  | |
+| lt      |   ✅   |  ✅  | |
+| gt      |   ✅   |  ✅  | |
+| gte      |   ✅   |  ✅  | |
+| lte      |   ✅   |  ✅  | |
+| shl      |   ✅   |  ✅  | |
+| shr      |   ✅   |  ✅  | |
+
+
+## Miden Repl
+
+Scribe features a REPL to write miden assembly. You can start the repl with:
+
+```
+cargo run -- repl
+```
+
+From within the repl, you can write any valid miden assembly, then check the
+stack with `stack`, or check your whole program with `program`. Anything that
+errors out will not be added to the program. You can undo the last command with `undo`.
+
+```
+$ cargo run -- repl
+
+>> push.4
+
+>> push.5 push.7 mul
+
+>> stack
+
+  35 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+>> program
+
+  begin
+      push.4
+      push.5 push.7 mul
+  end
+
+>> undo
+  Undoing push.5 push.7 mul
+
+>> stack
+
+  4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+>> help
+
+  Available commands:
+
+  stack: display the stack
+  undo: remove the last instruction
+  program: display the program
+```
 
 ## How Does it Work?
 
