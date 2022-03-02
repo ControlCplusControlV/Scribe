@@ -351,7 +351,6 @@ impl Transpiler {
     //See pop_top_stack_value_to_memory for more details.
     fn pop_bottom_var_to_memory(&mut self) {
         let stack_value = self.stack.0.last().cloned().unwrap();
-        dbg!(&self.stack);
 
         let stack_above: Vec<StackValue> = self
             .stack
@@ -756,18 +755,21 @@ impl Transpiler {
         self.add_line("");
     }
 
+    fn transpile_function_args(&mut self, op: &ExprFunctionCall) {
+        for expr in op.exprs.clone().into_iter() {
+            self.transpile_op(&expr);
+        }
+    }
+
     //Transpiles a procedure in miden.
     //For example, if a function call is passed in as an expression, the first parameter type is u256 and the function name is "add"
     //a call to the procedure exec.u256add_unsafe will be added into the program.
     //If the first parameter is u256, the transpiler will use u256 operations
     fn transpile_miden_function(&mut self, op: &ExprFunctionCall) {
-        for expr in op.exprs.clone().into_iter() {
-            self.transpile_op(&expr);
-        }
-
         self.add_comment(&format!("{}()", op.function_name));
 
         if let Some(function_stack) = self.user_functions.clone().get(&op.function_name) {
+            self.transpile_function_args(&op);
             self.add_line(&format!("exec.{}", op.function_name));
             self.add_function_stack(function_stack);
             return;
@@ -779,69 +781,57 @@ impl Transpiler {
         ) {
             //u256 operations
             (Some(YulType::U256), "add" | "mul" | "sub" | "and" | "or" | "xor") => {
+                self.transpile_function_args(&op);
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
                 self.add_unknown(YulType::U256);
                 return;
             }
-            (Some(YulType::U256), "mstore") => {
-                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                    inferred_type: _,
-                    value: address,
-                }))) = op.exprs.first()
-                {
-                    let store_addr: u64 = self.memory_offset + (address.as_u64() * 2);
-                    self.add_line(&format!("popw.mem.{}", store_addr));
-                    self.add_line(&format!("popw.mem.{}", store_addr + 1)); // As each 256 bit value takes up 2 words
-                    self._consume_top_stack_values(1);
-                } else {
-                    panic!("We don't support mstore from arbitrary expressions yet")
-                }
-            }
-            (Some(YulType::U256), "mload") => {
-                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                    inferred_type: _,
-                    value: address,
-                }))) = op.exprs.first()
-                {
-                    let load_addr: u64 = self.memory_offset + (address.as_u64() * 2);
-                    self.add_line(&format!("pushw.mem.{}", load_addr + 1)); // As each 256 bit value takes up 2 words
-                    self.add_line(&format!("pushw.mem.{}", load_addr));
-                    self.add_unknown(YulType::U256);
-                } else {
-                    panic!("We don't support mstore from arbitrary expressions yet")
-                }
-            }
-
             (Some(YulType::U32), "mstore") => {
-                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                    inferred_type: _,
-                    value: address,
-                }))) = op.exprs.first()
-                {
-                    let store_addr:u64 = self.memory_offset + (address.as_u64() * 2);
-                    self.add_line(&format!("pop.mem.{}", store_addr));
-                    self._consume_top_stack_values(1);
-                } else {
-                    panic!("We don't support mstore from arbitrary expressions yet")
-                }
+                let value_expr = op.exprs.get(1).unwrap();
+                self.transpile_op(value_expr);
+                let address_expr = op.exprs.first().unwrap();
+                self.transpile_op(address_expr);
+                match value_expr.get_inferred_type().unwrap() {
+                    YulType::U32 => {
+                        self.add_line(&format!("mul.2 push.{} add", self.memory_offset));
+                        self.add_line(&format!("pop.mem"));
+                        self._consume_top_stack_values(2);
+                    }
+                    YulType::U256 => {
+                        self.add_line(&format!(
+                            "mul.2 push.{} add dup movdn.5",
+                            self.memory_offset
+                        ));
+                        self.add_line(&format!("popw.mem"));
+                        self.add_line("add.1 popw.mem");
+                        self._consume_top_stack_values(2);
+                    }
+                };
             }
             (Some(YulType::U32), "mload") => {
-                if let Some(Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
-                    inferred_type: _,
-                    value: address,
-                }))) = op.exprs.first()
-                {
-                    let load_addr:u64 = self.memory_offset + (address.as_u64() * 2);
-                    self.add_line(&format!("push.mem.{}", load_addr)); // As each 256 bit value takes up 2 words
-                    self.add_unknown(YulType::U32);
-                } else {
-                    panic!("We don't support mstore from arbitrary expressions yet")
-                }
+                let address_expr = op.exprs.first().unwrap();
+                self.transpile_op(address_expr);
+                match op.inferred_return_types.first().unwrap().unwrap().clone() {
+                    YulType::U32 => {
+                        self.add_line(&format!("mul.2 push.{} add", self.memory_offset));
+                        self.add_line(&format!("push.mem"));
+                        self._consume_top_stack_values(1);
+                        self.add_unknown(YulType::U32);
+                    }
+                    YulType::U256 => {
+                        self.add_line(&format!("mul.2 push.{} add dup", self.memory_offset));
+                        self.add_line(&format!("add.1 pushw.mem"));
+                        self.add_line(&format!("movup.4 pushw.mem"));
+                        self._consume_top_stack_values(1);
+                        self.add_unknown(YulType::U256);
+                    }
+                };
             }
 
             (Some(YulType::U256), "iszero" | "eq" | "lt") => {
+                self.transpile_function_args(&op);
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(2);
@@ -849,6 +839,7 @@ impl Transpiler {
                 return;
             }
             (Some(YulType::U256), "shl" | "shr") => {
+                self.transpile_function_args(&op);
                 let u256_operation = format!("exec.u256{}_unsafe", op.function_name.as_str());
                 self.add_line(&u256_operation);
                 self._consume_top_stack_values(1);
@@ -861,6 +852,7 @@ impl Transpiler {
                 Some(YulType::U32) | None,
                 "add" | "sub" | "mul" | "div" | "gt" | "lt" | "eq" | "and" | "or",
             ) => {
+                self.transpile_function_args(&op);
                 self._consume_top_stack_values(2);
                 self.add_unknown(YulType::U32);
                 self.add_line(op.function_name.as_ref());
@@ -868,6 +860,7 @@ impl Transpiler {
             }
 
             (Some(YulType::U32) | None, "iszero") => {
+                self.transpile_function_args(&op);
                 self.add_line("push.0");
                 self.add_line("eq");
                 self._consume_top_stack_values(1);
@@ -1099,7 +1092,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
         user_functions: HashMap::default(),
         branches: VecDeque::new(),
         accept_overflow: false,
-        memory_offset: 0,
+        memory_offset: 1024,
     };
     //optimize the abstract syntax tree
     let ast = optimize_ast(expressions);

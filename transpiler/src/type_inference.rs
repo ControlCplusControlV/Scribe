@@ -40,13 +40,19 @@ impl TypeInferrer {
                 // TODO: this is dumb, but inferring that the params to the function should be the
                 // same type as the first return value. Will work for now, for our math and boolean
                 // ops
+                let expected_types = self.expected_types.clone();
                 let mut param_types = Vec::new();
                 let expressions = exprs
                     .iter()
-                    .map(|expr| {
+                    .enumerate()
+                    .map(|(i, expr)| {
+                        if (i == 0 && function_name == "mstore" || function_name == "mload") {
+                            self.expected_types = vec![Some(YulType::U32)];
+                        }
                         // self.expected_types = vec![expected_param_type.clone()];
                         let new_expr = self.walk_expr(expr.clone());
                         param_types.append(&mut self.evaluated_types.clone());
+                        self.expected_types = expected_types.clone();
                         new_expr
                     })
                     .collect();
