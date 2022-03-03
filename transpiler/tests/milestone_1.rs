@@ -366,7 +366,7 @@ fn mstore_mload_u32() {
 }
 
 #[test]
-fn sum_memory() {
+fn sum_memory_u32() {
     run_example(
         "
             function sum_from_memory(offset:u32,size:u32) -> b:u32 {

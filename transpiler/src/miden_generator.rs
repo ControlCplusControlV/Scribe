@@ -114,10 +114,11 @@ impl Transpiler {
     fn target_stack(&mut self, target_stack: Stack) {
         for v in target_stack.0.iter().rev() {
             // TODO: can do a no-op or padding op if no identifiers
-            self.dup_identifier(
+            self.move_identifier_to_top(
                 v.typed_identifier
                     .clone()
                     .expect("Need to deal w/ this case"),
+                false,
             );
         }
         self.stack.0 = self
@@ -188,7 +189,7 @@ impl Transpiler {
     //See pop_stack_value_to_memory for more details.
     fn update_identifier_in_memory(&mut self, typed_identifier: TypedIdentifier) {
         self.move_identifier_to_top(typed_identifier, false);
-        self.pop_top_stack_value_to_memory();
+        self.pop_top_stack_value_to_memory(None);
     }
 
     //Fetches an identifier from either memory or the stack, and moves it to the top. Will dup from
@@ -218,16 +219,20 @@ impl Transpiler {
                 ));
                 self.indent();
                 if dup {
-                    self.stack
-                        .0
-                        .insert(0, StackValue::from(&typed_identifier.clone()));
+                    self.stack.0.insert(
+                        0,
+                        StackValue {
+                            typed_identifier: None,
+                            yul_type: typed_identifier.yul_type,
+                        },
+                    );
                     self.dup_from_offset(offset, stack_value.yul_type);
                 } else {
                     let sv = self.stack.0.remove(index);
                     self.stack
                         .0
                         .insert(0, StackValue::from(&typed_identifier.clone()));
-                    self.dup_from_offset(offset, stack_value.yul_type);
+                    self.move_from_offset(offset, stack_value.yul_type);
                 }
                 self.outdent()
             }
@@ -342,11 +347,9 @@ impl Transpiler {
             if bottom_stack_value.typed_identifier.is_none() {
                 break;
             }
-            // dbg!(&self.stack);
             self.indent();
             self.pop_bottom_var_to_memory();
             self.outdent();
-            // dbg!(&self.stack);
         }
     }
 
@@ -368,15 +371,29 @@ impl Transpiler {
             .map(|sv| sv.yul_type.miden_stack_width())
             .sum();
         self.add_comment(&format!(
-            "Moving {} to top of stack",
-            stack_value.typed_identifier.as_ref().unwrap().identifier
+            "Moving {} to top of stack, {} values above",
+            stack_value.typed_identifier.as_ref().unwrap().identifier,
+            num_stack_values_above
         ));
-        match stack_value.yul_type {
-            YulType::U32 => {
-                self.add_line(&format!("movup.{}", num_stack_values_above));
-            }
+        self.move_from_offset(num_stack_values_above, stack_value.yul_type);
+        self.stack.0.pop();
+        self.stack.0.insert(0, stack_value.clone());
+        self.pop_top_stack_value_to_memory(None);
+    }
+
+    fn move_from_offset(&mut self, offset: u32, yul_type: YulType) {
+        match yul_type {
+            YulType::U32 => match offset {
+                0 => {}
+                1 => {
+                    self.add_line(&format!("swap"));
+                }
+                n => {
+                    self.add_line(&format!("movup.{}", n));
+                }
+            },
             YulType::U256 => {
-                match num_stack_values_above {
+                match offset {
                     1 => {
                         self.add_line(&format!("movdn.8"));
                     }
@@ -392,34 +409,33 @@ impl Transpiler {
                 };
             }
         }
-        self.stack.0.pop();
-        self.stack.0.insert(0, stack_value.clone());
-        self.pop_top_stack_value_to_memory();
     }
 
     //Function to remove the top stack value from the stack and save it into memory.
     //If the variable is already stored in memory, the transpiler will update the value. Else, the
     //transpiler will get the next available memory address. If the value is a u256,
     //mem.pop.address and mem.pop.address+1 can be used to pop two words into memory
-    fn pop_top_stack_value_to_memory(&mut self) -> u32 {
+    fn pop_top_stack_value_to_memory(&mut self, address: Option<u32>) -> u32 {
         let stack_value = self.stack.0.first().unwrap().clone();
 
-        let address = match stack_value
-            .typed_identifier
-            .clone()
-            .map(|typed_identifier| self.variables.get(&typed_identifier.clone()))
-            .flatten()
-        {
-            Some(address) => *address,
-            None => {
-                let address = self.next_open_memory_address;
-                if let Some(ref typed_identifier) = stack_value.typed_identifier {
-                    self.variables.insert(typed_identifier.clone(), address);
+        let address = address.unwrap_or(
+            match stack_value
+                .typed_identifier
+                .clone()
+                .map(|typed_identifier| self.variables.get(&typed_identifier.clone()))
+                .flatten()
+            {
+                Some(address) => *address,
+                None => {
+                    let address = self.next_open_memory_address;
+                    if let Some(ref typed_identifier) = stack_value.typed_identifier {
+                        self.variables.insert(typed_identifier.clone(), address);
+                    }
+                    self.next_open_memory_address += stack_value.yul_type.miden_memory_addresses();
+                    address
                 }
-                self.next_open_memory_address += stack_value.yul_type.miden_memory_addresses();
-                address
-            }
-        };
+            },
+        );
         self.add_comment(&format!(
             "popping {} from top of stack to memory",
             stack_value
@@ -494,38 +510,27 @@ impl Transpiler {
     //Drops the stack after the nth element.
     //For example if the stack is [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     // drop_after(10) will result [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0]
-    fn drop_after(&mut self, n: usize) {
-        let size_to_keep: u32 = self
-            .stack
-            .0
-            .iter()
-            .take(n)
-            .map(|sv| sv.yul_type.miden_stack_width())
-            .sum();
-        let total_size: u32 = self
-            .stack
-            .0
-            .iter()
-            .map(|sv| sv.yul_type.miden_stack_width())
-            .sum();
-
-        for n in 0..n {
-            let stack_length = self.stack.0.len();
-            self.stack.0.swap(n, stack_length - 1);
+    fn drop_after_returns(&mut self, returns: Vec<TypedIdentifier>) {
+        let mut address = 0;
+        for _ in &returns {
+            self.pop_top_stack_value_to_memory(Some(address));
+            address += 2;
         }
-        self.add_comment(&format!("dropping after {} ", n));
-        for n in 0..size_to_keep {
-            let shift = total_size - 1;
-            if shift == 1 {
-                self.add_line(&format!("swap"));
+        let mut miden_size = self.get_size_of_stack();
+        while miden_size > 0 {
+            if miden_size > 3 {
+                self.add_line("dropw");
+                miden_size -= 4;
             } else {
-                self.add_line(&format!("movdn.{}", shift));
+                self.add_line("drop");
+                miden_size -= 1;
             }
         }
-        for i in (n..self.stack.0.len()).rev() {
-            self.drop_top_stack_value();
+        self.stack.0 = vec![];
+        for function_return in returns {
+            address -= 2;
+            self.push_from_memory_to_top_of_stack(address, &function_return.yul_type);
         }
-        self.newline();
     }
 
     //Sets the value at the top of the stack to a typed_identifier. For example, when a value gets pushed to the stack, it is unknown.
@@ -936,13 +941,17 @@ impl Transpiler {
             self.scoped_identifiers
                 .insert(param.identifier.clone(), param.clone());
         }
-        self.add_line(&format!("proc.{}", op.function_name));
+        self.add_line(&format!(
+            "proc.{}.{}",
+            op.function_name,
+            op.params.len() * 2
+        ));
         self.indent();
         self.transpile_block(&op.block);
         for return_ident in &op.returns {
             self.dup_identifier(return_ident.clone());
         }
-        self.drop_after(op.returns.len());
+        self.drop_after_returns(op.returns.clone());
         let function_stack = self.stack.clone();
         self.stack = Stack::default();
         self.outdent();
@@ -1042,7 +1051,6 @@ impl Transpiler {
 
     //Add a comment in to the Miden assembly. Comments are generated throughout transpilation.
     fn add_comment(&mut self, comment: &str) {
-        dbg!(comment);
         self.program = format!(
             "{}\n{}# {} #",
             self.program,
