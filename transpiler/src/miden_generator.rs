@@ -338,6 +338,10 @@ impl Transpiler {
                 "stack would be too large after {}, popping to memory",
                 yul_type,
             ));
+            let bottom_stack_value = self.stack.0.last().unwrap();
+            if bottom_stack_value.typed_identifier.is_none() {
+                break;
+            }
             // dbg!(&self.stack);
             self.indent();
             self.pop_bottom_var_to_memory();

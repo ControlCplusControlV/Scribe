@@ -1,6 +1,5 @@
 object "math" {
   code {
-    let x := mul(2,3)
-    add(1, x)
+    add(1,mul(2,3))
   }
 }
