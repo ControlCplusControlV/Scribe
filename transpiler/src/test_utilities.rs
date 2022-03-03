@@ -5,10 +5,11 @@ use crate::miden_generator;
 use crate::parser;
 use crate::type_inference::infer_types;
 use crate::types::expressions_to_tree;
+use crate::types::YulFile;
 use colored::*;
 use miden_processor::StarkField;
 use primitive_types::U256;
-
+use std::fs;
 pub enum MidenResult {
     U256(primitive_types::U256),
     U32(u32),
@@ -73,6 +74,25 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     }
 }
 
+// pub fn run_yul() {}
+
+pub fn write_yul_to_masm(yul_file: YulFile) {
+    let parsed = parser::parse_yul_syntax(&yul_file.file_contents);
+    let ast = optimize_ast(parsed);
+    let ast = infer_types(&ast);
+
+    let miden_code = miden_generator::transpile_program(ast);
+
+    fs::write(
+        format!(
+            "../masm/{}.masm",
+            &yul_file.file_path.file_stem().unwrap().to_str().unwrap()
+        ),
+        miden_code,
+    )
+    .expect("Unable to write Miden to file.");
+}
+
 //Converts the top 8 elements on the top of the stack to a U256 struct
 //This is used during testing to assert that the Miden output is the correct U256 value
 pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
@@ -80,13 +100,12 @@ pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
         .last_stack_state()
         .iter()
         .take(8)
-        .rev()
         .flat_map(|x| {
             let svint = x.as_int() as u32;
 
-            return svint.to_le_bytes();
+            return svint.to_be_bytes();
         })
         .collect::<Vec<_>>();
 
-    U256::from_little_endian(&u256_bytes)
+    U256::from_big_endian(&u256_bytes)
 }

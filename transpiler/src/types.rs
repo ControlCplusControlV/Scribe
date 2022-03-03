@@ -1,6 +1,13 @@
-use std::fmt;
+use std::{fmt, path::PathBuf};
 
 use primitive_types::U256;
+
+#[derive(Debug)]
+//Struct to represent a YulFile
+pub struct YulFile {
+    pub file_path: PathBuf,
+    pub file_contents: String,
+}
 
 //Enum to represent Yul Expressions
 #[derive(Clone, PartialEq, Eq, Debug)]

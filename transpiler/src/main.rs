@@ -1,4 +1,6 @@
 use colored::*;
+use scribe::test_utilities::run_example;
+use scribe::test_utilities::write_yul_to_masm;
 use scribe::type_inference::infer_types;
 use std::path::Path;
 
@@ -8,9 +10,9 @@ use scribe::parser;
 use scribe::repl::start_repl;
 
 use scribe::types::expressions_to_tree;
+use scribe::types::YulFile;
 use std::fs;
 use std::io::{stdin, stdout, Read, Write};
-
 #[macro_use(quickcheck)]
 extern crate quickcheck_macros;
 
@@ -74,54 +76,10 @@ fn main() {
 
             //For each contract in Vec of YulFile
             for yul_code in yul_contracts {
-                //Print the YulFile contents
-                clear_screen();
-                print_title("Input File");
-                println!("{}", yul_code.file_contents);
-                pause();
-                //Parse the Yul code into a vec of Scribe expressions (Expr)
-                let inputs = vec![];
-                let ast = parser::parse_yul_syntax(&yul_code.file_contents);
-                let ast = infer_types(&ast);
-
-                //Convert the vec of Expr into an abstract syntax tree
-                clear_screen();
-                print_title("Parsed Expressions");
-                println!("{}", expressions_to_tree(&ast));
-                println!();
-                pause();
-
-                //Transpile the AST into Miden assembly
-                clear_screen();
-                let miden_code = miden_generator::transpile_program(ast);
-                print_title("Generated Miden Assembly");
-                println!("{}", miden_code);
-                println!();
-                pause();
-
-                //Display the Miden output
-                clear_screen();
-                print_title("Miden Output");
-                let execution_value = executor::execute(miden_code, inputs).unwrap();
-                let stack = execution_value.last_stack_state();
-                println!(
-                    "{}",
-                    stack
-                        .iter()
-                        .map(|f| format!("{}", f.to_string()))
-                        .collect::<Vec<_>>()
-                        .join(" ")
-                );
-                pause();
+                write_yul_to_masm(yul_code)
             }
         }
     }
-}
-
-//Struct to represent a YulFile
-pub struct YulFile {
-    pub file_name: String,
-    pub file_contents: String,
 }
 
 //Read in all of the Yul contracts from the contracts directory and return a Vec of Yul Files
@@ -141,7 +99,7 @@ fn read_yul_contracts() -> Vec<YulFile> {
             .expect("Something went wrong reading from the contracts directory");
 
         yul_files.push(YulFile {
-            file_name: path.path().display().to_string(),
+            file_path: path.path(),
             file_contents: contents,
         });
     }
