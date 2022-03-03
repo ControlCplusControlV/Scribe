@@ -12,7 +12,7 @@ function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list ~ 
 function_returns = { ( "->" ~ typed_identifier_list)? } 
 variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
 assignment = { (identifier_list) ~ ":=" ~ NEWLINE * ~ expr }
-expr = { function_call | literal | identifier  }
+expr = { function_call | identifier | literal }
 if_statement = { "if" ~ expr ~ block}
 switch = { "switch" ~ expr ~ NEWLINE* ~ ((case+ ~ default?) | default) }
 case = { "case" ~ literal ~ block ~ NEWLINE* }
@@ -22,7 +22,7 @@ break_ = @{ "break" }
 continue_ = @{ "continue" }
 leave = @{"leave"}
 function_call = { identifier ~ "(" ~ (expr ~ ( "," ~ expr)* )? ~ ")" }
-identifier = @{(ASCII_ALPHANUMERIC | "_" | "$")+}
+identifier = @{ ("_" | ASCII_ALPHA) ~ (ASCII_ALPHANUMERIC | "_" | "$")*}
 identifier_list = { identifier ~ ("," ~ identifier)*  }
 type_name = { identifier }
 typed_identifier_list = { typed_identifier? ~ ("," ~ typed_identifier )* }
@@ -38,7 +38,7 @@ string_char = {
     | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 true_literal = @{ "true" }
-false_literal = @{ "false" }
+false_literal = @{ "false"}
 hex_number = @{ "0x" ~ ('0'..'9'| 'a'..'f'|'A'..'F')+ }
 decimal_number = @{ digit+ }
 object = { "object" ~ string_literal ~ "{" ~ NEWLINE* ~ code ~ (object | data)* ~ NEWLINE* ~ "}" }
