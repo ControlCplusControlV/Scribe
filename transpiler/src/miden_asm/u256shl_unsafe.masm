@@ -1,0 +1,18 @@
+proc.u256shl_unsafe
+  dup.7
+  u32shl.1
+  movup.8
+  u32shr.31
+
+  repeat.6
+    dup.8
+    u32shl.1
+    add
+    movup.8
+    u32shr.31
+  end
+
+  movup.8
+  u32shl.1
+  add
+end
