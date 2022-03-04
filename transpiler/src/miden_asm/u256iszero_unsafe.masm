@@ -1,0 +1,8 @@
+proc.u256iszero_unsafe
+    eq.0
+    repeat.7
+    swap
+    eq.0
+    and
+    end
+end

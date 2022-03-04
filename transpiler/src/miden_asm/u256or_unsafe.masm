@@ -1,0 +1,28 @@
+proc.u256or_unsafe
+    swapw.3
+    movup.3
+    movup.7
+    u32or
+    movup.3
+    movup.6
+    u32or
+    movup.3
+    movup.5
+    u32or
+    movup.3
+    movup.4
+    u32or
+    swapw.2
+    movup.3
+    movup.7
+    u32or
+    movup.3
+    movup.6
+    u32or
+    movup.3
+    movup.5
+    u32or
+    movup.3
+    movup.4
+    u32or
+end
