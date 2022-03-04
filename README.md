@@ -51,8 +51,8 @@ use the much cheaper miden u32 operations. Scribe will default to `u256`.
 | gt      |   ✅   |  ✅  | |
 | gte      |   ✅   |  ✅  | |
 | lte      |   ✅   |  ✅  | |
-| shl      |   ✅   |  ✅  | |
-| shr      |   ✅   |  ✅  | |
+| shl      |   ✅   |  ❌  | |
+| shr      |   ✅   |  ❌  | |
 
 
 ## Miden Repl
