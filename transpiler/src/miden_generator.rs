@@ -816,14 +816,14 @@ impl Transpiler {
                 self.add_unknown(YulType::U256);
 
                 // Next ensure proc is added into the program
-                match &op.function_name.as_str() {
-                    &"add"=>self.procs_used.u256add_unsafe = true,
-                    &"mul"=>self.procs_used.u256mul_unsafe = true,
-                    &"sub"=>self.procs_used.u256sub_unsafe = true,
-                    &"and"=>self.procs_used.u256and_unsafe = true,
-                    &"or"=>self.procs_used.u256or_unsafe = true,
-                    &"xor"=>self.procs_used.u256xor_unsafe = true,
-                    _ => ()
+                match op.function_name.as_str() {
+                    "add"=>self.procs_used.u256add_unsafe = true,
+                    "mul"=>self.procs_used.u256mul_unsafe = true,
+                    "sub"=>self.procs_used.u256sub_unsafe = true,
+                    "and"=>self.procs_used.u256and_unsafe = true,
+                    "or"=>self.procs_used.u256or_unsafe = true,
+                    "xor"=>self.procs_used.u256xor_unsafe = true,
+                    _ => self.add_line(""),
                 }
                 return;
             }
@@ -881,6 +881,7 @@ impl Transpiler {
                     "eq"=>self.procs_used.u256shr_unsafe = true,
                     "lt"=>self.procs_used.u256shr_unsafe = true,
                     "gt"=>self.procs_used.u256gt_unsafe = true,
+                    _=>self.add_line(""),
                 }
                 return;
             }
@@ -895,6 +896,7 @@ impl Transpiler {
                 match op.function_name.as_str() {
                     "shl"=>self.procs_used.u256shl_unsafe = true,
                     "shr"=>self.procs_used.u256shr_unsafe = true,
+                    _=>self.add_line(""),
                 }
                 return;
             }
@@ -1128,9 +1130,71 @@ impl Transpiler {
     //Adds all procedures defined in the u256.masm file as utility functions that can be called in the transpiled Miden program
     //Ex. u256add_unsafe, u256sub_unsafe
     fn add_utility_functions(&mut self) {
-        let bytes = include_bytes!("./miden_asm/u256.masm");
-        let procs = String::from_utf8(bytes.to_vec()).unwrap();
-        self.add_line(&format!("{}\n", procs));
+        if(self.procs_used.u256add_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256add_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256and_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256and_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256div_by_one) {
+            let bytes = include_bytes!("./miden_asm/u256div_by_one.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256eq_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256eq_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256gt_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256gt_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256iszero_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256iszero_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256lt_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256lt_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256mul_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256mul_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256or_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256or_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256shl_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256shl_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256shr_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256shr_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256sub_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256sub_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
+        if(self.procs_used.u256xor_unsafe) {
+            let bytes = include_bytes!("./miden_asm/u256xor_unsafe.masm");
+            let procs = String::from_utf8(bytes.to_vec()).unwrap();
+            self.add_line(&format!("{}\n", procs));
+        }
     }
 }
 
