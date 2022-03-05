@@ -5,7 +5,7 @@ use quickcheck_macros::quickcheck;
 use scribe::{
     executor::execute,
     test_utilities::{miden_to_u256, MidenResult},
-    utils::{convert_u256_to_pushes, join_u32s_to_u256, split_u256_to_u32s},
+    utils::{convert_u256_to_pushes, join_u32s_to_u256, load_all_procs, split_u256_to_u32s},
 };
 
 #[derive(Clone, Debug)]
@@ -39,7 +39,7 @@ fn run_miden_function(
 ) -> TestResult {
     let program = format!(
         "{}\nbegin\n{}\n{}\nend",
-        String::from_utf8(include_bytes!("../src/miden_asm/u256.masm").to_vec()).unwrap(),
+        load_all_procs(),
         stack
             .iter()
             .map(|sv| convert_u256_to_pushes(&sv))
