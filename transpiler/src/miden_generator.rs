@@ -1041,6 +1041,8 @@ impl Transpiler {
         //If the type is u256, use u256eq_unsafe, otherwise use eq to evaluate equality between the case literal
         // and the transpiler_target_switch_expression
         if switch.inferred_type == Some(YulType::U256) {
+            // ensure U256 equal is included then
+            self.procs_used.u256eq_unsafe = true;
             self.add_line("exec.u256eq_unsafe");
         } else {
             self.add_line("eq");
