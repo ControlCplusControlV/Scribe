@@ -868,7 +868,7 @@ impl Transpiler {
                 self.add_unknown(YulType::U32);
 
                 match op.function_name.as_str() {
-                    "iszero"=>self.procs_used.u256iszero_unsafe = true,
+                    "iszero"=> self.procs_used.u256iszero_unsafe = true,
                     "eq"=>self.procs_used.u256shr_unsafe = true,
                     "lt"=>self.procs_used.u256shr_unsafe = true,
                     "gt"=>self.procs_used.u256gt_unsafe = true,
@@ -1121,67 +1121,67 @@ impl Transpiler {
         if(self.procs_used.u256add_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256add_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256and_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256and_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256div_by_one) {
             let bytes = include_bytes!("./miden_asm/u256div_by_one.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256eq_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256eq_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256gt_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256gt_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256iszero_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256iszero_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256lt_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256lt_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256mul_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256mul_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256or_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256or_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256shl_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256shl_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256shr_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256shr_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256sub_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256sub_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
         if(self.procs_used.u256xor_unsafe) {
             let bytes = include_bytes!("./miden_asm/u256xor_unsafe.masm");
             let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.add_line(&format!("{}\n", procs));
+            self.program = format!("{}\n {} \n", procs, self.program);
         }
     }
 }
@@ -1242,5 +1242,6 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     //end the Miden program
     transpiler.add_line("end");
     //return the Miden program as a string
+    transpiler.add_utility_functions();
     transpiler.program
 }
