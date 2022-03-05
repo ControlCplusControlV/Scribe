@@ -878,8 +878,8 @@ impl Transpiler {
 
                 match op.function_name.as_str() {
                     "iszero"=> self.procs_used.u256iszero_unsafe = true,
-                    "eq"=>self.procs_used.u256shr_unsafe = true,
-                    "lt"=>self.procs_used.u256shr_unsafe = true,
+                    "eq"=>self.procs_used.u256eq_unsafe = true,
+                    "lt"=>self.procs_used.u256lt_unsafe = true,
                     "gt"=>self.procs_used.u256gt_unsafe = true,
                     _=>self.add_line(""),
                 }
