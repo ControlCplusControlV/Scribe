@@ -1050,12 +1050,7 @@ impl Transpiler {
     // proc later
     fn add_proc_exec(&mut self, proc: &str) {
         self.procs_used.insert(proc.to_string());
-        self.program = format!(
-            "{}\n{}exec.{}",
-            self.program,
-            " ".repeat(self.indentation.try_into().unwrap()),
-            proc
-        )
+        self.add_line(&format!("exec.{}", proc));
     }
 
     //Add a new empty line into the Miden assembly
