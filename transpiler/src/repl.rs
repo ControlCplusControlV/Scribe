@@ -1,4 +1,5 @@
 use crate::executor::execute;
+use crate::utils::load_all_procs;
 use colored::*;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
@@ -98,7 +99,13 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
                 .collect::<Vec<_>>()
                 .join("\n")
         );
-        let result = execute(format!("{}\n{}", functions_miden, program.clone()), vec![]);
+        let program_with_procs = format!(
+            "{}\n{}\n{}",
+            functions_miden,
+            load_all_procs(),
+            program.clone()
+        );
+        let result = execute(program_with_procs, vec![]);
 
         let mut result_string = "".to_string();
         if program_lines.len() > 0 {
