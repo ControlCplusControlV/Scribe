@@ -1,3 +1,4 @@
+use include_dir::{include_dir, Dir};
 use itertools::Itertools;
 use primitive_types::U256;
 
@@ -52,4 +53,17 @@ pub fn join_u32s_to_u256(x: Vec<u32>) -> U256 {
         .collect::<Vec<_>>();
 
     U256::from_big_endian(&u256_bytes)
+}
+
+pub fn load_all_procs() -> String {
+    static MASM_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/src/miden_asm");
+    MASM_DIR
+        .files()
+        .filter_map(|file| {
+            if file.path().extension().unwrap().to_str() == Some("masm") {
+                return file.contents_utf8();
+            }
+            None
+        })
+        .join("\n")
 }
