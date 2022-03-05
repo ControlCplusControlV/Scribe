@@ -207,6 +207,7 @@ fn quickcheck_literals(x: U256) -> TestResult {
     run_miden_function("", vec![x.0], MidenResult::U256(expected))
 }
 
+#[ignore]
 #[test]
 fn subtraction_with_addition_overflow() {
     let x = join_u32s_to_u256(vec![0, 0, 0, 0, 0, 4, 0, 1]);
