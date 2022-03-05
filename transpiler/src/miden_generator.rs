@@ -1,5 +1,7 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet, VecDeque};
 
+use include_dir::{include_dir, Dir};
 use primitive_types::U256;
 
 use crate::{ast_optimization::optimize_ast, types::*, utils::convert_u256_to_pushes};
@@ -1097,28 +1099,20 @@ impl Transpiler {
     //Adds all procedures defined in the u256.masm file as utility functions that can be called in the transpiled Miden program
     //Ex. u256add_unsafe, u256sub_unsafe
     fn add_utility_functions(&mut self) {
-        for proc_used in &self.procs_used {
-            let bytes = match proc_used.as_str() {
-                "u256add_unsafe" => include_bytes!("./miden_asm/u256add_unsafe.masm").to_vec(),
-                "u256and_unsafe" => include_bytes!("./miden_asm/u256and_unsafe.masm").to_vec(),
-                "u256div_by_one" => include_bytes!("./miden_asm/u256div_by_one.masm").to_vec(),
-                "u256eq_unsafe" => include_bytes!("./miden_asm/u256eq_unsafe.masm").to_vec(),
-                "u256gt_unsafe" => include_bytes!("./miden_asm/u256gt_unsafe.masm").to_vec(),
-                "u256iszero_unsafe" => {
-                    include_bytes!("./miden_asm/u256iszero_unsafe.masm").to_vec()
+        static MASM_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/src/miden_asm");
+        let procs = MASM_DIR
+            .files()
+            .filter_map(|file| {
+                if self
+                    .procs_used
+                    .contains(file.path().file_stem().unwrap().to_str().unwrap())
+                {
+                    return file.contents_utf8();
                 }
-                "u256lt_unsafe" => include_bytes!("./miden_asm/u256lt_unsafe.masm").to_vec(),
-                "u256shl_unsafe" => include_bytes!("./miden_asm/u256shl_unsafe.masm").to_vec(),
-                "u256shr_unsafe" => include_bytes!("./miden_asm/u256shr_unsafe.masm").to_vec(),
-                "u256mul_unsafe" => include_bytes!("./miden_asm/u256mul_unsafe.masm").to_vec(),
-                "u256or_unsafe" => include_bytes!("./miden_asm/u256or_unsafe.masm").to_vec(),
-                "u256sub_unsafe" => include_bytes!("./miden_asm/u256sub_unsafe.masm").to_vec(),
-                "u256xor_unsafe" => include_bytes!("./miden_asm/u256xor_unsafe.masm").to_vec(),
-                _ => panic!("Unsupported proc {}", proc_used),
-            };
-            let procs = String::from_utf8(bytes.to_vec()).unwrap();
-            self.program = format!("{}\n {}", procs, self.program);
-        }
+                None
+            })
+            .join("\n");
+        self.program = format!("{}\n {}", procs, self.program);
     }
 }
 
