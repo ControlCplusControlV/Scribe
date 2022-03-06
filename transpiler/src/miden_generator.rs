@@ -254,7 +254,14 @@ impl Transpiler {
             "push {} from memory to top of stack",
             typed_identifier.identifier
         ));
-        let address = self.variables.get(&typed_identifier).cloned().unwrap();
+        let address = self
+            .variables
+            .get(&typed_identifier)
+            .cloned()
+            .expect(&format!(
+                "{} not found in memory",
+                &typed_identifier.identifier
+            ));
         self.push_from_memory_to_top_of_stack(address, &typed_identifier.yul_type);
         self.stack.0.first_mut().unwrap().typed_identifier = Some(typed_identifier);
     }
@@ -879,7 +886,7 @@ impl Transpiler {
             }
 
             _ => {
-                todo!()
+                panic!("\"{}\" not implemented in miden yet", op.function_name)
             }
         };
     }
