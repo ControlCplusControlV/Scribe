@@ -11,6 +11,7 @@ pest_derive = "2.0"
 miden-assembly = {path = "./miden/assembly"}
 miden-processor = {path = "./miden/processor"}
 miden-core = {path = "./miden/core"}
+hex = "0.4"
 colored = "2"
 debug_tree = "0.4.0"
 insta = "1.12.0"
