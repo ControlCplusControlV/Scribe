@@ -958,6 +958,7 @@ dependencies = [
  "clap",
  "colored",
  "debug_tree",
+ "hex",
  "include_dir",
  "insta",
  "itertools",

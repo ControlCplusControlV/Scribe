@@ -2,6 +2,18 @@ use primitive_types::U256;
 use scribe::test_utilities::{run_example, MidenResult};
 
 #[test]
+fn u256_hex_literal() {
+    run_example(                                                                           
+        "                                                                                  
+            let x:u256 := 0x1F6F1604415806848692A606A47
+            x
+        ",                                                                                 
+        MidenResult::U256(U256::from_dec_str("39847239847923879823657234623047").unwrap()),
+    ); 
+}
+
+
+#[test]
 fn u256_literal() {
     run_example(
         "

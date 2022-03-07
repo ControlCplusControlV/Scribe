@@ -3,7 +3,8 @@ use pest::iterators::Pair;
 use pest::Parser;
 use pest_derive::Parser;
 use primitive_types::U256;
-
+use hex::*;
+use std::str;
 use crate::type_inference::infer_types;
 use crate::types::*;
 
@@ -256,18 +257,18 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::number_literal => parse_expression(expression),
         Rule::hex_number => {
             // TODO: parse hex numbers
-            let i = expression.as_str();
+            let mut initial = expression.as_str();
             Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                 inferred_type: None,
-                value: U256::MAX,
+                value: U256::from_str_radix(initial, 16).unwrap(),
             }))
         }
         Rule::hex_literal => {
             // TODO: parse hex numbers
-            let i = expression.as_str();
+            let initial = expression.as_str();
             Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                 inferred_type: None,
-                value: U256::MAX,
+                value: U256::from_str_radix(initial, 16).unwrap(),
             }))
         }
         Rule::decimal_number => {
