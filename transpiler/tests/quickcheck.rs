@@ -97,20 +97,12 @@ fn addition(x: U256, y: U256) -> TestResult {
     )
 }
 
-#[ignore]
 #[quickcheck]
-fn multiplication(x: u64, y: u64) -> TestResult {
-    let (expected, overflowed) =
-        primitive_types::U256::from(x).overflowing_mul(primitive_types::U256::from(y));
-    if overflowed {
-        return TestResult::discard();
-    }
+fn multiplication(x: U256, y: U256) -> TestResult {
+    let (expected, overflowed) = (x.0).overflowing_mul(y.0);
     run_miden_function(
         "exec.u256mul_unsafe",
-        vec![
-            primitive_types::U256::from(x),
-            primitive_types::U256::from(y),
-        ],
+        vec![(x.0), (y.0)],
         MidenResult::U256(expected),
     )
 }
@@ -232,8 +224,8 @@ fn subtraction_with_addition_overflow() {
 
 #[test]
 fn multiplication_all_limbs() {
-    let x = join_u32s_to_u256(vec![1, 1, 1, 1, 1, 1, 1, 1]);
-    let y = join_u32s_to_u256(vec![1, 2, 3, 4, 5, 6, 7, 8]);
+    let x = join_u32s_to_u256(vec![8, 7, 6, 5, 4, 3, 2, 1]);
+    let y = join_u32s_to_u256(vec![1, 1, 1, 1, 1, 1, 1, 1]);
     dbg!(x, y);
     let (expected, _) = x.overflowing_mul(y);
     dbg!(expected);
