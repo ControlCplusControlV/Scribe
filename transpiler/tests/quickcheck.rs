@@ -56,8 +56,14 @@ fn run_miden_function(
             let stack_result = miden_to_u256(execution_value);
             println!("Expected: {}", expected);
             println!("Output  : {}", stack_result);
-            println!("E Stack: {}", expected);
-            println!("O Stack  : {:?}", output_stack.map(|x| x.as_int()));
+            println!(
+                "O Stack  : {:?}",
+                output_stack
+                    .iter()
+                    .take(8)
+                    .map(|x| x.as_int())
+                    .collect::<Vec<_>>()
+            );
             println!("E Stack  : {:?}", split_u256_to_u32s(&expected));
             TestResult::from_bool(stack_result == expected)
         }
@@ -217,6 +223,22 @@ fn subtraction_with_addition_overflow() {
     dbg!(expected);
     let test_result = run_miden_function(
         "exec.u256sub_unsafe",
+        vec![x, y],
+        MidenResult::U256(expected),
+    );
+    dbg!(&test_result);
+    assert!(!test_result.is_failure());
+}
+
+#[test]
+fn multiplication_all_limbs() {
+    let x = join_u32s_to_u256(vec![1, 1, 1, 1, 1, 1, 1, 1]);
+    let y = join_u32s_to_u256(vec![1, 2, 3, 4, 5, 6, 7, 8]);
+    dbg!(x, y);
+    let (expected, _) = x.overflowing_mul(y);
+    dbg!(expected);
+    let test_result = run_miden_function(
+        "exec.u256mul_unsafe",
         vec![x, y],
         MidenResult::U256(expected),
     );
