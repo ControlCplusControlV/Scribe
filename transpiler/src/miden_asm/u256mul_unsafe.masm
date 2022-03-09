@@ -197,26 +197,20 @@ proc.u256mul_unsafe.6
 
       dup.1
       movup.6
-      movup.9
+      movup.8
       swap.3
       exec.mulstep
       swap
-      movdn.7
+      movdn.6
       dup.1
       movup.5
-      movup.7
+      movup.6
       swap.3
       exec.mulstep
       swap
-      movdn.5
-      swap
-      movup.3
-      movup.4
-      swap.3
-      exec.mulstep
-      drop
-      swap
-      drop
+      swap drop
+      movdn.3
+      drop drop drop
       popw.local.5
 
 
