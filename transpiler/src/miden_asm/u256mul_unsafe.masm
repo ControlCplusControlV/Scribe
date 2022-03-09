@@ -1,26 +1,10 @@
 proc.mulstep
-  movdn.2
-  u32mul.full
-  swap.1
-  dup
-  movup.4
-  u32add
-  dup
-  movdn.2
-  swap
-  u32lt
-  movup.3
-  movup.2
-  dup.1
-  u32add
-  dup
-  movdn.2
-  swap
-  u32lt
-  swap
-  movdn.3
-  u32add
-  u32add
+    movdn.2
+    u32madd.unsafe
+    movdn.2
+    u32add.unsafe
+    movup.2
+    add
 end
 
 proc.mulstep4
