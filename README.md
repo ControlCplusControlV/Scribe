@@ -1,12 +1,4 @@
 
-<br />
-<p align="center">
-    <img src="Scribe.png" alt="Logo" width="800" height="450">
-  <p align="center">
-
- 
-<br />
-      
 # 📜 Scribe 📜
 ![Testing](https://github.com/ControlCplusControlV/Scribe/actions/workflows/rust.yml/badge.svg)
 
