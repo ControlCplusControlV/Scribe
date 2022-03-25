@@ -1,3 +1,6 @@
 [submodule "transpiler/miden"]
 	path = transpiler/miden
 	url = https://github.com/marcusbuffett/miden
+[submodule "transpiler/zero-machine-code"]
+	path = transpiler/zero-machine-code
+	url = https://github.com/mir-protocol/zero-machine-code

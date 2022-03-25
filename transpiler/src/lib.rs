@@ -7,3 +7,4 @@ pub mod test_utilities;
 pub mod type_inference;
 pub mod types;
 pub mod utils;
+pub mod zero_generator;
