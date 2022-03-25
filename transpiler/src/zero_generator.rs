@@ -7,7 +7,7 @@ use zero_machine_code::instructions::*;
 //Struct that enables transpilation management. Through implementations, this struct keeps track of the variables,
 //open memory addresses, the stack, indentation of Miden assembly and user defined functions.
 struct Transpiler {
-    local_vars_to_offsets: HashMap<String, u32>,
+    local_vars_to_types_and_offsets: HashMap<String, (YulType, u32)>,
     instructions: Vec<Instruction>,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
@@ -42,31 +42,31 @@ struct Stack(Vec<StackValue>);
 
 impl Transpiler {
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        let saved_local_vars = self.local_vars_to_offsets;
-        self.local_vars_to_offsets = HashMap::new();
+        let saved_local_vars = self.local_vars_to_types_and_offsets;
+        self.local_vars_to_types_and_offsets = HashMap::new();
         self.scan_function_definition_for_variables(op);
 
         for expr in op.block.exprs {
-            
+            // TODO
         }
 
-        self.local_vars_to_offsets = saved_local_vars;
+        self.local_vars_to_types_and_offsets = saved_local_vars;
     }
 
     fn scan_function_definition_for_variables(&mut self, op: &ExprFunctionDefinition) {
-        let mut all_variables = HashSet::<String>::new();
+        let mut all_variables = HashSet::<(String, YulType)>::new();
         for expr in op.block.exprs {
             match expr {
                 Expr::DeclareVariable(e) => {
-                    all_variables.extend(e.typed_identifiers.iter().map(|t| t.identifier));
+                    all_variables.extend(e.typed_identifiers.iter().map(|t| (t.identifier, t.yul_type)));
                 },
                 _ => {}
             }
         }
 
         let mut counter = 0;
-        for var in all_variables {
-            self.local_vars_to_offsets.insert(var, counter);
+        for (name, yul_type) in all_variables {
+            self.local_vars_to_offsets.insert(name, (yul_type, counter));
             counter += 1;
         }
     }
@@ -75,10 +75,10 @@ impl Transpiler {
         for identifier in op.typed_identifiers {
             match identifier.yul_type {
                 YulType::U32 => {
-
+                    // TODO
                 },
                 YulType::U256 => {
-                    
+                    // TODO
                 },
             }
         }
@@ -88,12 +88,20 @@ impl Transpiler {
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
         let offsets: Vec<u32> = op.identifiers.iter().map(|iden| self.local_vars_to_offsets.get(iden).unwrap().clone()).collect();
+
+
+        // TODO
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) {
         for op in &op.exprs {
             self.transpile_op(op);
         }
+    }
+
+    fn transpile_literal(&mut self, literal: &ExprLiteral) {
+        // Should never transpile a literal all on its own
+        unreachable!()
     }
 
     fn transpile_op(&mut self, expr: &Expr) {
