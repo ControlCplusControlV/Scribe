@@ -1,4 +1,3 @@
-
 # 📜 Scribe 📜
 ![Testing](https://github.com/ControlCplusControlV/Scribe/actions/workflows/rust.yml/badge.svg)
 
