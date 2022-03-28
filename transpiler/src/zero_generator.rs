@@ -79,18 +79,23 @@ impl Transpiler {
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) -> Option<LocalOffset> {
-        for identifier in op.typed_identifiers {
-            match identifier.yul_type {
-                YulType::U32 => {
-                    // TODO
-                },
-                YulType::U256 => {
-                    // TODO
-                },
-            }
-        }
         let offsets: Vec<u32> = op.typed_identifiers.iter().map(|iden| self.local_vars_to_offsets.get(&iden.identifier).unwrap().clone()).collect();
         
+        match op.rhs {
+            Some(rhs) => {
+                let rhs = self.transpile_op(op.rhs.deref()).unwrap();
+
+                for offset in offsets {
+                    let move_inst = Move32 {
+                        val: LocalOrImmediate::Local(rhs),
+                        dst: LocalOrImmediate::Local(offset),
+                    };
+                    self.add_instruction(move_inst);
+                }
+            }
+            None => _
+        };
+        None
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) -> Option<LocalOffset> {
