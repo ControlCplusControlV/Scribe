@@ -1,123 +1,3 @@
-
-proc.u256iszero_unsafe
-    eq.0
-    repeat.7
-    swap
-    eq.0
-    and
-    end
-end
-
-
-proc.u256div_by_one
-  push.2
-  u32div
-  swap.1
-  push.2
-  u32div 
-  swap.2
-  push.2
-  u32div
-  swap.3
-  push.2
-  u32div
-  swap.4
-  push.2
-  u32div
-  swap.5
-  push.2
-  u32div
-  swap.6
-  push.2
-  u32div
-  swap.7
-  push.2
-  u32div
-  movdn.7
-end
-
-proc.u256shl_unsafe
-  dup.7
-  u32shl.1
-  movup.8
-  u32shr.31
-
-  repeat.6
-    dup.8
-    u32shl.1
-    add
-    movup.8
-    u32shr.31
-  end
-
-  movup.8
-  u32shl.1
-  add
-end
-
-proc.u256shr_unsafe
-  dup
-  u32shr.1
-  movdn.8
-  u32shl.31
-
-  repeat.6
-    dup.1
-    u32shr.1
-    add
-    movdn.8
-    u32shl.31
-  end
-
-  swap
-  u32shr.1
-  add
-  movdn.7
-end
-
-proc.u256sub_unsafe
-    movup.15
-    movup.8
-    u32sub.unsafe
-    movup.8
-    add
-    movup.14
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.13
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.12
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.11
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.10
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.9
-    swap
-    u32sub.unsafe
-    movup.8
-    add
-    movup.8
-    swap
-    u32sub.unsafe
-    drop
-end
-
-
 proc.u256add_unsafe
     swapw.3
     movup.3
@@ -149,338 +29,6 @@ proc.u256add_unsafe
     u32addc.unsafe
     drop
 end
-
-proc.u256and_unsafe
-    swapw.3
-    movup.3
-    movup.7
-    u32and
-    movup.3
-    movup.6
-    u32and
-    movup.3
-    movup.5
-    u32and
-    movup.3
-    movup.4
-    u32and
-    swapw.2
-    movup.3
-    movup.7
-    u32and
-    movup.3
-    movup.6
-    u32and
-    movup.3
-    movup.5
-    u32and
-    movup.3
-    movup.4
-    u32and
-end
-
-proc.u256or_unsafe
-    swapw.3
-    movup.3
-    movup.7
-    u32or
-    movup.3
-    movup.6
-    u32or
-    movup.3
-    movup.5
-    u32or
-    movup.3
-    movup.4
-    u32or
-    swapw.2
-    movup.3
-    movup.7
-    u32or
-    movup.3
-    movup.6
-    u32or
-    movup.3
-    movup.5
-    u32or
-    movup.3
-    movup.4
-    u32or
-end
-
-proc.u256xor_unsafe
-    swapw.3
-    movup.3
-    movup.7
-    u32xor
-    movup.3
-    movup.6
-    u32xor
-    movup.3
-    movup.5
-    u32xor
-    movup.3
-    movup.4
-    u32xor
-    swapw.2
-    movup.3
-    movup.7
-    u32xor
-    movup.3
-    movup.6
-    u32xor
-    movup.3
-    movup.5
-    u32xor
-    movup.3
-    movup.4
-    u32xor
-end
-
-proc.u256eq_unsafe
-    swapw.3
-    eqw
-    movdn.8
-    dropw
-    dropw
-    movdn.8
-    eqw
-    movdn.8
-    dropw
-    dropw
-    and
-end
-
-proc.u256gte_unsafe
-  dup.8
-  dup.1
-  gt
-  movup.9
-  movup.2
-  eq
-
-  dup.9
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.9
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.8
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.8
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.7
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.7
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.6
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.6
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.5
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.5
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.4
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.4
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.3
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.3
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-  or
-end
-
-proc.u256lte_unsafe
-  dup.8
-  dup.1
-  lt
-  movup.9
-  movup.2
-  eq
-
-  dup.9
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.9
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.8
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.8
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.7
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.7
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.6
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.6
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.5
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.5
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.4
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.4
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.3
-  dup.3
-  lt
-  dup.1
-  and
-  movup.2
-  or
-  movup.3
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-  or
-end
-
 proc.u256lt_unsafe
   dup.8
   dup.1
@@ -589,474 +137,8 @@ proc.u256lt_unsafe
   swap
   drop
 end
-
-proc.u256gt_unsafe
-  dup.8
-  dup.1
-  gt
-  movup.9
-  movup.2
-  eq
-
-  dup.9
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.9
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.8
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.8
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.7
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.7
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.6
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.6
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.5
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.5
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  dup.4
-  dup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  movup.4
-  movup.3
-  eq
-  movup.2
-  dup
-  movdn.2
-  cdrop
-
-  movup.3
-  movup.3
-  gt
-  dup.1
-  and
-  movup.2
-  or
-  swap
-  drop
-end
-
-proc.mulstep
-  movdn.2
-  u32mul.full
-  swap.1
-  dup
-  movup.4
-  u32add
-  dup
-  movdn.2
-  swap
-  u32lt
-  movup.3
-  movup.2
-  dup.1
-  u32add
-  dup
-  movdn.2
-  swap
-  u32lt
-  swap
-  movdn.3
-  u32add
-  u32add
-end
-
-proc.mulstep4
-    movup.12
-    dup.1
-    movup.10
-    push.0 # start k at 0 #
-    exec.mulstep
-    swap
-    movdn.9
-    dup.1
-    movup.9
-    movup.13
-    swap.3
-    exec.mulstep
-    swap
-    movdn.8
-    dup.1
-    movup.8
-    movup.12
-    swap.3
-    exec.mulstep
-    swap
-    movdn.7
-    dup.1
-    movup.7
-    movup.11
-    swap.3
-    exec.mulstep
-    swap
-    movdn.6
-end
-
-proc.u256mul_unsafe.6
-    # Memory storing setup #
-      popw.local.0
-      # y[5-8] at 0 #
-      storew.local.1
-      # y[0-4] at 1 #
-      push.0 dropw
-      # y[0] at top of stack, followed by x[0-7] #
-      movdn.8
-      storew.local.2
-      # x[0-4] at 2 #
-      swapw
-      storew.local.3
-      # x[5-8] at 3 #
-      padw
-      storew.local.4
-      storew.local.5
-      # p at 4 and 5 #
-
-    # y[0] #
-      dropw
-      swapw
-      pushw.local.4
-      movdnw.2
-      movup.12
-
-      exec.mulstep4
-
-      movdn.9
-      movdn.9
-      swapw
-      popw.local.4
-      pushw.local.5
-      swapw
-      movup.9
-      movup.9
-
-      dup.1
-      movup.6
-      movup.10
-      swap.3
-      exec.mulstep
-      swap
-      movdn.5
-      dup.1
-      movup.5
-      movup.9
-      swap.3
-      exec.mulstep
-      swap
-      movdn.4
-      dup.1
-      movup.4
-      movup.8
-      swap.3
-      exec.mulstep
-      swap
-      movdn.3
-      swap
-      movup.2
-      movup.6
-      swap.3
-      exec.mulstep
-
-      drop
-      popw.local.5
-
-    # y[1] #
-      pushw.local.4
-      pushw.local.5
-      movup.7
-      dropw
-      pushw.local.3 pushw.local.2 # load the xs #
-      pushw.local.1
-      movup.2
-      movdn.3
-      push.0 dropw # only need y[1] #
-
-      exec.mulstep4
-
-      movdn.9
-      movdn.9
-      swapw
-      movdn.3
-      pushw.local.4
-      push.0 dropw # only need p[0] #
-      movdn.3
-      # save p[0-3] to memory, not needed any more #
-      popw.local.4
-
-      pushw.local.5
-      movup.3
-      drop
-      swapw
-      movup.9
-      movup.9
-
-      dup.1
-      movup.6
-      movup.9
-      swap.3
-      exec.mulstep
-      swap
-      movdn.7
-      dup.1
-      movup.5
-      movup.7
-      swap.3
-      exec.mulstep
-      swap
-      movdn.5
-      swap
-      movup.3
-      movup.4
-      swap.3
-      exec.mulstep
-
-      drop
-      swap
-      drop
-      popw.local.5
-
-
-    # y[2] #
-      pushw.local.4
-      pushw.local.5
-      movup.7
-      movup.7
-      dropw
-      pushw.local.3 pushw.local.2 # load the xs #
-      pushw.local.1
-      swap
-      movdn.3
-      push.0 dropw # only need y[1] #
-
-      exec.mulstep4
-
-      movdn.9
-      movdn.9
-      swapw
-      movdn.3
-      movdn.3
-      pushw.local.4
-      drop drop
-      movdn.3
-      movdn.3
-      popw.local.4
-
-      pushw.local.5
-      movup.3
-      movup.3
-      drop
-      drop
-      swapw
-      movup.9
-      movup.9
-
-      dup.1
-      movup.6
-      movup.9
-      swap.3
-      exec.mulstep
-      swap
-      movdn.7
-      dup.1
-      movup.5
-      movup.7
-      swap.3
-      exec.mulstep
-      swap
-      movdn.5
-      swap
-      movup.3
-      movup.4
-      swap.3
-      exec.mulstep
-      drop
-      swap
-      drop
-      popw.local.5
-
-
-    # y[3] #
-      pushw.local.4
-      pushw.local.5
-
-      movup.7 movup.7 movup.7
-      dropw
-      pushw.local.3 pushw.local.2
-
-      pushw.local.1
-      movdn.3
-      push.0 dropw
-
-      exec.mulstep4
-
-      movdn.9
-      movdn.9
-
-      swapw
-      movup.3
-      pushw.local.4
-      drop
-      movup.3
-
-      popw.local.4
-      pushw.local.5
-      movdn.3
-      push.0 dropw
-      swapw
-      movup.9
-      movup.9
-
-      swap
-      movup.5
-      movup.6
-      swap.3
-      exec.mulstep
-
-      drop
-      movdn.3
-      push.0 dropw
-
-    # y[4] #
-      pushw.local.3 pushw.local.2 # load the xs #
-      # OPTIM: don't need x[4-7] #, but can't use mulstep4 if we don't load #
-
-      pushw.local.0
-      push.0 dropw # y[4] #
-
-      exec.mulstep4
-      dropw drop drop # OPTIM: don't need x[4-7] #, but can't use mulstep4 if we don't load #
-
-    # y[5] #
-      pushw.local.3
-      pushw.local.0
-      movup.2 movdn.3
-      push.0 dropw
-      movup.7
-      dup.1
-      movup.6
-      push.0
-      exec.mulstep
-      swap
-      movdn.7
-      movup.4
-      dup.2
-      movup.7
-      swap.3
-      exec.mulstep
-      swap
-      movdn.5
-      swap
-      movup.3
-      movup.4
-      swap.3
-      exec.mulstep
-      drop
-      swap
-      drop
-
-    # y[6] #
-      pushw.local.3
-      pushw.local.0
-      swap
-      movdn.3
-      push.0 dropw
-      movup.6
-      dup.1
-      movup.6
-      push.0
-      exec.mulstep
-      swap
-      movdn.6
-      swap
-      movup.4
-      movup.5
-      swap.3
-      exec.mulstep
-      drop
-      movdn.2
-      drop drop
-
-    # y[7] #
-      pushw.local.3
-      pushw.local.0
-
-      movdn.3 push.0 dropw
-      movup.4
-      movup.5
-      movdn.2
-      push.0
-      exec.mulstep
-      drop
-      movdn.3
-      drop drop drop
-
-      pushw.local.4
-      swapw
-end
-
-
+ 
+ 
 # end std lib #
 begin
     # Assigning to n #
@@ -1069,7 +151,7 @@ begin
 
     # Assigning to b #
         # stack would be too large after u256, popping to memory #
-            # Moving n to top of stack #
+            # Moving n to top of stack, 8 values above #
             movupw.3
             movupw.3
             # popping n from top of stack to memory #
@@ -1081,7 +163,7 @@ begin
 
     # Assigning to c #
         # stack would be too large after u256, popping to memory #
-            # Moving a to top of stack #
+            # Moving a to top of stack, 8 values above #
             movupw.3
             movupw.3
             # popping a from top of stack to memory #
@@ -1093,7 +175,7 @@ begin
 
     # Assigning to i #
         # stack would be too large after u256, popping to memory #
-            # Moving b to top of stack #
+            # Moving b to top of stack, 8 values above #
             movupw.3
             movupw.3
             # popping b from top of stack to memory #
@@ -1106,7 +188,7 @@ begin
     # -- conditional -- #
     # lt() #
     # stack would be too large after u256, popping to memory #
-        # Moving c to top of stack #
+        # Moving c to top of stack, 8 values above #
         movupw.3
         movupw.3
         # popping c from top of stack to memory #
@@ -1117,7 +199,7 @@ begin
         dupw.1
         dupw.1
     # stack would be too large after u256, popping to memory #
-        # Moving i to top of stack #
+        # Moving i to top of stack, 8 values above #
         movupw.3
         movupw.3
         # popping i from top of stack to memory #
@@ -1149,7 +231,7 @@ begin
 
             # Assigning to b #
                 # stack would be too large after u256, popping to memory #
-                    # Moving c to top of stack #
+                    # Moving c to top of stack, 8 values above #
                     movupw.3
                     movupw.3
                     # popping c from top of stack to memory #
@@ -1165,7 +247,7 @@ begin
             # Assigning to i #
                 # add() #
                 # stack would be too large after u256, popping to memory #
-                    # Moving a to top of stack #
+                    # Moving a to top of stack, 8 values above #
                     movupw.3
                     movupw.3
                     # popping a from top of stack to memory #
@@ -1177,7 +259,7 @@ begin
                 pushw.mem.8
 
                 # stack would be too large after u256, popping to memory #
-                    # Moving b to top of stack #
+                    # Moving b to top of stack, 8 values above #
                     movupw.3
                     movupw.3
                     # popping b from top of stack to memory #
@@ -1198,9 +280,23 @@ begin
                 popw.mem.6
                 popw.mem.7
 
+                # push b from memory to top of stack #
+                pushw.mem.5
+                pushw.mem.4
+
+                # popping b from top of stack to memory #
+                popw.mem.4
+                popw.mem.5
+
                 # pushing i to the top #
-                    dupw.1
-                    dupw.1
+                    movup.7
+                    movup.7
+                    movup.7
+                    movup.7
+                    movup.7
+                    movup.7
+                    movup.7
+                    movup.7
                 # popping i from top of stack to memory #
                 popw.mem.8
                 popw.mem.9
@@ -1212,14 +308,6 @@ begin
                 # popping a from top of stack to memory #
                 popw.mem.2
                 popw.mem.3
-
-                # push b from memory to top of stack #
-                pushw.mem.5
-                pushw.mem.4
-
-                # popping b from top of stack to memory #
-                popw.mem.4
-                popw.mem.5
 
 
         # -- conditional -- #

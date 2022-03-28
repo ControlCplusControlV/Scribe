@@ -799,9 +799,31 @@ impl Transpiler {
             op.function_name.as_ref(),
         ) {
             //u256 operations
-            (Some(YulType::U256), "add" | "mul" | "sub" | "and" | "or" | "xor") => {
+            (Some(YulType::U256), "add" | "mul" | "sub" | "iszero") => {
+                self.transpile_function_args(&op);
+                self.add_proc_exec(&format!("u256::{}_unsafe", op.function_name.as_str()));
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U256);
+                return;
+            }
+            (Some(YulType::U256), "eq") => {
+                self.transpile_function_args(&op);
+                self.add_proc_exec(&format!("u256::{}_unsafe", op.function_name.as_str()));
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U32);
+
+                return;
+            }
+            (Some(YulType::U256), "lt" | "gt") => {
                 self.transpile_function_args(&op);
                 self.add_proc_exec(&format!("u256{}_unsafe", op.function_name.as_str()));
+                self._consume_top_stack_values(2);
+                self.add_unknown(YulType::U256);
+                return;
+            }
+            (Some(YulType::U256), "and" | "or" | "xor") => {
+                self.transpile_function_args(&op);
+                self.add_proc_exec(&format!("u256::{}", op.function_name.as_str()));
                 self._consume_top_stack_values(2);
                 self.add_unknown(YulType::U256);
                 return;
@@ -848,14 +870,6 @@ impl Transpiler {
                 };
             }
 
-            (Some(YulType::U256), "iszero" | "eq" | "lt") => {
-                self.transpile_function_args(&op);
-                self.add_proc_exec(&format!("u256{}_unsafe", op.function_name.as_str()));
-                self._consume_top_stack_values(2);
-                self.add_unknown(YulType::U32);
-
-                return;
-            }
             (Some(YulType::U256), "shl" | "shr") => {
                 self.transpile_function_args(&op);
                 self.add_proc_exec(&format!("u256{}_unsafe", op.function_name.as_str()));
@@ -1005,7 +1019,7 @@ impl Transpiler {
         // and the transpiler_target_switch_expression
         if switch.inferred_type == Some(YulType::U256) {
             // ensure U256 equal is included then
-            self.add_proc_exec("u256eq_unsafe");
+            self.add_proc_exec("u256::eq_unsafe");
         } else {
             self.add_line("eq");
         }
@@ -1105,8 +1119,7 @@ impl Transpiler {
         let procs = MASM_DIR
             .files()
             .filter_map(|file| {
-                if self
-                    .procs_used
+                if dbg!(&self.procs_used)
                     .contains(file.path().file_stem().unwrap().to_str().unwrap())
                 {
                     return file.contents_utf8();
@@ -1115,6 +1128,10 @@ impl Transpiler {
             })
             .join("\n");
         self.program = format!("{}\n {}", procs, self.program);
+    }
+
+    fn add_use(&mut self, library: &str) {
+        self.program = format!("use.{}\n {}", library, self.program);
     }
 }
 
@@ -1136,9 +1153,7 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     };
     //optimize the abstract syntax tree
     let ast = optimize_ast(expressions);
-    //add utility functions from the u256.masm file
-    transpiler.add_utility_functions();
-    transpiler.add_line("# end std lib #");
+    // transpiler.add_line("# end std lib #");
 
     //transpile function declarations first so that the procs are generated before we begin
     //transpiling the body of the miden program
@@ -1161,5 +1176,6 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     transpiler.add_line("end");
     //return the Miden program as a string
     transpiler.add_utility_functions();
+    transpiler.add_use("std::math::u256");
     transpiler.program
 }

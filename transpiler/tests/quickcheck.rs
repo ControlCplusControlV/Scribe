@@ -38,7 +38,7 @@ fn run_miden_function(
     expected: MidenResult,
 ) -> TestResult {
     let program = format!(
-        "{}\nbegin\n{}\n{}\nend",
+        "use.std::math::u256\n{}\nbegin\n{}\n{}\nend",
         load_all_procs(),
         stack
             .iter()
@@ -91,7 +91,7 @@ fn addition(x: U256, y: U256) -> TestResult {
         return TestResult::discard();
     }
     run_miden_function(
-        "exec.u256add_unsafe",
+        "exec.u256::add_unsafe",
         vec![x.0, y.0],
         MidenResult::U256(expected),
     )
@@ -101,7 +101,7 @@ fn addition(x: U256, y: U256) -> TestResult {
 fn multiplication(x: U256, y: U256) -> TestResult {
     let (expected, overflowed) = (x.0).overflowing_mul(y.0);
     run_miden_function(
-        "exec.u256mul_unsafe",
+        "exec.u256::mul_unsafe",
         vec![(x.0), (y.0)],
         MidenResult::U256(expected),
     )
@@ -178,7 +178,7 @@ fn shr(x: U256) -> TestResult {
 fn auto_and(x: U256, y: U256) -> TestResult {
     let expected = x.0 & y.0;
     run_miden_function(
-        "exec.u256and_unsafe",
+        "exec.u256::and",
         vec![x.0, y.0],
         MidenResult::U256(expected),
     )
@@ -192,7 +192,7 @@ fn quickcheck_subtraction(x: U256, y: U256) -> TestResult {
         return TestResult::discard();
     }
     run_miden_function(
-        "exec.u256sub_unsafe",
+        "exec.u256::sub_unsafe",
         vec![x.0, y.0],
         MidenResult::U256(expected),
     )
@@ -214,7 +214,7 @@ fn subtraction_with_addition_overflow() {
     let expected = x - y;
     dbg!(expected);
     let test_result = run_miden_function(
-        "exec.u256sub_unsafe",
+        "exec.u256::sub_unsafe",
         vec![x, y],
         MidenResult::U256(expected),
     );
@@ -230,7 +230,7 @@ fn multiplication_all_limbs() {
     let (expected, _) = x.overflowing_mul(y);
     dbg!(expected);
     let test_result = run_miden_function(
-        "exec.u256mul_unsafe",
+        "exec.u256::mul_unsafe",
         vec![x, y],
         MidenResult::U256(expected),
     );
