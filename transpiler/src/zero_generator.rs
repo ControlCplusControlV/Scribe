@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, HashSet}, ops::Deref};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Deref,
+};
 
 use crate::types::*;
 
@@ -11,7 +14,6 @@ struct Transpiler {
     local_vars_to_types_and_offsets: HashMap<String, (YulType, u32)>,
     instructions: Vec<Instruction>,
     stack_scratch_space_offset: LocalOffset,
-
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -28,7 +30,7 @@ struct Transpiler {
 #[derive(Default, Clone)]
 struct Branch {
     //modified_identifiers: HashSet<TypedIdentifier>,
-    //stack_before: Stack,
+//stack_before: Stack,
 }
 
 //Struct to represent a stack value.
@@ -48,7 +50,10 @@ impl Transpiler {
         self.instructions.push(inst);
     }
 
-    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) -> Option<LocalOffset> {
+    fn transpile_function_declaration(
+        &mut self,
+        op: &ExprFunctionDefinition,
+    ) -> Option<LocalOffset> {
         let saved_local_vars = self.local_vars_to_types_and_offsets.clone();
         self.local_vars_to_types_and_offsets = HashMap::new();
         self.scan_function_definition_for_variables(op);
@@ -67,22 +72,37 @@ impl Transpiler {
         for expr in op.block.exprs.clone() {
             match expr {
                 Expr::DeclareVariable(e) => {
-                    all_variables.extend(e.typed_identifiers.iter().map(|t| (t.identifier.clone(), t.yul_type)));
-                },
+                    all_variables.extend(
+                        e.typed_identifiers
+                            .iter()
+                            .map(|t| (t.identifier.clone(), t.yul_type)),
+                    );
+                }
                 _ => {}
             }
         }
 
         let mut counter = 0;
         for (name, yul_type) in all_variables {
-            self.local_vars_to_types_and_offsets.insert(name, (yul_type, counter));
+            self.local_vars_to_types_and_offsets
+                .insert(name, (yul_type, counter));
             counter += 1;
         }
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op.typed_identifiers.iter().map(|iden| self.local_vars_to_types_and_offsets.get(&iden.identifier).unwrap().clone().1).collect();
-        
+        let offsets: Vec<u32> = op
+            .typed_identifiers
+            .iter()
+            .map(|iden| {
+                self.local_vars_to_types_and_offsets
+                    .get(&iden.identifier)
+                    .unwrap()
+                    .clone()
+                    .1
+            })
+            .collect();
+
         match &op.rhs {
             Some(rhs) => {
                 let rhs = self.transpile_op(rhs.deref()).unwrap();
@@ -101,8 +121,18 @@ impl Transpiler {
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op.identifiers.iter().map(|iden| self.local_vars_to_types_and_offsets.get(iden).unwrap().clone().1).collect();
-        
+        let offsets: Vec<u32> = op
+            .identifiers
+            .iter()
+            .map(|iden| {
+                self.local_vars_to_types_and_offsets
+                    .get(iden)
+                    .unwrap()
+                    .clone()
+                    .1
+            })
+            .collect();
+
         let rhs = self.transpile_op(op.rhs.deref()).unwrap();
 
         for offset in offsets {
@@ -169,7 +199,7 @@ impl Transpiler {
 
             self.stack_scratch_space_offset += 1;
         }
-        
+
         to_return
     }
 
