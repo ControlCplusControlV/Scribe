@@ -106,16 +106,20 @@ impl Transpiler {
         for offset in offsets {
             let move_inst = Move32 {
                 val: LocalOrImmediate::Local(rhs),
-                dst: LocalOrImmediate::Local(offset),
+                dst: offset,
             };
-            self.add_instruction(move_inst);
+            self.add_instruction(Instruction::Move32(move_inst));
         }
+
+        None
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) -> Option<LocalOffset> {
         for op in &op.exprs {
             self.transpile_op(op);
         }
+
+        None
     }
 
     fn transpile_literal(&mut self, literal: &ExprLiteral) -> Option<LocalOffset> {
