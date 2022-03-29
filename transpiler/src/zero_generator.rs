@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, ops::Deref};
 
 use crate::types::*;
 
@@ -49,23 +49,25 @@ impl Transpiler {
     }
 
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) -> Option<LocalOffset> {
-        let saved_local_vars = self.local_vars_to_types_and_offsets;
+        let saved_local_vars = self.local_vars_to_types_and_offsets.clone();
         self.local_vars_to_types_and_offsets = HashMap::new();
         self.scan_function_definition_for_variables(op);
 
-        for expr in op.block.exprs {
+        for expr in op.block.exprs.clone() {
             // TODO
         }
 
         self.local_vars_to_types_and_offsets = saved_local_vars;
+
+        None
     }
 
     fn scan_function_definition_for_variables(&mut self, op: &ExprFunctionDefinition) {
         let mut all_variables = HashSet::<(String, YulType)>::new();
-        for expr in op.block.exprs {
+        for expr in op.block.exprs.clone() {
             match expr {
                 Expr::DeclareVariable(e) => {
-                    all_variables.extend(e.typed_identifiers.iter().map(|t| (t.identifier, t.yul_type)));
+                    all_variables.extend(e.typed_identifiers.iter().map(|t| (t.identifier.clone(), t.yul_type)));
                 },
                 _ => {}
             }
@@ -73,33 +75,33 @@ impl Transpiler {
 
         let mut counter = 0;
         for (name, yul_type) in all_variables {
-            self.local_vars_to_offsets.insert(name, (yul_type, counter));
+            self.local_vars_to_types_and_offsets.insert(name, (yul_type, counter));
             counter += 1;
         }
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op.typed_identifiers.iter().map(|iden| self.local_vars_to_offsets.get(&iden.identifier).unwrap().clone()).collect();
+        let offsets: Vec<u32> = op.typed_identifiers.iter().map(|iden| self.local_vars_to_types_and_offsets.get(&iden.identifier).unwrap().clone().1).collect();
         
-        match op.rhs {
+        match &op.rhs {
             Some(rhs) => {
-                let rhs = self.transpile_op(op.rhs.deref()).unwrap();
+                let rhs = self.transpile_op(rhs.deref()).unwrap();
 
                 for offset in offsets {
                     let move_inst = Move32 {
                         val: LocalOrImmediate::Local(rhs),
-                        dst: LocalOrImmediate::Local(offset),
+                        dst: offset,
                     };
-                    self.add_instruction(move_inst);
+                    self.add_instruction(Instruction::Move32(move_inst));
                 }
             }
-            None => _
+            None => {}
         };
         None
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op.identifiers.iter().map(|iden| self.local_vars_to_offsets.get(iden).unwrap().clone()).collect();
+        let offsets: Vec<u32> = op.identifiers.iter().map(|iden| self.local_vars_to_types_and_offsets.get(iden).unwrap().clone().1).collect();
         
         let rhs = self.transpile_op(op.rhs.deref()).unwrap();
 
@@ -131,10 +133,10 @@ impl Transpiler {
                 inferred_type,
             }) => {
                 if inferred_type == &Some(YulType::U256) {
-                    let offset = self.place_u256_on_stack(*value as u32);
+                    let offset = self.place_u256_on_stack(*value);
                     Some(offset)
                 } else {
-                    let offset = self.place_u32_on_stack(*value as u32);
+                    let offset = self.place_u32_on_stack((*value).try_into().unwrap());
                     Some(offset)
                 }
             }
@@ -148,7 +150,7 @@ impl Transpiler {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
             dst: self.stack_scratch_space_offset,
         };
-        self.add_instruction(move_inst);
+        self.add_instruction(Instruction::Move32(move_inst));
         let to_return = self.stack_scratch_space_offset;
         self.stack_scratch_space_offset += 1;
         to_return
@@ -158,12 +160,12 @@ impl Transpiler {
         let to_return = self.stack_scratch_space_offset;
 
         for _ in 0..8 {
-            let cur = (val % 1u64 << 32) as u32;
+            let cur: u32 = val.try_into().unwrap();
             let move_inst = Move32 {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
                 dst: self.stack_scratch_space_offset,
             };
-            self.add_instruction(move_inst);
+            self.add_instruction(Instruction::Move32(move_inst));
 
             self.stack_scratch_space_offset += 1;
         }
@@ -183,7 +185,7 @@ impl Transpiler {
             // Expr::FunctionCall(op) => self.transpile_miden_function(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
-            Expr::FunctionDefinition(op) => (),
+            Expr::FunctionDefinition(op) => todo!(),
             // Expr::Break => self.transpile_break(),
             // Expr::Continue => self.transpile_continue(),
             // Expr::Leave => self.transpile_leave(),
@@ -194,6 +196,6 @@ impl Transpiler {
 }
 
 //Transpile a Miden program from a Vec of expressions and return the compiled Miden program as a string
-pub fn transpile_program(expressions: Vec<Expr>) -> String {
-    
+pub fn transpile_program(expressions: Vec<Expr>) -> Vec<Instruction> {
+    todo!()
 }
