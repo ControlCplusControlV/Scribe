@@ -1,12 +1,12 @@
 // use std::fs;
+use crate::type_inference::infer_types;
+use crate::types::*;
+use hex::*;
 use pest::iterators::Pair;
 use pest::Parser;
 use pest_derive::Parser;
 use primitive_types::U256;
-use hex::*;
 use std::str;
-use crate::type_inference::infer_types;
-use crate::types::*;
 
 #[derive(Parser)]
 #[grammar = "./grammar.pest"]
