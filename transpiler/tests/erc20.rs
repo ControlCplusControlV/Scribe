@@ -1,11 +1,6 @@
 #[cfg(test)]
 mod tests {
-    
-    
-    
-    
-    
-    
+
     use scribe::parser::parse_yul_syntax;
     use scribe::types::expressions_to_tree;
 
