@@ -12,8 +12,11 @@ use zero_machine_code::instructions::*;
 //open memory addresses, the stack, indentation of Miden assembly and user defined functions.
 struct Transpiler {
     local_vars_to_types_and_offsets: HashMap<String, (YulType, u32)>,
-    instructions: Vec<Instruction>,
-    stack_scratch_space_offset: LocalOffset,
+    instructions: Vec<GeneralInstruction>,
+    //stack_scratch_space_offset: LocalOffset,
+    evaluation_stack: EvaluationStack,
+    call_stack: CallStack,
+
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -27,33 +30,48 @@ struct Transpiler {
     procs_used: HashSet<String>, */
 }
 
-#[derive(Default, Clone)]
+const CALL_STACK_START_ADDRESS: u32 = 0;
+const EVALUATION_STACK_START_ADDRESS: u32 = 2 << 8;
+
+struct EvaluationStack {
+    state: Vec<TypedIdentifier>,
+}
+
+impl EvaluationStack {
+    fn push(&mut self, id: TypedIdentifier) {
+        self.state.push(id)
+    }
+
+    fn pop(&mut self) -> Option<TypedIdentifier> {
+        self.state.pop()
+    }
+
+    fn get(&mut self) -> u32 {
+
+    }
+}
+
+struct CallStack {
+    frames: Vec<CallStackFrame>,
+}
+
+struct CallStackFrame {
+    address: u32,
+    variables: HashMap<TypedIdentifier, u32>,
+}
+
+/*#[derive(Default, Clone)]
 struct Branch {
-    //modified_identifiers: HashSet<TypedIdentifier>,
-//stack_before: Stack,
-}
-
-//Struct to represent a stack value.
-//Each stack value has an optional typed identifier (ie. x or x:u256) and a YulType
-#[derive(Clone, Debug)]
-struct StackValue {
-    typed_identifier: Option<TypedIdentifier>,
-    yul_type: YulType,
-}
-
-//Struct to represent the stack, consisting of a Vec of Stack Values
-#[derive(Default, Clone)]
-struct Stack(Vec<StackValue>);
+    modified_identifiers: HashSet<TypedIdentifier>,
+    stack_before: Stack,
+}*/
 
 impl Transpiler {
     fn add_instruction(&mut self, inst: Instruction) {
         self.instructions.push(inst);
     }
 
-    fn transpile_function_declaration(
-        &mut self,
-        op: &ExprFunctionDefinition,
-    ) -> Option<LocalOffset> {
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
         let saved_local_vars = self.local_vars_to_types_and_offsets.clone();
         self.local_vars_to_types_and_offsets = HashMap::new();
         self.scan_function_definition_for_variables(op);
@@ -63,8 +81,6 @@ impl Transpiler {
         }
 
         self.local_vars_to_types_and_offsets = saved_local_vars;
-
-        None
     }
 
     fn scan_function_definition_for_variables(&mut self, op: &ExprFunctionDefinition) {
@@ -90,73 +106,55 @@ impl Transpiler {
         }
     }
 
-    fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op
-            .typed_identifiers
-            .iter()
-            .map(|iden| {
-                self.local_vars_to_types_and_offsets
-                    .get(&iden.identifier)
-                    .unwrap()
-                    .clone()
-                    .1
-            })
-            .collect();
+    fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
+        // TODO: more than one identifier in variable declaration
+        assert_eq!(op.typed_identifiers.len(), 1);
+        let identifier = &op.typed_identifiers[0];
 
-        match &op.rhs {
-            Some(rhs) => {
-                let rhs = self.transpile_op(rhs.deref()).unwrap();
+        let offset = 
+            self.local_vars_to_types_and_offsets
+                .get(&identifier.identifier)
+                .unwrap()
+                .clone()
+                .1;
 
-                for offset in offsets {
-                    let move_inst = Move32 {
-                        val: LocalOrImmediate::Local(rhs),
-                        dst: offset,
-                    };
-                    self.add_instruction(Instruction::Move32(move_inst));
-                }
-            }
-            None => {}
-        };
-        None
-    }
+        if let Some(rhs) = &op.rhs {
+            let rhs = self.transpile_op(rhs.deref());
 
-    fn transpile_assignment(&mut self, op: &ExprAssignment) -> Option<LocalOffset> {
-        let offsets: Vec<u32> = op
-            .identifiers
-            .iter()
-            .map(|iden| {
-                self.local_vars_to_types_and_offsets
-                    .get(iden)
-                    .unwrap()
-                    .clone()
-                    .1
-            })
-            .collect();
-
-        let rhs = self.transpile_op(op.rhs.deref()).unwrap();
-
-        for offset in offsets {
             let move_inst = Move32 {
                 val: LocalOrImmediate::Local(rhs),
                 dst: offset,
             };
             self.add_instruction(Instruction::Move32(move_inst));
-        }
-
-        None
+        };
     }
 
-    fn transpile_block(&mut self, op: &ExprBlock) -> Option<LocalOffset> {
+    fn transpile_assignment(&mut self, op: &ExprAssignment) {
+        // TODO: more than one identifier in assignment
+        assert_eq!(op.identifiers.len(), 1);
+        let identifier = &op.identifiers[0];
+
+        let offset = self.local_vars_to_types_and_offsets
+            .get(identifier)
+            .unwrap()
+            .clone()
+            .1;
+        let rhs = self.transpile_op(op.rhs.deref()).unwrap();
+
+        let move_inst = Move32 {
+            val: LocalOrImmediate::Local(rhs),
+            dst: offset,
+        };
+        self.add_instruction(Instruction::Move32(move_inst));
+    }
+
+    fn transpile_block(&mut self, op: &ExprBlock)  {
         for op in &op.exprs {
             self.transpile_op(op);
         }
-
-        None
     }
 
-    fn transpile_literal(&mut self, literal: &ExprLiteral) -> Option<LocalOffset> {
-        let stack_scratch = self.stack_scratch_space_offset;
-
+    fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
             ExprLiteral::Number(ExprLiteralNumber {
                 value,
@@ -203,7 +201,7 @@ impl Transpiler {
         to_return
     }
 
-    fn transpile_op(&mut self, expr: &Expr) -> Option<LocalOffset> {
+    fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
             Expr::Assignment(op) => self.transpile_assignment(op),
