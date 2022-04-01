@@ -16,7 +16,6 @@ struct Transpiler {
     //stack_scratch_space_offset: LocalOffset,
     evaluation_stack: EvaluationStack,
     call_stack: CallStack,
-
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -31,7 +30,7 @@ struct Transpiler {
 }
 
 const CALL_STACK_START_ADDRESS: u32 = 0;
-const EVALUATION_STACK_START_ADDRESS: u32 = 2 << 8;
+const EVALUATION_STACK_START_ADDRESS: u32 = 1 << 8;
 
 struct EvaluationStack {
     state: Vec<TypedIdentifier>,
@@ -46,9 +45,9 @@ impl EvaluationStack {
         self.state.pop()
     }
 
-    fn get(&mut self) -> u32 {
+    // fn get(&mut self) -> u32 {
 
-    }
+    // }
 }
 
 struct CallStack {
@@ -111,22 +110,24 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         let identifier = &op.typed_identifiers[0];
 
-        let offset = 
-            self.local_vars_to_types_and_offsets
-                .get(&identifier.identifier)
-                .unwrap()
-                .clone()
-                .1;
+        let offset = self
+            .local_vars_to_types_and_offsets
+            .get(&identifier.identifier)
+            .unwrap()
+            .clone()
+            .1;
 
         if let Some(rhs) = &op.rhs {
             let rhs = self.transpile_op(rhs.deref());
 
-            let move_inst = Move32 {
-                val: LocalOrImmediate::Local(rhs),
-                dst: offset,
-            };
-            self.add_instruction(Instruction::Move32(move_inst));
-        };
+            for offset in offsets {
+                let move_inst = Instruction::Move32 {
+                    val: LocalOrImmediate::Local(rhs),
+                    dst: offset,
+                };
+                self.add_instruction(move_inst);
+            }
+        }
     }
 
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
@@ -134,7 +135,8 @@ impl Transpiler {
         assert_eq!(op.identifiers.len(), 1);
         let identifier = &op.identifiers[0];
 
-        let offset = self.local_vars_to_types_and_offsets
+        let offset = self
+            .local_vars_to_types_and_offsets
             .get(identifier)
             .unwrap()
             .clone()
@@ -148,7 +150,7 @@ impl Transpiler {
         self.add_instruction(Instruction::Move32(move_inst));
     }
 
-    fn transpile_block(&mut self, op: &ExprBlock)  {
+    fn transpile_block(&mut self, op: &ExprBlock) {
         for op in &op.exprs {
             self.transpile_op(op);
         }
@@ -174,11 +176,11 @@ impl Transpiler {
     }
 
     fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
-        let move_inst = Move32 {
+        let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
             dst: self.stack_scratch_space_offset,
         };
-        self.add_instruction(Instruction::Move32(move_inst));
+        self.add_instruction(move_inst);
         let to_return = self.stack_scratch_space_offset;
         self.stack_scratch_space_offset += 1;
         to_return
@@ -189,11 +191,11 @@ impl Transpiler {
 
         for _ in 0..8 {
             let cur: u32 = val.try_into().unwrap();
-            let move_inst = Move32 {
+            let move_inst = Instruction::Move32 {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
                 dst: self.stack_scratch_space_offset,
             };
-            self.add_instruction(Instruction::Move32(move_inst));
+            self.add_instruction(move_inst);
 
             self.stack_scratch_space_offset += 1;
         }
