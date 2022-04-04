@@ -33,7 +33,7 @@ const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
 
 struct LocalVariables {
     current_offset: u32,
-    variables: HashMap<TypedIdentifier, u32>,
+    variables: HashMap<String, (YulType, u32)>,
 }
 
 struct EvaluationStack {
@@ -114,14 +114,16 @@ impl Transpiler {
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
         // variables: HashMap<TypedIdentifier, u32>,
         let mut current_offset = self.current_stack_frame.local_variables.current_offset;
-        let mut new_entries: Vec<(TypedIdentifier, u32)> = Vec::new();
+        let mut new_entries: Vec<(String, (YulType, u32))> = Vec::new();
 
         for expr in op.block.exprs.clone() {
             match expr {
                 Expr::DeclareVariable(e) => {
                     for t in e.typed_identifiers {
-                        new_entries.push((t.clone(), current_offset));
-                        current_offset += match t.yul_type {
+                        let iden = t.identifier;
+                        let typ = t.yul_type;
+                        new_entries.push((iden, (typ, current_offset)));
+                        current_offset += match typ {
                             YulType::U32 => 1,
                             YulType::U256 => 8,
                         };
@@ -144,16 +146,17 @@ impl Transpiler {
             .current_stack_frame
             .local_variables
             .variables
-            .get(&identifier)
+            .get(&identifier.identifier)
             .unwrap();
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
             let rhs = self.current_stack_frame.evaluation_stack.pop();
 
+            // TODO: deal with U256 case
             let move_inst = Instruction::Move32 {
                 val: LocalOrImmediate::Local(rhs),
-                dst: offset,
+                dst: offset.1,
             };
             self.add_instruction(GeneralInstruction::Real(move_inst));
         }
@@ -164,22 +167,27 @@ impl Transpiler {
         assert_eq!(op.identifiers.len(), 1);
         let identifier = &op.identifiers[0];
 
-        let offset = self
-            .
+        let offset = *self
+            .current_stack_frame
+            .local_variables
+            .variables
             .get(identifier)
-            .unwrap()
-            .clone()
-            .1;
-        let rhs = self.transpile_op(op.rhs.deref()).unwrap();
+            .unwrap();
 
-        let move_inst = Move32 {
+        self.transpile_op(op.rhs.deref());
+        let rhs = self.current_stack_frame.evaluation_stack.pop();
+
+        // TODO: deal with U256 case
+        let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Local(rhs),
-            dst: offset,
+            dst: offset.1,
         };
-        self.add_instruction(Instruction::Move32(move_inst));
+        self.add_instruction(GeneralInstruction::Real(move_inst));
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) {
+        // scan block for variables
+
         for op in &op.exprs {
             self.transpile_op(op);
         }
@@ -192,11 +200,9 @@ impl Transpiler {
                 inferred_type,
             }) => {
                 if inferred_type == &Some(YulType::U256) {
-                    let offset = self.place_u256_on_stack(*value);
-                    Some(offset)
+                    self.place_u256_on_stack(*value);
                 } else {
-                    let offset = self.place_u32_on_stack((*value).try_into().unwrap());
-                    Some(offset)
+                    self.place_u32_on_stack((*value).try_into().unwrap());
                 }
             }
             ExprLiteral::String(_) => todo!(),
