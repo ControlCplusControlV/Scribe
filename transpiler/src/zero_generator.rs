@@ -33,7 +33,7 @@ const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
 
 struct LocalVariables {
     current_offset: u32,
-    variables: HashMap<String, (YulType, u32)>,
+    scopes: Vec<HashMap<String, (YulType, u32)>>,
 }
 
 struct EvaluationStack {
@@ -187,6 +187,7 @@ impl Transpiler {
 
     fn transpile_block(&mut self, op: &ExprBlock) {
         // scan block for variables
+        // add new variable mapping for this scope
 
         for op in &op.exprs {
             self.transpile_op(op);
@@ -247,7 +248,7 @@ impl Transpiler {
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
             // Expr::IfStatement(op) => self.transpile_if_statement(op),
-            // Expr::FunctionCall(op) => self.transpile_miden_function(op),
+            Expr::FunctionCall(op) => self.transpile_function_call(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
             Expr::FunctionDefinition(op) => todo!(),
@@ -257,6 +258,12 @@ impl Transpiler {
             // Expr::Switch(op) => self.transpile_switch(op),
             _ => unreachable!(),
         }
+    }
+
+    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
+        // insert CALL
+        // add new stack frame
+
     }
 }
 
