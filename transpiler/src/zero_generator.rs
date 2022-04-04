@@ -40,7 +40,7 @@ struct LocalVariables {
 
 impl LocalVariables {
     fn current_scope(&mut self) -> Scope {
-        self.scopes[self.scopes.len() - 1]
+        self.scopes[self.scopes.len() - 1].clone()
     }
 
     fn add_scope(&mut self, scope: Scope) {
@@ -51,6 +51,7 @@ impl LocalVariables {
 struct EvaluationStack {
     state: Vec<YulType>,
 }
+
 struct StackFrame {
     local_variables: LocalVariables,
     evaluation_stack: EvaluationStack,
@@ -279,5 +280,7 @@ impl Transpiler {
 
 //Transpile a Miden program from a Vec of expressions and return the compiled Miden program as a string
 pub fn transpile_program(expressions: Vec<Expr>) -> Vec<Instruction> {
+    let transpiler = Transpiler::new();
+
     todo!()
 }
