@@ -31,14 +31,20 @@ struct Transpiler {
 const EVAL_STACK_START_ADDRESS: u32 = 0;
 const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
 
+type Scope = HashMap<String, (YulType, u32)>;
+
 struct LocalVariables {
     current_offset: u32,
-    scopes: Vec<HashMap<String, (YulType, u32)>>,
+    scopes: Vec<Scope>,
 }
 
 impl LocalVariables {
-    fn current_scope(&mut self) -> HashMap<String, (YulType, u32)> {
+    fn current_scope(&mut self) -> Scope {
         self.scopes[self.scopes.len() - 1]
+    }
+
+    fn add_scope(&mut self, scope: Scope) {
+        self.scopes.push(scope)
     }
 }
 
@@ -116,9 +122,8 @@ impl Transpiler {
     }
 
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
-        // variables: HashMap<TypedIdentifier, u32>,
         let mut current_offset = self.current_stack_frame.local_variables.current_offset;
-        let mut new_entries: Vec<(String, (YulType, u32))> = Vec::new();
+        let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
 
         for expr in op.block.exprs.clone() {
             match expr {
@@ -126,7 +131,7 @@ impl Transpiler {
                     for t in e.typed_identifiers {
                         let iden = t.identifier;
                         let typ = t.yul_type;
-                        new_entries.push((iden, (typ, current_offset)));
+                        new_scope.insert(iden, (typ, current_offset));
                         current_offset += match typ {
                             YulType::U32 => 1,
                             YulType::U256 => 8,
@@ -137,11 +142,7 @@ impl Transpiler {
             }
         }
 
-        self.current_stack_frame
-            .local_variables
-            .variables
-            .extend(new_entries);
-        self.current_stack_frame.local_variables.current_offset = current_offset;
+        self.current_stack_frame.local_variables.add_scope(new_scope);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
