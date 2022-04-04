@@ -36,6 +36,12 @@ struct LocalVariables {
     scopes: Vec<HashMap<String, (YulType, u32)>>,
 }
 
+impl LocalVariables {
+    fn current_scope(&mut self) -> HashMap<String, (YulType, u32)> {
+        self.scopes[self.scopes.len() - 1]
+    }
+}
+
 struct EvaluationStack {
     state: Vec<YulType>,
 }
@@ -102,7 +108,7 @@ impl Transpiler {
     }
 
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        // TODO: calling convention stuff!
+        // TODO: calling convention stuff?
 
         for expr in op.block.exprs.clone() {
             self.transpile_op(&expr);
@@ -143,10 +149,8 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         let identifier = &op.typed_identifiers[0];
 
-        let offset = *self
-            .current_stack_frame
-            .local_variables
-            .variables
+        let scope = self.current_stack_frame.local_variables.current_scope();
+        let offset = scope
             .get(&identifier.identifier)
             .unwrap();
 
@@ -168,10 +172,8 @@ impl Transpiler {
         assert_eq!(op.identifiers.len(), 1);
         let identifier = &op.identifiers[0];
 
-        let offset = *self
-            .current_stack_frame
-            .local_variables
-            .variables
+        let scope = self.current_stack_frame.local_variables.current_scope();
+        let offset = scope
             .get(identifier)
             .unwrap();
 
@@ -264,6 +266,8 @@ impl Transpiler {
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         // insert CALL
         // add new stack frame
+
+        
     }
 }
 
