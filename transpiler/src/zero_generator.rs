@@ -11,11 +11,10 @@ use zero_machine_code::instructions::*;
 //Struct that enables transpilation management. Through implementations, this struct keeps track of the variables,
 //open memory addresses, the stack, indentation of Miden assembly and user defined functions.
 struct Transpiler {
-    local_vars_to_types_and_offsets: HashMap<String, (YulType, u32)>,
     instructions: Vec<GeneralInstruction>,
     //stack_scratch_space_offset: LocalOffset,
-    evaluation_stack: EvaluationStack,
-    call_stack: CallStack,
+    current_stack_frame: StackFrame,
+    previous_stack_frames: Vec<StackFrame>,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -29,14 +28,33 @@ struct Transpiler {
     procs_used: HashSet<String>, */
 }
 
-const CALL_STACK_START_ADDRESS: u32 = 0;
-const EVALUATION_STACK_START_ADDRESS: u32 = 1 << 8;
+struct LocalVariables {
+    start_address: u32,
+    variables: HashMap<TypedIdentifier, u32>,
+}
 
 struct EvaluationStack {
+    start_address: u32,
+    current_offset: u32,
     state: Vec<TypedIdentifier>,
+}
+struct StackFrame {
+    local_variables: LocalVariables,
+    evaluation_stack: EvaluationStack,
 }
 
 impl EvaluationStack {
+    fn offset_of_ith_element(&mut self, i: usize) -> u32 {
+        let mut offset = self.start_address;
+        for j in 0..i {
+            offset += match self.state[j].yul_type {
+                YulType::U32 => 1,
+                YulType::U256 => 8,
+            };
+        }
+        offset
+    }
+
     fn push(&mut self, id: TypedIdentifier) {
         self.state.push(id)
     }
@@ -45,19 +63,28 @@ impl EvaluationStack {
         self.state.pop()
     }
 
-    // fn get(&mut self) -> u32 {
 
-    // }
+    fn add3(&mut self) -> Vec<GeneralInstruction> {
+        let n = self.state.len();
+        assert!(n > 2);
+
+        let x_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n - 2));
+        let y_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n - 1));
+        let z_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n));
+
+        let dst_addr = self.offset_of_ith_element(n - 2);
+
+        let add3_inst = Instruction::Add3 {
+            x: x_addr,
+            y: y_addr,
+            z: z_addr,
+            dst: dst_addr,
+        };
+        
+        vec![GeneralInstruction::Real(add3_inst)]
+    }
 }
 
-struct CallStack {
-    frames: Vec<CallStackFrame>,
-}
-
-struct CallStackFrame {
-    address: u32,
-    variables: HashMap<TypedIdentifier, u32>,
-}
 
 /*#[derive(Default, Clone)]
 struct Branch {
@@ -66,23 +93,20 @@ struct Branch {
 }*/
 
 impl Transpiler {
-    fn add_instruction(&mut self, inst: Instruction) {
+    fn add_instruction(&mut self, inst: GeneralInstruction) {
         self.instructions.push(inst);
     }
 
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        let saved_local_vars = self.local_vars_to_types_and_offsets.clone();
-        self.local_vars_to_types_and_offsets = HashMap::new();
         self.scan_function_definition_for_variables(op);
 
         for expr in op.block.exprs.clone() {
             // TODO
         }
-
-        self.local_vars_to_types_and_offsets = saved_local_vars;
     }
 
     fn scan_function_definition_for_variables(&mut self, op: &ExprFunctionDefinition) {
+        let mut current_offset = self.current_stack_frame.local_variables.start_address;
         let mut all_variables = HashSet::<(String, YulType)>::new();
         for expr in op.block.exprs.clone() {
             match expr {
