@@ -37,7 +37,7 @@ struct LocalVariables {
 }
 
 struct EvaluationStack {
-    state: Vec<TypedIdentifier>,
+    state: Vec<YulType>,
 }
 struct StackFrame {
     local_variables: LocalVariables,
@@ -48,7 +48,7 @@ impl EvaluationStack {
     fn offset_of_ith_element(&mut self, i: usize) -> u32 {
         let mut offset = EVAL_STACK_START_ADDRESS;
         for j in 0..i {
-            offset += match self.state[j].yul_type {
+            offset += match self.state[j] {
                 YulType::U32 => 1,
                 YulType::U256 => 8,
             };
@@ -56,14 +56,19 @@ impl EvaluationStack {
         offset
     }
 
-    fn push(&mut self, id: TypedIdentifier) {
-        self.state.push(id)
+    fn offset_of_last_element(&mut self) -> u32 {
+        self.offset_of_ith_element(self.state.len() - 1)
     }
 
-    fn pop(&mut self) -> Option<TypedIdentifier> {
-        self.state.pop()
+    fn push(&mut self, typ: YulType) {
+        self.state.push(typ)
     }
 
+    fn pop(&mut self) -> u32 {
+        let idx = self.offset_of_last_element();
+        self.state.pop();
+        idx
+    }
 
     fn add3(&mut self) -> Vec<GeneralInstruction> {
         let n = self.state.len();
@@ -135,26 +140,22 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         let identifier = &op.typed_identifiers[0];
 
-        let offset = self
+        let offset = *self
             .current_stack_frame
             .local_variables
             .variables
-            .get(&identifier.identifier)
-            .unwrap()
-            .clone()
-            .1;
+            .get(&identifier)
+            .unwrap();
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
-            
+            let rhs = self.current_stack_frame.evaluation_stack.pop();
 
-            for offset in offsets {
-                let move_inst = Instruction::Move32 {
-                    val: LocalOrImmediate::Local(rhs),
-                    dst: offset,
-                };
-                self.add_instruction(move_inst);
-            }
+            let move_inst = Instruction::Move32 {
+                val: LocalOrImmediate::Local(rhs),
+                dst: offset,
+            };
+            self.add_instruction(GeneralInstruction::Real(move_inst));
         }
     }
 
