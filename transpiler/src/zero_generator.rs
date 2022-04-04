@@ -28,14 +28,15 @@ struct Transpiler {
     procs_used: HashSet<String>, */
 }
 
+const EVAL_STACK_START_ADDRESS: u32 = 0;
+const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
+
 struct LocalVariables {
-    start_address: u32,
+    current_offset: u32,
     variables: HashMap<TypedIdentifier, u32>,
 }
 
 struct EvaluationStack {
-    start_address: u32,
-    current_offset: u32,
     state: Vec<TypedIdentifier>,
 }
 struct StackFrame {
@@ -45,7 +46,7 @@ struct StackFrame {
 
 impl EvaluationStack {
     fn offset_of_ith_element(&mut self, i: usize) -> u32 {
-        let mut offset = self.start_address;
+        let mut offset = EVAL_STACK_START_ADDRESS;
         for j in 0..i {
             offset += match self.state[j].yul_type {
                 YulType::U32 => 1,
@@ -98,35 +99,35 @@ impl Transpiler {
     }
 
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        self.scan_function_definition_for_variables(op);
+        // TODO: calling convention stuff!
 
         for expr in op.block.exprs.clone() {
-            // TODO
+            self.transpile_op(&expr);
         }
     }
 
-    fn scan_function_definition_for_variables(&mut self, op: &ExprFunctionDefinition) {
-        let mut current_offset = self.current_stack_frame.local_variables.start_address;
-        let mut all_variables = HashSet::<(String, YulType)>::new();
+    fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
+        // variables: HashMap<TypedIdentifier, u32>,
+        let mut current_offset = self.current_stack_frame.local_variables.current_offset;
+        let mut new_entries: Vec<(TypedIdentifier, u32)> = Vec::new();
+
         for expr in op.block.exprs.clone() {
             match expr {
                 Expr::DeclareVariable(e) => {
-                    all_variables.extend(
-                        e.typed_identifiers
-                            .iter()
-                            .map(|t| (t.identifier.clone(), t.yul_type)),
-                    );
+                    for t in e.typed_identifiers {
+                        new_entries.push((t.clone(), current_offset));
+                        current_offset += match t.yul_type {
+                            YulType::U32 => 1,
+                            YulType::U256 => 8,
+                        };
+                    }
                 }
                 _ => {}
             }
         }
 
-        let mut counter = 0;
-        for (name, yul_type) in all_variables {
-            self.local_vars_to_types_and_offsets
-                .insert(name, (yul_type, counter));
-            counter += 1;
-        }
+        self.current_stack_frame.local_variables.variables.extend(new_entries);
+        self.current_stack_frame.local_variables.current_offset = current_offset;
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
@@ -135,14 +136,17 @@ impl Transpiler {
         let identifier = &op.typed_identifiers[0];
 
         let offset = self
-            .local_vars_to_types_and_offsets
+            .current_stack_frame
+            .local_variables
+            .variables
             .get(&identifier.identifier)
             .unwrap()
             .clone()
             .1;
 
         if let Some(rhs) = &op.rhs {
-            let rhs = self.transpile_op(rhs.deref());
+            self.transpile_op(rhs.deref());
+            
 
             for offset in offsets {
                 let move_inst = Instruction::Move32 {
@@ -160,7 +164,7 @@ impl Transpiler {
         let identifier = &op.identifiers[0];
 
         let offset = self
-            .local_vars_to_types_and_offsets
+            .
             .get(identifier)
             .unwrap()
             .clone()
