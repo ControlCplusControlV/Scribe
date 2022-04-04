@@ -72,11 +72,12 @@ impl EvaluationStack {
         self.offset_of_ith_element(self.state.len() - 1)
     }
 
-    fn push(&mut self, typ: YulType) {
-        self.state.push(typ)
+    fn push(&mut self, typ: YulType) -> LocalOffset {
+        self.state.push(typ);
+        self.offset_of_last_element()
     }
 
-    fn pop(&mut self) -> u32 {
+    fn pop(&mut self) -> LocalOffset {
         let idx = self.offset_of_last_element();
         self.state.pop();
         idx
@@ -216,31 +217,35 @@ impl Transpiler {
     }
 
     fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
+        let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U32);
+
         let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
-            dst: self.stack_scratch_space_offset,
+            dst: location_of_new_space,
         };
         self.add_instruction(GeneralInstruction::Real(move_inst));
-        let to_return = self.stack_scratch_space_offset;
-        self.stack_scratch_space_offset += 1;
-        to_return
+        
+        location_of_new_space
     }
 
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
-        let to_return = self.stack_scratch_space_offset;
+        let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U256);
+        let mut cur_location = location_of_new_space;
+        let mut cur_val = val;
 
         for _ in 0..8 {
-            let cur: u32 = val.try_into().unwrap();
+            let cur: u32 = (cur_val % (1u64 << 32)).try_into().unwrap();
             let move_inst = Instruction::Move32 {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
-                dst: self.stack_scratch_space_offset,
+                dst: cur_location,
             };
             self.add_instruction(GeneralInstruction::Real(move_inst));
+            cur_location += 1;
 
-            self.stack_scratch_space_offset += 1;
+            cur_val = cur_val / (1u64 << 32);
         }
 
-        to_return
+        location_of_new_space
     }
 
     fn transpile_op(&mut self, expr: &Expr) {
