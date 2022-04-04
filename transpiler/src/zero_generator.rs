@@ -39,6 +39,13 @@ struct LocalVariables {
 }
 
 impl LocalVariables {
+    fn new() -> Self {
+        LocalVariables {
+            current_offset: 0,
+            scopes: Vec::new(),
+        }
+    }
+
     fn current_scope(&mut self) -> Scope {
         self.scopes[self.scopes.len() - 1].clone()
     }
@@ -52,9 +59,26 @@ struct EvaluationStack {
     state: Vec<YulType>,
 }
 
+impl EvaluationStack {
+    fn new() -> Self {
+        EvaluationStack {
+            state: Vec::new(),
+        }
+    }
+}
+
 struct StackFrame {
     local_variables: LocalVariables,
     evaluation_stack: EvaluationStack,
+}
+
+impl StackFrame {
+    fn new() -> Self {
+        StackFrame {
+            local_variables: LocalVariables::new(),
+            evaluation_stack: EvaluationStack::new(),
+        }
+    }
 }
 
 impl EvaluationStack {
@@ -280,7 +304,11 @@ impl Transpiler {
 
 //Transpile a Miden program from a Vec of expressions and return the compiled Miden program as a string
 pub fn transpile_program(expressions: Vec<Expr>) -> Vec<Instruction> {
-    let transpiler = Transpiler::new();
+    let transpiler = Transpiler {
+        instructions: Vec::new(),
+        current_stack_frame: StackFrame::new(),
+        previous_stack_frames: Vec::new(),        
+    };
 
     todo!()
 }
