@@ -86,11 +86,9 @@ impl EvaluationStack {
             z: z_addr,
             dst: dst_addr,
         };
-        
         vec![GeneralInstruction::Real(add3_inst)]
     }
 }
-
 
 /*#[derive(Default, Clone)]
 struct Branch {
@@ -133,7 +131,10 @@ impl Transpiler {
             }
         }
 
-        self.current_stack_frame.local_variables.variables.extend(new_entries);
+        self.current_stack_frame
+            .local_variables
+            .variables
+            .extend(new_entries);
         self.current_stack_frame.local_variables.current_offset = current_offset;
     }
 
@@ -216,7 +217,7 @@ impl Transpiler {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
             dst: self.stack_scratch_space_offset,
         };
-        self.add_instruction(move_inst);
+        self.add_instruction(GeneralInstruction::Real(move_inst));
         let to_return = self.stack_scratch_space_offset;
         self.stack_scratch_space_offset += 1;
         to_return
@@ -231,7 +232,7 @@ impl Transpiler {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
                 dst: self.stack_scratch_space_offset,
             };
-            self.add_instruction(move_inst);
+            self.add_instruction(GeneralInstruction::Real(move_inst));
 
             self.stack_scratch_space_offset += 1;
         }
@@ -263,7 +264,6 @@ impl Transpiler {
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         // insert CALL
         // add new stack frame
-
     }
 }
 
