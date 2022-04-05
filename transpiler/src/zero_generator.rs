@@ -57,11 +57,9 @@ impl LocalVariables {
             scopes: Vec::new(),
         }
     }
-
     fn current_scope(&mut self) -> Scope {
         self.scopes[self.scopes.len() - 1].clone()
     }
-
     fn add_scope(&mut self, scope: Scope) {
         self.scopes.push(scope)
     }
