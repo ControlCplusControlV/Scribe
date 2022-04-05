@@ -29,6 +29,20 @@ struct Transpiler {
 const EVAL_STACK_START_ADDRESS: u32 = 0;
 const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
 
+struct StackFrame {
+    local_variables: LocalVariables,
+    evaluation_stack: EvaluationStack,
+}
+
+impl StackFrame {
+    fn new() -> Self {
+        StackFrame {
+            local_variables: LocalVariables::new(),
+            evaluation_stack: EvaluationStack::new(),
+        }
+    }
+}
+
 type Scope = HashMap<String, (YulType, u32)>;
 
 struct LocalVariables {
@@ -61,23 +75,6 @@ impl EvaluationStack {
     fn new() -> Self {
         EvaluationStack { state: Vec::new() }
     }
-}
-
-struct StackFrame {
-    local_variables: LocalVariables,
-    evaluation_stack: EvaluationStack,
-}
-
-impl StackFrame {
-    fn new() -> Self {
-        StackFrame {
-            local_variables: LocalVariables::new(),
-            evaluation_stack: EvaluationStack::new(),
-        }
-    }
-}
-
-impl EvaluationStack {
     fn offset_of_ith_element(&mut self, i: usize) -> u32 {
         let mut offset = EVAL_STACK_START_ADDRESS;
         for j in 0..i {
@@ -88,22 +85,18 @@ impl EvaluationStack {
         }
         offset
     }
-
     fn offset_of_last_element(&mut self) -> u32 {
         self.offset_of_ith_element(self.state.len() - 1)
     }
-
     fn push(&mut self, typ: YulType) -> LocalOffset {
         self.state.push(typ);
         self.offset_of_last_element()
     }
-
     fn pop(&mut self) -> LocalOffset {
         let idx = self.offset_of_last_element();
         self.state.pop();
         idx
     }
-
     fn add3(&mut self) -> Vec<GeneralInstruction> {
         let n = self.state.len();
         assert!(n > 2);
@@ -141,7 +134,88 @@ impl Transpiler {
     fn add_instruction(&mut self, inst: GeneralInstruction) {
         self.instructions.push(inst);
     }
+    fn transpile_op(&mut self, expr: &Expr) {
+        match expr {
+            Expr::Literal(value) => self.transpile_literal(value),
+            Expr::Assignment(op) => self.transpile_assignment(op),
+            Expr::DeclareVariable(op) => self.transpile_variable_declaration(op),
+            // Expr::ForLoop(op) => self.transpile_for_loop(op),
+            // Expr::Variable(op) => self.transpile_variable_reference(op),
+            Expr::Block(op) => self.transpile_block(op),
+            // Expr::IfStatement(op) => self.transpile_if_statement(op),
+            Expr::FunctionCall(op) => self.transpile_function_call(op),
+            // Expr::Repeat(op) => self.transpile_repeat(op),
+            // We've already compiled the functions
+            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            // Expr::Break => self.transpile_break(),
+            // Expr::Continue => self.transpile_continue(),
+            // Expr::Leave => self.transpile_leave(),
+            // Expr::Switch(op) => self.transpile_switch(op),
+            _ => unreachable!(),
+        }
+    }
+    fn transpile_literal(&mut self, literal: &ExprLiteral) {
+        match literal {
+            ExprLiteral::Number(ExprLiteralNumber {
+                value,
+                inferred_type,
+            }) => {
+                if inferred_type == &Some(YulType::U256) {
+                    self.place_u256_on_stack(*value);
+                } else {
+                    self.place_u32_on_stack((*value).try_into().unwrap());
+                }
+            }
+            ExprLiteral::String(_) => todo!(),
+            &ExprLiteral::Bool(_) => todo!(),
+        }
+    }
+    fn transpile_assignment(&mut self, op: &ExprAssignment) {
+        // TODO: more than one identifier in assignment
+        assert_eq!(op.identifiers.len(), 1);
+        let identifier = &op.identifiers[0];
 
+        let scope = self.current_stack_frame.local_variables.current_scope();
+        let offset = scope.get(identifier).unwrap();
+
+        self.transpile_op(op.rhs.deref());
+        let rhs = self.current_stack_frame.evaluation_stack.pop();
+
+        // TODO: deal with U256 case
+        let move_inst = Instruction::Move32 {
+            val: LocalOrImmediate::Local(rhs),
+            dst: offset.1,
+        };
+        self.add_instruction(GeneralInstruction::Real(move_inst));
+    }
+    fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
+        // TODO: more than one identifier in variable declaration
+        assert_eq!(op.typed_identifiers.len(), 1);
+        let identifier = &op.typed_identifiers[0];
+
+        let scope = self.current_stack_frame.local_variables.current_scope();
+        let offset = scope.get(&identifier.identifier).unwrap();
+
+        if let Some(rhs) = &op.rhs {
+            self.transpile_op(rhs.deref());
+            let rhs = self.current_stack_frame.evaluation_stack.pop();
+
+            // TODO: deal with U256 case
+            let move_inst = Instruction::Move32 {
+                val: LocalOrImmediate::Local(rhs),
+                dst: offset.1,
+            };
+            self.add_instruction(GeneralInstruction::Real(move_inst));
+        }
+    }
+    fn transpile_block(&mut self, op: &ExprBlock) {
+        // scan block for variables
+        // add new variable mapping for this scope
+
+        for op in &op.exprs {
+            self.transpile_op(op);
+        }
+    }
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
         // TODO: calling convention stuff?
 
@@ -149,7 +223,10 @@ impl Transpiler {
             self.transpile_op(&expr);
         }
     }
-
+    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
+        // insert CALL
+        // add new stack frame
+    }
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
         let mut current_offset = self.current_stack_frame.local_variables.current_offset;
         let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
@@ -175,73 +252,6 @@ impl Transpiler {
             .local_variables
             .add_scope(new_scope);
     }
-
-    fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
-        // TODO: more than one identifier in variable declaration
-        assert_eq!(op.typed_identifiers.len(), 1);
-        let identifier = &op.typed_identifiers[0];
-
-        let scope = self.current_stack_frame.local_variables.current_scope();
-        let offset = scope.get(&identifier.identifier).unwrap();
-
-        if let Some(rhs) = &op.rhs {
-            self.transpile_op(rhs.deref());
-            let rhs = self.current_stack_frame.evaluation_stack.pop();
-
-            // TODO: deal with U256 case
-            let move_inst = Instruction::Move32 {
-                val: LocalOrImmediate::Local(rhs),
-                dst: offset.1,
-            };
-            self.add_instruction(GeneralInstruction::Real(move_inst));
-        }
-    }
-
-    fn transpile_assignment(&mut self, op: &ExprAssignment) {
-        // TODO: more than one identifier in assignment
-        assert_eq!(op.identifiers.len(), 1);
-        let identifier = &op.identifiers[0];
-
-        let scope = self.current_stack_frame.local_variables.current_scope();
-        let offset = scope.get(identifier).unwrap();
-
-        self.transpile_op(op.rhs.deref());
-        let rhs = self.current_stack_frame.evaluation_stack.pop();
-
-        // TODO: deal with U256 case
-        let move_inst = Instruction::Move32 {
-            val: LocalOrImmediate::Local(rhs),
-            dst: offset.1,
-        };
-        self.add_instruction(GeneralInstruction::Real(move_inst));
-    }
-
-    fn transpile_block(&mut self, op: &ExprBlock) {
-        // scan block for variables
-        // add new variable mapping for this scope
-
-        for op in &op.exprs {
-            self.transpile_op(op);
-        }
-    }
-
-    fn transpile_literal(&mut self, literal: &ExprLiteral) {
-        match literal {
-            ExprLiteral::Number(ExprLiteralNumber {
-                value,
-                inferred_type,
-            }) => {
-                if inferred_type == &Some(YulType::U256) {
-                    self.place_u256_on_stack(*value);
-                } else {
-                    self.place_u32_on_stack((*value).try_into().unwrap());
-                }
-            }
-            ExprLiteral::String(_) => todo!(),
-            &ExprLiteral::Bool(_) => todo!(),
-        }
-    }
-
     fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
         let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U32);
 
@@ -252,7 +262,6 @@ impl Transpiler {
         self.add_instruction(GeneralInstruction::Real(move_inst));
         location_of_new_space
     }
-
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
         let location_of_new_space = self
             .current_stack_frame
@@ -274,32 +283,6 @@ impl Transpiler {
         }
 
         location_of_new_space
-    }
-
-    fn transpile_op(&mut self, expr: &Expr) {
-        match expr {
-            Expr::Literal(value) => self.transpile_literal(value),
-            Expr::Assignment(op) => self.transpile_assignment(op),
-            Expr::DeclareVariable(op) => self.transpile_variable_declaration(op),
-            // Expr::ForLoop(op) => self.transpile_for_loop(op),
-            // Expr::Variable(op) => self.transpile_variable_reference(op),
-            Expr::Block(op) => self.transpile_block(op),
-            // Expr::IfStatement(op) => self.transpile_if_statement(op),
-            Expr::FunctionCall(op) => self.transpile_function_call(op),
-            // Expr::Repeat(op) => self.transpile_repeat(op),
-            // We've already compiled the functions
-            Expr::FunctionDefinition(op) => todo!(),
-            // Expr::Break => self.transpile_break(),
-            // Expr::Continue => self.transpile_continue(),
-            // Expr::Leave => self.transpile_leave(),
-            // Expr::Switch(op) => self.transpile_switch(op),
-            _ => unreachable!(),
-        }
-    }
-
-    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
-        // insert CALL
-        // add new stack frame
     }
 }
 
