@@ -168,10 +168,10 @@ impl Transpiler {
                 value,
                 inferred_type,
             }) => {
-                if inferred_type == &Some(YulType::U256) {
-                    self.place_u256_on_stack(*value);
-                } else {
+                if inferred_type == &Some(YulType::U32) {
                     self.place_u32_on_stack((*value).try_into().unwrap());
+                } else {
+                    self.place_u256_on_stack(*value);
                 }
             }
             ExprLiteral::String(_) => todo!(),
