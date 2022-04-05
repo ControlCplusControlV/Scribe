@@ -8,11 +8,9 @@ use crate::types::*;
 use primitive_types::U256;
 use zero_machine_code::instructions::*;
 
-//Struct that enables transpilation management. Through implementations, this struct keeps track of the variables,
-//open memory addresses, the stack, indentation of Miden assembly and user defined functions.
+//Struct that enables transpilation management into System Zero instructions by keeping track of the stack frames.
 struct Transpiler {
     instructions: Vec<GeneralInstruction>,
-    //stack_scratch_space_offset: LocalOffset,
     current_stack_frame: StackFrame,
     previous_stack_frames: Vec<StackFrame>,
     /* variables: HashMap<TypedIdentifier, u32>,
