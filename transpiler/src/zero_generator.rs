@@ -61,9 +61,7 @@ struct EvaluationStack {
 
 impl EvaluationStack {
     fn new() -> Self {
-        EvaluationStack {
-            state: Vec::new(),
-        }
+        EvaluationStack { state: Vec::new() }
     }
 }
 
@@ -135,6 +133,13 @@ struct Branch {
 }*/
 
 impl Transpiler {
+    fn new() -> Self {
+        Transpiler {
+            instructions: Vec::new(),
+            current_stack_frame: StackFrame::new(),
+            previous_stack_frames: Vec::new(),
+        }
+    }
     fn add_instruction(&mut self, inst: GeneralInstruction) {
         self.instructions.push(inst);
     }
@@ -168,7 +173,9 @@ impl Transpiler {
             }
         }
 
-        self.current_stack_frame.local_variables.add_scope(new_scope);
+        self.current_stack_frame
+            .local_variables
+            .add_scope(new_scope);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
@@ -177,9 +184,7 @@ impl Transpiler {
         let identifier = &op.typed_identifiers[0];
 
         let scope = self.current_stack_frame.local_variables.current_scope();
-        let offset = scope
-            .get(&identifier.identifier)
-            .unwrap();
+        let offset = scope.get(&identifier.identifier).unwrap();
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
@@ -200,9 +205,7 @@ impl Transpiler {
         let identifier = &op.identifiers[0];
 
         let scope = self.current_stack_frame.local_variables.current_scope();
-        let offset = scope
-            .get(identifier)
-            .unwrap();
+        let offset = scope.get(identifier).unwrap();
 
         self.transpile_op(op.rhs.deref());
         let rhs = self.current_stack_frame.evaluation_stack.pop();
@@ -249,12 +252,14 @@ impl Transpiler {
             dst: location_of_new_space,
         };
         self.add_instruction(GeneralInstruction::Real(move_inst));
-        
         location_of_new_space
     }
 
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
-        let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U256);
+        let location_of_new_space = self
+            .current_stack_frame
+            .evaluation_stack
+            .push(YulType::U256);
         let mut cur_location = location_of_new_space;
         let mut cur_val = val;
 
@@ -297,18 +302,14 @@ impl Transpiler {
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         // insert CALL
         // add new stack frame
-
-        
     }
 }
 
-//Transpile a Miden program from a Vec of expressions and return the compiled Miden program as a string
-pub fn transpile_program(expressions: Vec<Expr>) -> Vec<Instruction> {
-    let transpiler = Transpiler {
-        instructions: Vec::new(),
-        current_stack_frame: StackFrame::new(),
-        previous_stack_frames: Vec::new(),        
-    };
-
-    todo!()
+//Return a list of Generalized System Zero instructions from a Vec of Yul expressions
+pub fn transpile_program(expressions: Vec<Expr>) -> Vec<GeneralInstruction> {
+    let mut transpiler = Transpiler::new();
+    for expression in &expressions {
+        transpiler.transpile_op(expression);
+    }
+    transpiler.instructions
 }
