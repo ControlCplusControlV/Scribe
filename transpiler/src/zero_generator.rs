@@ -57,9 +57,11 @@ impl LocalVariables {
             scopes: Vec::new(),
         }
     }
+
     fn current_scope(&mut self) -> Scope {
         self.scopes[self.scopes.len() - 1].clone()
     }
+
     fn add_scope(&mut self, scope: Scope) {
         self.scopes.push(scope)
     }
@@ -73,6 +75,7 @@ impl EvaluationStack {
     fn new() -> Self {
         EvaluationStack { state: Vec::new() }
     }
+
     fn offset_of_ith_element(&mut self, i: usize) -> u32 {
         let mut offset = EVAL_STACK_START_ADDRESS;
         for j in 0..i {
@@ -83,18 +86,22 @@ impl EvaluationStack {
         }
         offset
     }
+
     fn offset_of_last_element(&mut self) -> u32 {
         self.offset_of_ith_element(self.state.len() - 1)
     }
+
     fn push(&mut self, typ: YulType) -> LocalOffset {
         self.state.push(typ);
         self.offset_of_last_element()
     }
+
     fn pop(&mut self) -> LocalOffset {
         let idx = self.offset_of_last_element();
         self.state.pop();
         idx
     }
+
     fn add3(&mut self) -> Vec<GeneralInstruction> {
         let n = self.state.len();
         assert!(n > 2);
@@ -129,9 +136,11 @@ impl Transpiler {
             previous_stack_frames: Vec::new(),
         }
     }
+
     fn add_instruction(&mut self, inst: GeneralInstruction) {
         self.instructions.push(inst);
     }
+
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -152,6 +161,7 @@ impl Transpiler {
             _ => unreachable!(),
         }
     }
+
     fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
             ExprLiteral::Number(ExprLiteralNumber {
@@ -168,6 +178,7 @@ impl Transpiler {
             &ExprLiteral::Bool(_) => todo!(),
         }
     }
+
     fn transpile_assignment(&mut self, op: &ExprAssignment) {
         // TODO: more than one identifier in assignment
         assert_eq!(op.identifiers.len(), 1);
@@ -186,6 +197,7 @@ impl Transpiler {
         };
         self.add_instruction(GeneralInstruction::Real(move_inst));
     }
+
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         // TODO: more than one identifier in variable declaration
         assert_eq!(op.typed_identifiers.len(), 1);
@@ -206,6 +218,7 @@ impl Transpiler {
             self.add_instruction(GeneralInstruction::Real(move_inst));
         }
     }
+
     fn transpile_block(&mut self, op: &ExprBlock) {
         // scan block for variables
         // add new variable mapping for this scope
@@ -214,6 +227,7 @@ impl Transpiler {
             self.transpile_op(op);
         }
     }
+
     fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
         // TODO: calling convention stuff?
 
@@ -221,10 +235,12 @@ impl Transpiler {
             self.transpile_op(&expr);
         }
     }
+
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         // insert CALL
         // add new stack frame
     }
+
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
         let mut current_offset = self.current_stack_frame.local_variables.current_offset;
         let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
@@ -250,6 +266,7 @@ impl Transpiler {
             .local_variables
             .add_scope(new_scope);
     }
+
     fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
         let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U32);
 
@@ -260,6 +277,7 @@ impl Transpiler {
         self.add_instruction(GeneralInstruction::Real(move_inst));
         location_of_new_space
     }
+
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
         let location_of_new_space = self
             .current_stack_frame
