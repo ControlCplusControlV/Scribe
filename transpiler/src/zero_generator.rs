@@ -26,8 +26,8 @@ struct Transpiler {
     procs_used: HashSet<String>, */
 }
 
-const EVAL_STACK_START_ADDRESS: u32 = 0;
-const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
+const LOCAL_VARS_START_ADDRESS: u32 = 0;
+const EVAL_STACK_START_ADDRESS: u32 = 1 << 12;
 
 struct StackFrame {
     local_variables: LocalVariables,
