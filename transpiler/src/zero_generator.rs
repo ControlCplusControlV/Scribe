@@ -13,7 +13,7 @@ struct Transpiler {
     instructions: Vec<GeneralInstruction>,
     current_stack_frame: StackFrame,
     previous_stack_frames: Vec<StackFrame>,
-    label_count: usize,
+    if_label_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -30,6 +30,7 @@ struct Transpiler {
 const LOCAL_VARS_START_ADDRESS: u32 = 0;
 const EVAL_STACK_START_ADDRESS: u32 = 1 << 12;
 
+#[derive(Clone)]
 struct StackFrame {
     local_variables: LocalVariables,
     evaluation_stack: EvaluationStack,
@@ -46,6 +47,7 @@ impl StackFrame {
 
 type Scope = HashMap<String, (YulType, u32)>;
 
+#[derive(Clone)]
 struct LocalVariables {
     current_offset: u32,
     scopes: Vec<Scope>,
@@ -54,7 +56,7 @@ struct LocalVariables {
 impl LocalVariables {
     fn new() -> Self {
         LocalVariables {
-            current_offset: 0,
+            current_offset: LOCAL_VARS_START_ADDRESS,
             scopes: Vec::new(),
         }
     }
@@ -68,6 +70,7 @@ impl LocalVariables {
     }
 }
 
+#[derive(Clone)]
 struct EvaluationStack {
     state: Vec<YulType>,
 }
@@ -135,18 +138,49 @@ impl Transpiler {
             instructions: Vec::new(),
             current_stack_frame: StackFrame::new(),
             previous_stack_frames: Vec::new(),
-            label_count: 0,
+            if_label_count: 0,
         }
     }
+    
+    fn add_real_instruction(&mut self, inst: Instruction) {
+        self.add_instruction(GeneralInstruction::Real(inst))
+    }
 
-    fn new_label(&mut self) -> String {
+    fn add_label(&mut self, label: String) {
+        let label_inst = PseudoInstruction::Label { label };
+        self.add_instruction(GeneralInstruction::Pseudo(label_inst));
+    }
+
+    fn add_jump(&mut self, addr: ImmediateOrMacro) {
+        let jump_inst = PseudoInstruction::Jump { addr };
+        self.add_instruction(GeneralInstruction::Pseudo(jump_inst));
+    }
+
+    fn new_if_label(&mut self) -> String {
         let lbl = format!("if{}", self.label_count);
         self.label_count += 1;
         lbl
     }
 
-    fn add_instruction(&mut self, inst: Instruction) {
-        self.instructions.push(GeneralInstruction::Real(inst));
+    fn add_instruction(&mut self, inst: GeneralInstruction) {
+        self.instructions.push(inst);
+    }
+
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
+        let function_name = op.function_name.clone();
+        let end_label = format!("end_of_{}", function_name);
+
+        self.add_jump(ImmediateOrMacro::AddrOf(end_label.clone()));
+        self.add_label(function_name);
+
+        // CALLING CONVENTION
+
+        for expr in op.block.exprs.clone() {
+            self.transpile_op(&expr);
+        }
+
+        self.add_real_instruction(Instruction::Ret);
+        self.add_label(end_label);
     }
 
     fn add_pseudo_instruction(&mut self, inst: PseudoInstruction) {
@@ -207,7 +241,7 @@ impl Transpiler {
             val: LocalOrImmediate::Local(rhs),
             dst: offset.1,
         };
-        self.add_instruction(move_inst);
+        self.add_real_instruction(move_inst);
     }
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
@@ -242,7 +276,7 @@ impl Transpiler {
                 val: LocalOrImmediate::Local(rhs),
                 dst: offset.1,
             };
-            self.add_instruction(move_inst);
+            self.add_real_instruction(move_inst);
         }
     }
 
@@ -253,19 +287,6 @@ impl Transpiler {
         for op in &op.exprs {
             self.transpile_op(op);
         }
-    }
-
-    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        // TODO: calling convention stuff?
-
-        for expr in op.block.exprs.clone() {
-            self.transpile_op(&expr);
-        }
-    }
-
-    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
-        // insert CALL
-        // add new stack frame
     }
 
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
@@ -301,7 +322,8 @@ impl Transpiler {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
             dst: location_of_new_space,
         };
-        self.add_instruction(move_inst);
+        self.add_real_instruction(move_inst);
+        
         location_of_new_space
     }
 
@@ -319,13 +341,36 @@ impl Transpiler {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
                 dst: cur_location,
             };
-            self.add_instruction(move_inst);
+            self.add_real_instruction(move_inst);
             cur_location += 1;
 
             cur_val = cur_val / (1u64 << 32);
         }
 
         location_of_new_space
+    }
+
+    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
+        let function_name = op.function_name.clone();
+        let mut arguments = Vec::new();
+        for expr in op.exprs.iter() {
+            self.transpile_op(expr);
+            let argument = self.current_stack_frame.evaluation_stack.pop();
+            arguments.push(argument);
+        }
+
+        // TODO: more than one return value
+        let return_types = op.inferred_return_types;
+        assert!(return_types.len() < 2);
+
+        self.previous_stack_frames.push(self.current_stack_frame.clone());
+        self.current_stack_frame = StackFrame::new();
+
+        self.add_real_instruction(Instruction::Call { addr: ImmediateOrMacro::AddrOf(function_name) });
+        
+        if return_types.len() == 1 {
+            // TODO: copy value from 
+        }
     }
 }
 
