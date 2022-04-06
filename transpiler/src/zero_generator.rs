@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    ops::Deref,
-};
+use std::{collections::HashMap, ops::Deref};
 
 use crate::types::*;
 
@@ -141,7 +138,7 @@ impl Transpiler {
             if_label_count: 0,
         }
     }
-    
+
     fn add_real_instruction(&mut self, inst: Instruction) {
         self.add_instruction(GeneralInstruction::Real(inst))
     }
@@ -323,7 +320,7 @@ impl Transpiler {
             dst: location_of_new_space,
         };
         self.add_real_instruction(move_inst);
-        
+
         location_of_new_space
     }
 
@@ -360,16 +357,19 @@ impl Transpiler {
         }
 
         // TODO: more than one return value
-        let return_types = op.inferred_return_types;
+        let return_types = op.inferred_return_types.clone();
         assert!(return_types.len() < 2);
 
-        self.previous_stack_frames.push(self.current_stack_frame.clone());
+        self.previous_stack_frames
+            .push(self.current_stack_frame.clone());
         self.current_stack_frame = StackFrame::new();
 
-        self.add_real_instruction(Instruction::Call { addr: ImmediateOrMacro::AddrOf(function_name) });
-        
+        self.add_real_instruction(Instruction::Call {
+            addr: ImmediateOrMacro::AddrOf(function_name),
+        });
+
         if return_types.len() == 1 {
-            // TODO: copy value from 
+            // TODO: copy value from
         }
     }
 }
