@@ -26,8 +26,8 @@ struct Transpiler {
     procs_used: HashSet<String>, */
 }
 
-const EVAL_STACK_START_ADDRESS: u32 = 0;
-const LOCAL_VARS_START_ADDRESS: u32 = 1 << 12;
+const LOCAL_VARS_START_ADDRESS: u32 = 0;
+const EVAL_STACK_START_ADDRESS: u32 = 1 << 12;
 
 struct StackFrame {
     local_variables: LocalVariables,
@@ -137,8 +137,8 @@ impl Transpiler {
         }
     }
 
-    fn add_instruction(&mut self, inst: GeneralInstruction) {
-        self.instructions.push(inst);
+    fn add_instruction(&mut self, inst: Instruction) {
+        self.instructions.push(GeneralInstruction::Real(inst));
     }
 
     fn transpile_op(&mut self, expr: &Expr) {
@@ -168,10 +168,10 @@ impl Transpiler {
                 value,
                 inferred_type,
             }) => {
-                if inferred_type == &Some(YulType::U256) {
-                    self.place_u256_on_stack(*value);
-                } else {
+                if inferred_type == &Some(YulType::U32) {
                     self.place_u32_on_stack((*value).try_into().unwrap());
+                } else {
+                    self.place_u256_on_stack(*value);
                 }
             }
             ExprLiteral::String(_) => todo!(),
@@ -195,7 +195,7 @@ impl Transpiler {
             val: LocalOrImmediate::Local(rhs),
             dst: offset.1,
         };
-        self.add_instruction(GeneralInstruction::Real(move_inst));
+        self.add_instruction(move_inst);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
@@ -215,7 +215,7 @@ impl Transpiler {
                 val: LocalOrImmediate::Local(rhs),
                 dst: offset.1,
             };
-            self.add_instruction(GeneralInstruction::Real(move_inst));
+            self.add_instruction(move_inst);
         }
     }
 
@@ -274,7 +274,7 @@ impl Transpiler {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
             dst: location_of_new_space,
         };
-        self.add_instruction(GeneralInstruction::Real(move_inst));
+        self.add_instruction(move_inst);
         location_of_new_space
     }
 
@@ -292,7 +292,7 @@ impl Transpiler {
                 val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(cur)),
                 dst: cur_location,
             };
-            self.add_instruction(GeneralInstruction::Real(move_inst));
+            self.add_instruction(move_inst);
             cur_location += 1;
 
             cur_val = cur_val / (1u64 << 32);
