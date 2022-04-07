@@ -13,6 +13,7 @@ struct Transpiler {
     instructions: Vec<GeneralInstruction>,
     current_stack_frame: StackFrame,
     previous_stack_frames: Vec<StackFrame>,
+    label_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -134,7 +135,14 @@ impl Transpiler {
             instructions: Vec::new(),
             current_stack_frame: StackFrame::new(),
             previous_stack_frames: Vec::new(),
+            label_count: 0,
         }
+    }
+
+    fn new_label(&mut self) -> String {
+        let lbl = format!("if{}", self.label_count);
+        self.label_count += 1;
+        lbl
     }
 
     fn add_instruction(&mut self, inst: Instruction) {
@@ -205,15 +213,16 @@ impl Transpiler {
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
         let prop = self.current_stack_frame.evaluation_stack.offset_of_last_element();
-        let dest = "destination";
+        let dest0 = self.new_label();
+        let dest1 = dest0.clone();
         let jump = Instruction::JumpEQ {
             x: LocalOrImmediate::Local(prop),
             y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(0)),
-            addr: ImmediateOrMacro::AddrOf(dest.to_string()),
+            addr: ImmediateOrMacro::AddrOf(dest0),
         };
         self.add_instruction(jump);
         self.transpile_block(&op.second_expr);
-        let skip_block = PseudoInstruction::Label{label: dest.to_string()};
+        let skip_block = PseudoInstruction::Label{label: dest1};
         self.add_pseudoinstruction(skip_block);
     }
 
