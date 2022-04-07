@@ -149,7 +149,7 @@ impl Transpiler {
             // Expr::ForLoop(op) => self.transpile_for_loop(op),
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
-            // Expr::IfStatement(op) => self.transpile_if_statement(op),
+            Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::FunctionCall(op) => self.transpile_function_call(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
@@ -196,6 +196,19 @@ impl Transpiler {
             dst: offset.1,
         };
         self.add_instruction(move_inst);
+    }
+
+    fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
+        self.transpile_op(&op.first_expr);
+        let prop = self.current_stack_frame.evaluation_stack.offset_of_last_element();
+        self.transpile_block(&op.second_expr);
+        let dest = "destination";
+        let jump = Instruction::JumpEQ {
+            x: LocalOrImmediate::Local(prop),
+            y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(1)),
+            addr: ImmediateOrMacro::AddrOf(dest.to_string()),
+        };
+        self.add_instruction(jump);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
