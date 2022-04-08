@@ -13,6 +13,7 @@ struct Transpiler {
     instructions: Vec<GeneralInstruction>,
     current_stack_frame: StackFrame,
     previous_stack_frames: Vec<StackFrame>,
+    label_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -134,11 +135,22 @@ impl Transpiler {
             instructions: Vec::new(),
             current_stack_frame: StackFrame::new(),
             previous_stack_frames: Vec::new(),
+            label_count: 0,
         }
+    }
+
+    fn new_label(&mut self) -> String {
+        let lbl = format!("if{}", self.label_count);
+        self.label_count += 1;
+        lbl
     }
 
     fn add_instruction(&mut self, inst: Instruction) {
         self.instructions.push(GeneralInstruction::Real(inst));
+    }
+
+    fn add_pseudo_instruction(&mut self, inst: PseudoInstruction) {
+        self.instructions.push(GeneralInstruction::Pseudo(inst));
     }
 
     fn transpile_op(&mut self, expr: &Expr) {
@@ -149,7 +161,7 @@ impl Transpiler {
             // Expr::ForLoop(op) => self.transpile_for_loop(op),
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
-            // Expr::IfStatement(op) => self.transpile_if_statement(op),
+            Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::FunctionCall(op) => self.transpile_function_call(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
@@ -196,6 +208,21 @@ impl Transpiler {
             dst: offset.1,
         };
         self.add_instruction(move_inst);
+    }
+
+    fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
+        self.transpile_op(&op.first_expr);
+        let prop = self.current_stack_frame.evaluation_stack.offset_of_last_element();
+        let dest = self.new_label();
+        let jump = Instruction::JumpEQ {
+            x: LocalOrImmediate::Local(prop),
+            y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(0)),
+            addr: ImmediateOrMacro::AddrOf(dest.clone()),
+        };
+        self.add_instruction(jump);
+        self.transpile_block(&op.second_expr);
+        let skip_block = PseudoInstruction::Label{label: dest};
+        self.add_pseudo_instruction(skip_block);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
