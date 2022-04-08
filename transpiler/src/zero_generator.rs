@@ -149,7 +149,7 @@ impl Transpiler {
         self.instructions.push(GeneralInstruction::Real(inst));
     }
 
-    fn add_pseudoinstruction(&mut self, inst: PseudoInstruction) {
+    fn add_pseudo_instruction(&mut self, inst: PseudoInstruction) {
         self.instructions.push(GeneralInstruction::Pseudo(inst));
     }
 
@@ -213,17 +213,16 @@ impl Transpiler {
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
         let prop = self.current_stack_frame.evaluation_stack.offset_of_last_element();
-        let dest0 = self.new_label();
-        let dest1 = dest0.clone();
+        let dest = self.new_label();
         let jump = Instruction::JumpEQ {
             x: LocalOrImmediate::Local(prop),
             y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(0)),
-            addr: ImmediateOrMacro::AddrOf(dest0),
+            addr: ImmediateOrMacro::AddrOf(dest.clone()),
         };
         self.add_instruction(jump);
         self.transpile_block(&op.second_expr);
-        let skip_block = PseudoInstruction::Label{label: dest1};
-        self.add_pseudoinstruction(skip_block);
+        let skip_block = PseudoInstruction::Label{label: dest};
+        self.add_pseudo_instruction(skip_block);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
