@@ -105,25 +105,6 @@ impl EvaluationStack {
     fn address(&mut self) -> LocalOffset {
         EVAL_STACK_START_ADDRESS
     }
-
-    fn add3(&mut self) -> Vec<GeneralInstruction> {
-        let n = self.state.len();
-        assert!(n > 2);
-
-        let x_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n - 2));
-        let y_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n - 1));
-        let z_addr = LocalOrImmediate::Local(self.offset_of_ith_element(n));
-
-        let dst_addr = self.offset_of_ith_element(n - 2);
-
-        let add3_inst = Instruction::Add3 {
-            x: x_addr,
-            y: y_addr,
-            z: z_addr,
-            dst: dst_addr,
-        };
-        vec![GeneralInstruction::Real(add3_inst)]
-    }
 }
 
 /*#[derive(Default, Clone)]
@@ -165,27 +146,6 @@ impl Transpiler {
         self.instructions.push(inst);
     }
 
-    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
-        let function_name = op.function_name.clone();
-        let end_label = format!("end_of_{}", function_name);
-
-        self.add_jump(ImmediateOrMacro::AddrOf(end_label.clone()));
-        self.add_label(function_name);
-
-        // CALLING CONVENTION
-
-        for expr in op.block.exprs.clone() {
-            self.transpile_op(&expr);
-        }
-
-        self.add_real_instruction(Instruction::Ret);
-        self.add_label(end_label);
-    }
-
-    fn add_pseudo_instruction(&mut self, inst: PseudoInstruction) {
-        self.instructions.push(GeneralInstruction::Pseudo(inst));
-    }
-
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -195,10 +155,10 @@ impl Transpiler {
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
             Expr::IfStatement(op) => self.transpile_if_statement(op),
-            Expr::FunctionCall(op) => self.transpile_function_call(op),
+            // Expr::FunctionCall(op) => self.transpile_function_call(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
-            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            // Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
             // Expr::Break => self.transpile_break(),
             // Expr::Continue => self.transpile_continue(),
             // Expr::Leave => self.transpile_leave(),
@@ -233,7 +193,7 @@ impl Transpiler {
         let offset = scope.get(identifier).unwrap();
 
         self.transpile_op(op.rhs.deref());
-        let rhs = self.stack_frame.evaluation_stack.pop();
+        let rhs = self.stack_frame.evaluation_stack.address();
 
         // TODO: deal with U256 case
         let move_inst = Instruction::Move32 {
@@ -268,7 +228,7 @@ impl Transpiler {
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
-            let rhs = self.stack_frame.evaluation_stack.pop();
+            let rhs = self.stack_frame.evaluation_stack.address();
 
             // TODO: deal with U256 case
             let move_inst = Instruction::Move32 {
@@ -314,8 +274,8 @@ impl Transpiler {
             .add_scope(new_scope);
     }
 
-    /*fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
-        let location_of_new_space = self.stack_frame.evaluation_stack.push(YulType::U32);
+    fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
+        let location_of_new_space = self.stack_frame.evaluation_stack.address();
 
         let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
@@ -327,10 +287,8 @@ impl Transpiler {
     }
 
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
-        let location_of_new_space = self
-            .stack_frame
-            .evaluation_stack
-            .push(YulType::U256);
+        let location_of_new_space = self.stack_frame.evaluation_stack.address();
+
         let mut cur_location = location_of_new_space;
         let mut cur_val = val;
 
@@ -347,42 +305,6 @@ impl Transpiler {
         }
 
         location_of_new_space
-    }*/
-
-    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
-        let function_name = op.function_name.clone();
-        let mut arguments = Vec::new();
-        for expr in op.exprs.iter() {
-            self.transpile_op(expr);
-            let argument = self.stack_frame.evaluation_stack.address();
-            arguments.push(argument);
-        }
-        
-        let mut index = 0;
-        for argument in arguments {
-            self.add_real_instruction(Instruction::CalleeWrite {
-                index: index,
-                val: LocalOrImmediate::Local(argument),
-            });
-            index += 1; // TODO: handle u256's
-        }
-
-        // TODO: more than one return value
-        let return_types = op.inferred_return_types.clone();
-        assert!(return_types.len() < 2);
-
-        self.add_real_instruction(Instruction::Call {
-            addr: ImmediateOrMacro::AddrOf(function_name),
-        });
-
-        if return_types.len() == 1 {
-            let location_to_read_to = self.stack_frame.evaluation_stack.address();
-
-            self.add_real_instruction(Instruction::CalleeWrite {
-                index: 0,
-                val: LocalOrImmediate::Local(location_to_read_to),
-            });
-        }
     }
 }
 
