@@ -8,8 +8,7 @@ use zero_machine_code::instructions::*;
 //Struct that enables transpilation management into System Zero instructions by keeping track of the stack frames.
 struct Transpiler {
     instructions: Vec<GeneralInstruction>,
-    current_stack_frame: StackFrame,
-    previous_stack_frames: Vec<StackFrame>,
+    stack_frame: StackFrame,
     if_label_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
@@ -77,7 +76,7 @@ impl EvaluationStack {
         EvaluationStack { state: Vec::new() }
     }
 
-    fn offset_of_ith_element(&mut self, i: usize) -> u32 {
+    /*fn offset_of_ith_element(&mut self, i: usize) -> u32 {
         let mut offset = EVAL_STACK_START_ADDRESS;
         for j in 0..i {
             offset += match self.state[j] {
@@ -101,6 +100,10 @@ impl EvaluationStack {
         let idx = self.offset_of_last_element();
         self.state.pop();
         idx
+    }*/
+
+    fn address(&mut self) -> LocalOffset {
+        EVAL_STACK_START_ADDRESS
     }
 
     fn add3(&mut self) -> Vec<GeneralInstruction> {
@@ -133,8 +136,7 @@ impl Transpiler {
     fn new() -> Self {
         Transpiler {
             instructions: Vec::new(),
-            current_stack_frame: StackFrame::new(),
-            previous_stack_frames: Vec::new(),
+            stack_frame: StackFrame::new(),
             if_label_count: 0,
         }
     }
@@ -227,11 +229,11 @@ impl Transpiler {
         assert_eq!(op.identifiers.len(), 1);
         let identifier = &op.identifiers[0];
 
-        let scope = self.current_stack_frame.local_variables.current_scope();
+        let scope = self.stack_frame.local_variables.current_scope();
         let offset = scope.get(identifier).unwrap();
 
         self.transpile_op(op.rhs.deref());
-        let rhs = self.current_stack_frame.evaluation_stack.pop();
+        let rhs = self.stack_frame.evaluation_stack.pop();
 
         // TODO: deal with U256 case
         let move_inst = Instruction::Move32 {
@@ -261,12 +263,12 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         let identifier = &op.typed_identifiers[0];
 
-        let scope = self.current_stack_frame.local_variables.current_scope();
+        let scope = self.stack_frame.local_variables.current_scope();
         let offset = scope.get(&identifier.identifier).unwrap();
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
-            let rhs = self.current_stack_frame.evaluation_stack.pop();
+            let rhs = self.stack_frame.evaluation_stack.pop();
 
             // TODO: deal with U256 case
             let move_inst = Instruction::Move32 {
@@ -287,7 +289,7 @@ impl Transpiler {
     }
 
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
-        let mut current_offset = self.current_stack_frame.local_variables.current_offset;
+        let mut current_offset = self.stack_frame.local_variables.current_offset;
         let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
 
         for expr in op.block.exprs.clone() {
@@ -307,13 +309,13 @@ impl Transpiler {
             }
         }
 
-        self.current_stack_frame
+        self.stack_frame
             .local_variables
             .add_scope(new_scope);
     }
 
-    fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
-        let location_of_new_space = self.current_stack_frame.evaluation_stack.push(YulType::U32);
+    /*fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
+        let location_of_new_space = self.stack_frame.evaluation_stack.push(YulType::U32);
 
         let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
@@ -326,7 +328,7 @@ impl Transpiler {
 
     fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
         let location_of_new_space = self
-            .current_stack_frame
+            .stack_frame
             .evaluation_stack
             .push(YulType::U256);
         let mut cur_location = location_of_new_space;
@@ -345,31 +347,41 @@ impl Transpiler {
         }
 
         location_of_new_space
-    }
+    }*/
 
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         let function_name = op.function_name.clone();
         let mut arguments = Vec::new();
         for expr in op.exprs.iter() {
             self.transpile_op(expr);
-            let argument = self.current_stack_frame.evaluation_stack.pop();
+            let argument = self.stack_frame.evaluation_stack.address();
             arguments.push(argument);
+        }
+        
+        let mut index = 0;
+        for argument in arguments {
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: index,
+                val: LocalOrImmediate::Local(argument),
+            });
+            index += 1; // TODO: handle u256's
         }
 
         // TODO: more than one return value
         let return_types = op.inferred_return_types.clone();
         assert!(return_types.len() < 2);
 
-        self.previous_stack_frames
-            .push(self.current_stack_frame.clone());
-        self.current_stack_frame = StackFrame::new();
-
         self.add_real_instruction(Instruction::Call {
             addr: ImmediateOrMacro::AddrOf(function_name),
         });
 
         if return_types.len() == 1 {
-            // TODO: copy value from
+            let location_to_read_to = self.stack_frame.evaluation_stack.address();
+
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: 0,
+                val: LocalOrImmediate::Local(location_to_read_to),
+            });
         }
     }
 }
