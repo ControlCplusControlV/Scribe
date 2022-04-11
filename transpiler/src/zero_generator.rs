@@ -137,8 +137,8 @@ impl Transpiler {
     }
 
     fn new_if_label(&mut self) -> String {
-        let lbl = format!("if{}", self.label_count);
-        self.label_count += 1;
+        let lbl = format!("if{}", self.if_label_count);
+        self.if_label_count += 1;
         lbl
     }
 
@@ -205,17 +205,16 @@ impl Transpiler {
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
-        let prop = self.current_stack_frame.evaluation_stack.offset_of_last_element();
-        let dest = self.new_label();
+        let prop = self.stack_frame.evaluation_stack.address();
+        let dest = self.new_if_label();
         let jump = Instruction::JumpEQ {
             x: LocalOrImmediate::Local(prop),
             y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(0)),
             addr: ImmediateOrMacro::AddrOf(dest.clone()),
         };
-        self.add_instruction(jump);
+        self.add_real_instruction(jump);
         self.transpile_block(&op.second_expr);
-        let skip_block = PseudoInstruction::Label{label: dest};
-        self.add_pseudo_instruction(skip_block);
+        self.add_label(dest);
     }
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
