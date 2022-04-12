@@ -9,7 +9,7 @@ use zero_machine_code::instructions::*;
 struct Transpiler {
     instructions: Vec<GeneralInstruction>,
     stack_frame: StackFrame,
-    if_label_count: usize,
+    label_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -118,7 +118,7 @@ impl Transpiler {
         Transpiler {
             instructions: Vec::new(),
             stack_frame: StackFrame::new(),
-            if_label_count: 0,
+            label_count: 0,
         }
     }
 
@@ -137,8 +137,8 @@ impl Transpiler {
     }
 
     fn new_if_label(&mut self) -> String {
-        let lbl = format!("if{}", self.if_label_count);
-        self.if_label_count += 1;
+        let lbl = format!("if{}", self.label_count);
+        self.label_count += 1;
         lbl
     }
 
