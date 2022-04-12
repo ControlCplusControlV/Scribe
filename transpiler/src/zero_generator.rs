@@ -10,6 +10,7 @@ struct Transpiler {
     instructions: Vec<GeneralInstruction>,
     stack_frame: StackFrame,
     label_count: usize,
+    variable_count: usize,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -119,6 +120,7 @@ impl Transpiler {
             instructions: Vec::new(),
             stack_frame: StackFrame::new(),
             label_count: 0,
+            variable_count: 0,
         }
     }
 
@@ -145,19 +147,29 @@ impl Transpiler {
         self.add_instruction(GeneralInstruction::Pseudo(jump_inst));
     }
 
+    fn add_increment(&mut self, x: LocalOrImmediate) {
+        let incr = PseudoInstruction::Incr { x };
+        self.add_instruction(GeneralInstruction::Pseudo(incr));
+    }
+
     fn new_if_label(&mut self) -> String {
         let lbl = format!("if{}", self.label_count);
         self.label_count += 1;
         lbl
     }
 
-    fn new_for_label(&mut self) -> (String, String) {
-        let pre = format!("for_pre{}", self.label_count);
-        let post = format!("for_post{}", self.label_count);
+    fn new_loop_label(&mut self) -> (String, String) {
+        let pre = format!("pre{}", self.label_count);
+        let post = format!("post{}", self.label_count);
         self.label_count += 1;
         (pre, post)
     }
 
+    fn new_variable(&mut self) -> String {
+        let name = format!("var{}", self.variable_count);
+        self.variable_count += 1;
+        name
+    }
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -170,7 +182,7 @@ impl Transpiler {
             Expr::Block(op) => self.transpile_block(op),
             // Expr::Switch(op) => self.transpile_switch(op),
             // Expr::Variable(op) => self.transpile_variable_reference(op),
-            // Expr::Repeat(op) => self.transpile_repeat(op),
+            Expr::Repeat(op) => self.transpile_repeat(op),
             // Expr::Break => self.transpile_break(),
             // Expr::Continue => self.transpile_continue(),
             // Expr::Leave => self.transpile_leave(),
@@ -227,7 +239,6 @@ impl Transpiler {
     }
 
 
-
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         // TODO: more than one identifier in variable declaration
         assert_eq!(op.typed_identifiers.len(), 1);
@@ -251,7 +262,7 @@ impl Transpiler {
 
     fn transpile_for_loop(&mut self, op: &ExprForLoop) {
         self.transpile_block(&op.init_block);
-        let (pre, post) = self.new_for_label();
+        let (pre, post) = self.new_loop_label();
 
         self.add_label(pre.clone());
         self.transpile_op(&op.conditional);
@@ -276,6 +287,26 @@ impl Transpiler {
         for op in &op.exprs {
             self.transpile_op(op);
         }
+    }
+
+    fn transpile_repeat(&mut self, op: &ExprRepeat) {
+        
+        let (pre, post) = self.new_loop_label();
+        self.add_label(pre.clone());
+        
+        let counter = self.new_variable();
+        let jump = Instruction::JumpGE {
+            x: LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(counter.clone())),
+            y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(op.iterations)),
+            addr: ImmediateOrMacro::AddrOf(post.clone()),
+        };
+        self.add_real_instruction(jump);
+
+        self.transpile_block(&op.interior_block);
+        self.add_increment(LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(counter.clone())));
+
+        self.add_jump(ImmediateOrMacro::AddrOf(pre));
+        self.add_label(post);
     }
 
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
