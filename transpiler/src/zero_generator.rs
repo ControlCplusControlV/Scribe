@@ -155,15 +155,69 @@ impl Transpiler {
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Block(op) => self.transpile_block(op),
             Expr::IfStatement(op) => self.transpile_if_statement(op),
-            // Expr::FunctionCall(op) => self.transpile_function_call(op),
+            Expr::FunctionCall(op) => self.transpile_function_call(op),
             // Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
-            // Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
             // Expr::Break => self.transpile_break(),
             // Expr::Continue => self.transpile_continue(),
             // Expr::Leave => self.transpile_leave(),
             // Expr::Switch(op) => self.transpile_switch(op),
             _ => unreachable!(),
+        }
+    }
+
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
+        let function_name = op.function_name.clone();
+        let end_label = format!("end_of_{}", function_name);
+
+        self.add_jump(ImmediateOrMacro::AddrOf(end_label.clone()));
+        self.add_label(function_name);
+
+        // CALLING CONVENTION
+
+        for expr in op.block.exprs.clone() {
+            self.transpile_op(&expr);
+        }
+
+        self.add_real_instruction(Instruction::Ret);
+        self.add_label(end_label);
+    }
+
+
+    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
+        let function_name = op.function_name.clone();
+        let mut arguments = Vec::new();
+        for expr in op.exprs.iter() {
+            self.transpile_op(expr);
+            let argument = self.stack_frame.evaluation_stack.address();
+            arguments.push(argument);
+        }
+        
+        let mut index = 0;
+        for argument in arguments {
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: index,
+                val: LocalOrImmediate::Local(argument),
+            });
+            index += 1; // TODO: handle u256's
+        }
+
+        // TODO: more than one return value
+        let return_types = op.inferred_return_types.clone();
+        assert!(return_types.len() < 2);
+
+        self.add_real_instruction(Instruction::Call {
+            addr: ImmediateOrMacro::AddrOf(function_name),
+        });
+
+        if return_types.len() == 1 {
+            let location_to_read_to = self.stack_frame.evaluation_stack.address();
+
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: 0,
+                val: LocalOrImmediate::Local(location_to_read_to),
+            });
         }
     }
 
