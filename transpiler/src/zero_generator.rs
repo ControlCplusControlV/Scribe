@@ -147,6 +147,11 @@ impl Transpiler {
         self.add_instruction(GeneralInstruction::Pseudo(jump_inst));
     }
 
+    fn add_initialize(&mut self, name: String) {
+        let init = PseudoInstruction::Init { name };
+        self.add_instruction(GeneralInstruction::Pseudo(name));
+    }
+
     fn add_increment(&mut self, x: LocalOrImmediate) {
         let incr = PseudoInstruction::Incr { x };
         self.add_instruction(GeneralInstruction::Pseudo(incr));
@@ -295,6 +300,8 @@ impl Transpiler {
         self.add_label(pre.clone());
         
         let counter = self.new_variable();
+        self.add_initialize(counter.clone());
+
         let jump = Instruction::JumpGE {
             x: LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(counter.clone())),
             y: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(op.iterations)),
