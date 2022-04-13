@@ -175,6 +175,7 @@ impl Transpiler {
         self.variable_count += 1;
         name
     }
+    
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -242,7 +243,6 @@ impl Transpiler {
         };
         self.add_real_instruction(move_inst);
     }
-
 
     fn transpile_variable_declaration(&mut self, op: &ExprDeclareVariable) {
         // TODO: more than one identifier in variable declaration
