@@ -175,7 +175,7 @@ impl Transpiler {
         self.variable_count += 1;
         name
     }
-    
+
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
@@ -295,7 +295,6 @@ impl Transpiler {
     }
 
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
-        
         let (pre, post) = self.new_loop_label();
         self.add_label(pre.clone());
         
