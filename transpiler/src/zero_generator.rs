@@ -25,34 +25,21 @@ struct Transpiler {
 }
 
 const LOCAL_VARS_START_ADDRESS: u32 = 0;
-const EVAL_STACK_START_ADDRESS: u32 = 1 << 12;
+const EVALUATION_ADDRESS: u32 = 1 << 12;
+const FIRST_OPERAND_ADDRESS: u32 = EVALUATION_ADDRESS + 8;
+const SECOND_OPERAND_ADDRESS: u32 = FIRST_OPERAND_ADDRESS + 8;
+
+type Scope = HashMap<String, (YulType, u32)>;
 
 #[derive(Clone)]
 struct StackFrame {
-    local_variables: LocalVariables,
-    evaluation_stack: EvaluationStack,
+    current_offset: u32,
+    scopes: Vec<Scope>,
 }
 
 impl StackFrame {
     fn new() -> Self {
         StackFrame {
-            local_variables: LocalVariables::new(),
-            evaluation_stack: EvaluationStack::new(),
-        }
-    }
-}
-
-type Scope = HashMap<String, (YulType, u32)>;
-
-#[derive(Clone)]
-struct LocalVariables {
-    current_offset: u32,
-    scopes: Vec<Scope>,
-}
-
-impl LocalVariables {
-    fn new() -> Self {
-        LocalVariables {
             current_offset: LOCAL_VARS_START_ADDRESS,
             scopes: Vec::new(),
         }
@@ -66,53 +53,6 @@ impl LocalVariables {
         self.scopes.push(scope)
     }
 }
-
-#[derive(Clone)]
-struct EvaluationStack {
-    state: Vec<YulType>,
-}
-
-impl EvaluationStack {
-    fn new() -> Self {
-        EvaluationStack { state: Vec::new() }
-    }
-
-    /*fn offset_of_ith_element(&mut self, i: usize) -> u32 {
-        let mut offset = EVAL_STACK_START_ADDRESS;
-        for j in 0..i {
-            offset += match self.state[j] {
-                YulType::U32 => 1,
-                YulType::U256 => 8,
-            };
-        }
-        offset
-    }
-
-    fn offset_of_last_element(&mut self) -> u32 {
-        self.offset_of_ith_element(self.state.len() - 1)
-    }
-
-    fn push(&mut self, typ: YulType) -> LocalOffset {
-        self.state.push(typ);
-        self.offset_of_last_element()
-    }
-
-    fn pop(&mut self) -> LocalOffset {
-        let idx = self.offset_of_last_element();
-        self.state.pop();
-        idx
-    }*/
-
-    fn address(&mut self) -> LocalOffset {
-        EVAL_STACK_START_ADDRESS
-    }
-}
-
-/*#[derive(Default, Clone)]
-struct Branch {
-    modified_identifiers: HashSet<TypedIdentifier>,
-    stack_before: Stack,
-}*/
 
 impl Transpiler {
     fn new() -> Self {
@@ -149,7 +89,7 @@ impl Transpiler {
 
     fn add_initialize(&mut self, name: String) {
         let init = PseudoInstruction::Init { name };
-        self.add_instruction(GeneralInstruction::Pseudo(name));
+        self.add_instruction(GeneralInstruction::Pseudo(init));
     }
 
     fn add_increment(&mut self, x: LocalOrImmediate) {
@@ -196,6 +136,60 @@ impl Transpiler {
         }
     }
 
+    fn transpile_function_declaration(&mut self, op: &ExprFunctionDefinition) {
+        let function_name = op.function_name.clone();
+        let end_label = format!("end_of_{}", function_name);
+
+        self.add_jump(ImmediateOrMacro::AddrOf(end_label.clone()));
+        self.add_label(function_name);
+
+        // CALLING CONVENTION
+
+        for expr in op.block.exprs.clone() {
+            self.transpile_op(&expr);
+        }
+
+        self.add_real_instruction(Instruction::Ret);
+        self.add_label(end_label);
+    }
+
+
+    fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
+        let function_name = op.function_name.clone();
+        let mut arguments = Vec::new();
+        for expr in op.exprs.iter() {
+            self.transpile_op(expr);
+            let argument = EVALUATION_ADDRESS;
+            arguments.push(argument);
+        }
+        
+        let mut index = 0;
+        for argument in arguments {
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: index,
+                val: LocalOrImmediate::Local(argument),
+            });
+            index += 1; // TODO: handle u256's
+        }
+
+        // TODO: more than one return value
+        let return_types = op.inferred_return_types.clone();
+        assert!(return_types.len() < 2);
+
+        self.add_real_instruction(Instruction::Call {
+            addr: ImmediateOrMacro::AddrOf(function_name),
+        });
+
+        if return_types.len() == 1 {
+            let location_to_read_to = EVALUATION_ADDRESS;
+
+            self.add_real_instruction(Instruction::CalleeWrite {
+                index: 0,
+                val: LocalOrImmediate::Local(location_to_read_to),
+            });
+        }
+    }
+
     fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
             ExprLiteral::Number(ExprLiteralNumber {
@@ -215,7 +209,7 @@ impl Transpiler {
 
     fn transpile_if_statement(&mut self, op: &ExprIfStatement) {
         self.transpile_op(&op.first_expr);
-        let prop = self.stack_frame.evaluation_stack.address();
+        let prop = EVALUATION_ADDRESS;
         let dest = self.new_if_label();
         self.add_jump_if(
             LocalOrImmediate::Local(prop),
@@ -230,11 +224,11 @@ impl Transpiler {
         assert_eq!(op.identifiers.len(), 1);
         let identifier = &op.identifiers[0];
 
-        let scope = self.stack_frame.local_variables.current_scope();
+        let scope = self.stack_frame.current_scope();
         let offset = scope.get(identifier).unwrap();
 
         self.transpile_op(op.rhs.deref());
-        let rhs = self.stack_frame.evaluation_stack.address();
+        let rhs = EVALUATION_ADDRESS;
 
         // TODO: deal with U256 case
         let move_inst = Instruction::Move32 {
@@ -249,12 +243,12 @@ impl Transpiler {
         assert_eq!(op.typed_identifiers.len(), 1);
         let identifier = &op.typed_identifiers[0];
 
-        let scope = self.stack_frame.local_variables.current_scope();
+        let scope = self.stack_frame.current_scope();
         let offset = scope.get(&identifier.identifier).unwrap();
 
         if let Some(rhs) = &op.rhs {
             self.transpile_op(rhs.deref());
-            let rhs = self.stack_frame.evaluation_stack.address();
+            let rhs = EVALUATION_ADDRESS;
 
             // TODO: deal with U256 case
             let move_inst = Instruction::Move32 {
@@ -272,7 +266,7 @@ impl Transpiler {
         self.add_label(pre.clone());
         self.transpile_op(&op.conditional);
 
-        let prop = self.stack_frame.evaluation_stack.address();
+        let prop = EVALUATION_ADDRESS;
         self.add_jump_if(
             LocalOrImmediate::Local(prop), 
             ImmediateOrMacro::AddrOf(post.clone()),
@@ -316,7 +310,7 @@ impl Transpiler {
     }
 
     fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
-        let mut current_offset = self.stack_frame.local_variables.current_offset;
+        let mut current_offset = self.stack_frame.current_offset;
         let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
 
         for expr in op.block.exprs.clone() {
@@ -337,26 +331,21 @@ impl Transpiler {
         }
 
         self.stack_frame
-            .local_variables
             .add_scope(new_scope);
     }
 
-    fn place_u32_on_stack(&mut self, val: u32) -> LocalOffset {
-        let location_of_new_space = self.stack_frame.evaluation_stack.address();
+    fn place_u32_on_stack(&mut self, val: u32) {
+        let destination = EVALUATION_ADDRESS;
 
         let move_inst = Instruction::Move32 {
             val: LocalOrImmediate::Immediate(ImmediateOrMacro::Immediate(val)),
-            dst: location_of_new_space,
+            dst: destination,
         };
         self.add_real_instruction(move_inst);
-
-        location_of_new_space
     }
 
-    fn place_u256_on_stack(&mut self, val: U256) -> LocalOffset {
-        let location_of_new_space = self.stack_frame.evaluation_stack.address();
-
-        let mut cur_location = location_of_new_space;
+    fn place_u256_on_stack(&mut self, val: U256) {
+        let mut cur_location = EVALUATION_ADDRESS;
         let mut cur_val = val;
 
         for _ in 0..8 {
@@ -370,8 +359,6 @@ impl Transpiler {
 
             cur_val = cur_val / (1u64 << 32);
         }
-
-        location_of_new_space
     }
 }
 
