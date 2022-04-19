@@ -11,6 +11,8 @@ struct Transpiler {
     stack_frame: StackFrame,
     label_count: usize,
     variable_count: usize,
+
+    current_for_loop: Vec<(String, String, String)>,
     /* variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -61,6 +63,7 @@ impl Transpiler {
             stack_frame: StackFrame::new(),
             label_count: 0,
             variable_count: 0,
+            current_for_loop: Vec::new(),
         }
     }
 
@@ -103,11 +106,12 @@ impl Transpiler {
         lbl
     }
 
-    fn new_loop_label(&mut self) -> (String, String) {
+    fn new_loop_label(&mut self) -> (String, String, String) {
         let pre = format!("pre{}", self.label_count);
+        let after_block = format!("after{}", self.label_count);
         let post = format!("post{}", self.label_count);
         self.label_count += 1;
-        (pre, post)
+        (pre, after_block, post)
     }
 
     fn new_variable(&mut self) -> String {
@@ -129,8 +133,8 @@ impl Transpiler {
             // Expr::Switch(op) => self.transpile_switch(op),
             // Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
-            // Expr::Break => self.transpile_break(),
-            // Expr::Continue => self.transpile_continue(),
+            Expr::Break => self.transpile_break(),
+            Expr::Continue => self.transpile_continue(),
             // Expr::Leave => self.transpile_leave(),
             _ => unreachable!(),
         }
@@ -261,7 +265,7 @@ impl Transpiler {
 
     fn transpile_for_loop(&mut self, op: &ExprForLoop) {
         self.transpile_block(&op.init_block);
-        let (pre, post) = self.new_loop_label();
+        let (pre, after_block, post) = self.new_loop_label();
 
         self.add_label(pre.clone());
         self.transpile_op(&op.conditional);
@@ -272,11 +276,25 @@ impl Transpiler {
             ImmediateOrMacro::AddrOf(post.clone()),
         );
 
+        self.current_for_loop.push((pre.clone(), after_block.clone(), post.clone()));
         self.transpile_block(&op.interior_block);
+        self.current_for_loop.pop();
+
+        self.add_label(after_block.clone());
         self.transpile_block(&op.after_block);
         self.add_jump(ImmediateOrMacro::AddrOf(pre));
 
         self.add_label(post);
+    }
+
+    fn transpile_break(&mut self) {
+        let (_pre, _after_block, post) = self.current_for_loop.last().unwrap();
+        self.add_jump(ImmediateOrMacro::AddrOf(post.clone()));
+    }
+
+    fn transpile_continue(&mut self) {
+        let (_pre, after_block, _post) = self.current_for_loop.last().unwrap();
+        self.add_jump(ImmediateOrMacro::AddrOf(after_block.clone()));
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) {
@@ -289,7 +307,7 @@ impl Transpiler {
     }
 
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
-        let (pre, post) = self.new_loop_label();
+        let (pre, after_block, post) = self.new_loop_label();
         self.add_label(pre.clone());
         
         let counter = self.new_variable();
@@ -302,7 +320,11 @@ impl Transpiler {
         };
         self.add_real_instruction(jump);
 
+        self.current_for_loop.push((pre.clone(), after_block.clone(), post.clone()));
         self.transpile_block(&op.interior_block);
+        self.current_for_loop.pop();
+
+        self.add_label(after_block.clone());
         self.add_increment(LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(counter.clone())));
 
         self.add_jump(ImmediateOrMacro::AddrOf(pre));
