@@ -28,8 +28,9 @@ struct Transpiler {
 
 const LOCAL_VARS_START_ADDRESS: u32 = 0;
 const EVALUATION_ADDRESS: u32 = 1 << 12;
-const FIRST_OPERAND_ADDRESS: u32 = EVALUATION_ADDRESS + 8;
-const SECOND_OPERAND_ADDRESS: u32 = FIRST_OPERAND_ADDRESS + 8;
+// const FIRST_OPERAND_ADDRESS: u32 = EVALUATION_ADDRESS + 8;
+// const MAX_NUM_OPERANDS: u32 = 12;
+// const MAX_OPERAND_ADDRESS: u32 = FIRST_OPERAND_ADDRESS + (MAX_NUM_OPERANDS + 1) * 8;
 
 type Scope = HashMap<String, (YulType, u32)>;
 
@@ -53,6 +54,20 @@ impl StackFrame {
 
     fn add_scope(&mut self, scope: Scope) {
         self.scopes.push(scope)
+    }
+
+    fn remove_scope(&mut self) {
+        self.scopes.pop();
+    }
+
+    fn get_variable(&mut self, name: &String) -> Option<(YulType, u32)> {
+        for scope in self.scopes.iter().rev() {
+            if scope.contains_key(name) {
+                return Some(scope.get(name).unwrap().clone());
+            }
+        }
+
+        None
     }
 }
 
@@ -120,18 +135,20 @@ impl Transpiler {
         name
     }
 
+    // Postcondition: if `expr` is a true Yul "Expression" (a function call, literal, or variable reference),
+    // its evaluation is left at EVALUATION_ADDRESS
     fn transpile_op(&mut self, expr: &Expr) {
         match expr {
             Expr::Literal(value) => self.transpile_literal(value),
-            // Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
-            // Expr::FunctionCall(op) => self.transpile_function_call(op),
+            Expr::FunctionDefinition(op) => self.transpile_function_declaration(op),
+            Expr::FunctionCall(op) => self.transpile_function_call(op),
             Expr::IfStatement(op) => self.transpile_if_statement(op),
             Expr::Assignment(op) => self.transpile_assignment(op),
             Expr::DeclareVariable(op) => self.transpile_variable_declaration(op),
             Expr::ForLoop(op) => self.transpile_for_loop(op),
             Expr::Block(op) => self.transpile_block(op),
-            // Expr::Switch(op) => self.transpile_switch(op),
-            // Expr::Variable(op) => self.transpile_variable_reference(op),
+            Expr::Switch(op) => self.transpile_switch(op),
+            Expr::Variable(op) => self.transpile_variable_reference(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
             Expr::Break => self.transpile_break(),
             Expr::Continue => self.transpile_continue(),
@@ -157,21 +174,16 @@ impl Transpiler {
         self.add_label(end_label);
     }
 
-
+    // Postcondition: the function's return value is left at EVALUATION_ADDRESS
     fn transpile_function_call(&mut self, op: &ExprFunctionCall) {
         let function_name = op.function_name.clone();
-        let mut arguments = Vec::new();
+
+        let mut index = 0;
         for expr in op.exprs.iter() {
             self.transpile_op(expr);
-            let argument = EVALUATION_ADDRESS;
-            arguments.push(argument);
-        }
-        
-        let mut index = 0;
-        for argument in arguments {
             self.add_real_instruction(Instruction::CalleeWrite {
                 index: index,
-                val: LocalOrImmediate::Local(argument),
+                val: LocalOrImmediate::Local(EVALUATION_ADDRESS),
             });
             index += 1; // TODO: handle u256's
         }
@@ -194,6 +206,24 @@ impl Transpiler {
         }
     }
 
+    // Postcondition: the variable's value is left at EVALUATION_ADDRESS
+    fn transpile_variable_reference(&mut self, var: &ExprVariableReference) {
+        let (ty, address) = self.stack_frame.get_variable(&var.identifier).unwrap();
+        
+        let move_inst = match ty {
+            YulType::U32 => Instruction::Move32 {
+                val: LocalOrImmediate::Local(address),
+                dst: EVALUATION_ADDRESS,
+            },
+            YulType::U256 => Instruction::Move256 {
+                val: address,
+                dst: EVALUATION_ADDRESS,
+            },
+        };
+        self.add_real_instruction(move_inst);
+    }
+
+    // Postcondition: the function's return value is left at EVALUATION_ADDRESS
     fn transpile_literal(&mut self, literal: &ExprLiteral) {
         match literal {
             ExprLiteral::Number(ExprLiteralNumber {
@@ -288,22 +318,27 @@ impl Transpiler {
     }
 
     fn transpile_break(&mut self) {
-        let (_pre, _after_block, post) = self.current_for_loop.last().unwrap();
-        self.add_jump(ImmediateOrMacro::AddrOf(post.clone()));
+        let (_pre, _after_block, post) = self.current_for_loop.last().unwrap().clone();
+        self.add_jump(ImmediateOrMacro::AddrOf(post));
     }
 
     fn transpile_continue(&mut self) {
-        let (_pre, after_block, _post) = self.current_for_loop.last().unwrap();
-        self.add_jump(ImmediateOrMacro::AddrOf(after_block.clone()));
+        let (_pre, after_block, _post) = self.current_for_loop.last().unwrap().clone();
+        self.add_jump(ImmediateOrMacro::AddrOf(after_block));
+    }
+
+    fn transpile_switch(&mut self, op: &ExprSwitch) {
+
     }
 
     fn transpile_block(&mut self, op: &ExprBlock) {
-        // scan block for variables
-        // add new variable mapping for this scope
+        self.scan_block_for_variables(op);
 
         for op in &op.exprs {
             self.transpile_op(op);
         }
+
+        self.end_block_scope();
     }
 
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
@@ -331,11 +366,11 @@ impl Transpiler {
         self.add_label(post);
     }
 
-    fn scan_block_for_variables(&mut self, op: &ExprFunctionDefinition) {
+    fn scan_block_for_variables(&mut self, block: &ExprBlock) {
         let mut current_offset = self.stack_frame.current_offset;
         let mut new_scope: HashMap<String, (YulType, u32)> = HashMap::new();
 
-        for expr in op.block.exprs.clone() {
+        for expr in block.exprs.clone() {
             match expr {
                 Expr::DeclareVariable(e) => {
                     for t in e.typed_identifiers {
@@ -354,6 +389,10 @@ impl Transpiler {
 
         self.stack_frame
             .add_scope(new_scope);
+    }
+
+    fn end_block_scope(&mut self) {
+        self.stack_frame.remove_scope();
     }
 
     fn place_u32_on_stack(&mut self, val: u32) {
