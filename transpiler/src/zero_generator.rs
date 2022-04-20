@@ -209,7 +209,7 @@ impl Transpiler {
     // Postcondition: the variable's value is left at EVALUATION_ADDRESS
     fn transpile_variable_reference(&mut self, var: &ExprVariableReference) {
         let (ty, address) = self.stack_frame.get_variable(&var.identifier).unwrap();
-        
+
         let move_inst = match ty {
             YulType::U32 => Instruction::Move32 {
                 val: LocalOrImmediate::Local(address),
@@ -302,11 +302,12 @@ impl Transpiler {
 
         let prop = EVALUATION_ADDRESS;
         self.add_jump_if(
-            LocalOrImmediate::Local(prop), 
+            LocalOrImmediate::Local(prop),
             ImmediateOrMacro::AddrOf(post.clone()),
         );
 
-        self.current_for_loop.push((pre.clone(), after_block.clone(), post.clone()));
+        self.current_for_loop
+            .push((pre.clone(), after_block.clone(), post.clone()));
         self.transpile_block(&op.interior_block);
         self.current_for_loop.pop();
 
@@ -327,9 +328,7 @@ impl Transpiler {
         self.add_jump(ImmediateOrMacro::AddrOf(after_block));
     }
 
-    fn transpile_switch(&mut self, op: &ExprSwitch) {
-
-    }
+    fn transpile_switch(&mut self, op: &ExprSwitch) {}
 
     fn transpile_block(&mut self, op: &ExprBlock) {
         self.scan_block_for_variables(op);
@@ -344,7 +343,7 @@ impl Transpiler {
     fn transpile_repeat(&mut self, op: &ExprRepeat) {
         let (pre, after_block, post) = self.new_loop_label();
         self.add_label(pre.clone());
-        
+
         let counter = self.new_variable();
         self.add_initialize(counter.clone());
 
@@ -355,12 +354,15 @@ impl Transpiler {
         };
         self.add_real_instruction(jump);
 
-        self.current_for_loop.push((pre.clone(), after_block.clone(), post.clone()));
+        self.current_for_loop
+            .push((pre.clone(), after_block.clone(), post.clone()));
         self.transpile_block(&op.interior_block);
         self.current_for_loop.pop();
 
         self.add_label(after_block.clone());
-        self.add_increment(LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(counter.clone())));
+        self.add_increment(LocalOrImmediate::Immediate(ImmediateOrMacro::AddrOf(
+            counter.clone(),
+        )));
 
         self.add_jump(ImmediateOrMacro::AddrOf(pre));
         self.add_label(post);
@@ -387,8 +389,7 @@ impl Transpiler {
             }
         }
 
-        self.stack_frame
-            .add_scope(new_scope);
+        self.stack_frame.add_scope(new_scope);
     }
 
     fn end_block_scope(&mut self) {
