@@ -25,5 +25,9 @@ jobs:
       run: git submodule update
     - name: Build
       run: cargo build --verbose
+    - name: Check formatting
+      run: cargo fmt --all --verbose -- --check
+    - name: Ask Clippy for his thoughts
+      run: cargo clippy --all-targets --all-features
     - name: Run tests
       run: cargo test --verbose
