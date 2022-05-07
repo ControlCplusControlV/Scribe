@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use miden_processor::StarkField;
 use quickcheck::{Arbitrary, Gen, TestResult};
 use quickcheck_macros::quickcheck;
@@ -42,7 +41,7 @@ fn run_miden_function(
         load_all_procs(),
         stack
             .iter()
-            .map(|sv| convert_u256_to_pushes(&sv))
+            .map(|sv| convert_u256_to_pushes(sv))
             .collect::<Vec<_>>()
             .join("\n"),
         proc
@@ -52,7 +51,7 @@ fn run_miden_function(
     let execution_value = result.unwrap();
     match expected {
         MidenResult::U256(expected) => {
-            let output_stack = execution_value.last_stack_state().clone();
+            let output_stack = execution_value.last_stack_state();
             let stack_result = miden_to_u256(execution_value);
             println!("Expected: {}", expected);
             println!("Output  : {}", stack_result);
@@ -99,7 +98,7 @@ fn addition(x: U256, y: U256) -> TestResult {
 
 #[quickcheck]
 fn multiplication(x: U256, y: U256) -> TestResult {
-    let (expected, overflowed) = (x.0).overflowing_mul(y.0);
+    let (expected, _overflowed) = (x.0).overflowing_mul(y.0);
     run_miden_function(
         "exec.u256::mul_unsafe",
         vec![(x.0), (y.0)],
@@ -110,7 +109,7 @@ fn multiplication(x: U256, y: U256) -> TestResult {
 #[ignore]
 #[quickcheck]
 fn shl(x: U256) -> TestResult {
-    let expected = x.0 << 1 as u32;
+    let expected = x.0 << 1_u32;
     run_miden_function(
         "exec.u256shl_unsafe",
         vec![x.0],
@@ -165,7 +164,7 @@ fn greater_than_or_equal_to(x: U256Small, y: U256Small) -> TestResult {
 #[ignore]
 #[quickcheck]
 fn shr(x: U256) -> TestResult {
-    let expected = x.0 >> 1 as u32;
+    let expected = x.0 >> 1_u32;
     run_miden_function(
         "exec.u256shr_unsafe",
         vec![x.0],

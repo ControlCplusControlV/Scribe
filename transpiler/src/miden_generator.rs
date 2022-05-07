@@ -231,7 +231,7 @@ impl Transpiler {
                     );
                     self.dup_from_offset(offset, stack_value.yul_type);
                 } else {
-                    let sv = self.stack.0.remove(index);
+                    let _sv = self.stack.0.remove(index);
                     self.stack
                         .0
                         .insert(0, StackValue::from(&typed_identifier.clone()));
@@ -276,7 +276,7 @@ impl Transpiler {
             }
             YulType::U256 => {
                 self.add_line(&format!("pushw.mem.{}", address + 1));
-                self.add_line(&format!("pushw.mem.{}", address + 0));
+                self.add_line(&format!("pushw.mem.{}", address));
             }
         }
         self.stack.0.insert(
