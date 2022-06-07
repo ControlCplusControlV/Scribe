@@ -9,6 +9,7 @@ use crate::{ast_optimization::optimize_ast, types::*, utils::convert_u256_to_pus
 //Struct that enables transpilation management. Through implementations, this struct keeps track of the variables,
 //open memory addresses, the stack, indentation of Miden assembly and user defined functions.
 struct Transpiler {
+    options: CompileOptions,
     variables: HashMap<TypedIdentifier, u32>,
     indentation: u32,
     next_open_memory_address: u32,
@@ -101,7 +102,9 @@ impl Transpiler {
     // if.true
     //     push.0
     fn indent(&mut self) {
-        self.indentation += 4;
+        if (self.options.auto_indent || self.indentation == 0) {
+            self.indentation += 4;
+        }
     }
 
     //Function to decrease the indent in the Miden assembly by four spaces
@@ -110,7 +113,9 @@ impl Transpiler {
     //     push.0
     // drop
     fn outdent(&mut self) {
-        self.indentation -= 4;
+        if (self.options.auto_indent) {
+            self.indentation -= 4;
+        }
     }
 
     //Function to return the state of the stack before branching. For more details on a branch, see the Branch struct.
@@ -1081,12 +1086,14 @@ impl Transpiler {
 
     //Add a comment in to the Miden assembly. Comments are generated throughout transpilation.
     fn add_comment(&mut self, comment: &str) {
-        self.program = format!(
-            "{}\n{}# {} #",
-            self.program,
-            " ".repeat(self.indentation.try_into().unwrap()),
-            comment
-        )
+        if (self.options.comments) {
+            self.program = format!(
+                "{}\n{}# {} #",
+                self.program,
+                " ".repeat(self.indentation.try_into().unwrap()),
+                comment
+            )
+        }
     }
 
     //Function to transpile expressions into Miden instructions
@@ -1119,7 +1126,8 @@ impl Transpiler {
         let procs = MASM_DIR
             .files()
             .filter_map(|file| {
-                if dbg!(&self.procs_used)
+                if self
+                    .procs_used
                     .contains(file.path().file_stem().unwrap().to_str().unwrap())
                 {
                     return file.contents_utf8();
@@ -1135,10 +1143,26 @@ impl Transpiler {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct CompileOptions {
+    pub comments: bool,
+    pub auto_indent: bool,
+}
+
+impl Default for CompileOptions {
+    fn default() -> Self {
+        CompileOptions {
+            comments: true,
+            auto_indent: true,
+        }
+    }
+}
+
 //Transpile a Miden program from a Vec of expressions and return the compiled Miden program as a string
-pub fn transpile_program(expressions: Vec<Expr>) -> String {
+pub fn transpile_program(expressions: Vec<Expr>, options: CompileOptions) -> String {
     //Initalize the transpiler
     let mut transpiler = Transpiler {
+        options,
         variables: HashMap::new(),
         next_open_memory_address: 0,
         indentation: 0,
@@ -1171,7 +1195,8 @@ pub fn transpile_program(expressions: Vec<Expr>) -> String {
     for expr in ast {
         transpiler.transpile_op(&expr);
     }
-    transpiler.outdent();
+    // transpiler.outdent();
+    transpiler.indentation = 0;
     //end the Miden program
     transpiler.add_line("end");
     //return the Miden program as a string

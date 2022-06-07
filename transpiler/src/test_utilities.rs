@@ -2,6 +2,7 @@
 use crate::ast_optimization::optimize_ast;
 use crate::executor;
 use crate::miden_generator;
+use crate::miden_generator::CompileOptions;
 use crate::parser;
 use crate::type_inference::infer_types;
 use crate::types::expressions_to_tree;
@@ -38,7 +39,7 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     println!("{}", expressions_to_tree(&ast));
     println!();
 
-    let miden_code = miden_generator::transpile_program(ast);
+    let miden_code = miden_generator::transpile_program(ast, Default::default());
     let mut trimmed_miden_code = miden_code
         .split("\n")
         // .skip_while(|line| *line != "# end std lib #")
@@ -74,6 +75,83 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     }
 }
 
+pub fn compile_example(yul_code: &str, expected_output: &str) {
+    fn print_title(s: &str) {
+        let s1 = format!("=== {} ===", s).blue().bold();
+        println!("{}", s1);
+        println!(" ");
+    }
+    // println!();
+    // println!();
+    // print_title("Input Yul");
+    // println!("{}", yul_code);
+    // println!();
+
+    let parsed = parser::parse_yul_syntax(yul_code);
+
+    let ast = optimize_ast(parsed);
+
+    let ast = infer_types(&ast);
+    // print_title("AST");
+    // println!("{}", expressions_to_tree(&ast));
+    // println!();
+
+    let miden_code = miden_generator::transpile_program(
+        ast,
+        CompileOptions {
+            comments: false,
+            auto_indent: false,
+            ..Default::default()
+        },
+    );
+    let mut trimmed_miden_code = miden_code
+        .split("\n")
+        .filter(|line| !line.contains("use std") && !line.trim().is_empty())
+        .collect::<Vec<_>>()
+        .join("\n");
+    let mut trimmed_yul_code = yul_code
+        .split("\n")
+        .filter(|line| !line.trim().is_empty())
+        .collect::<Vec<_>>()
+        .join("\n");
+    print_title("Input Yul");
+    println!("{}", trimmed_yul_code);
+    println!("");
+    // println!();
+    // assert_eq!(trimmed_miden_code, expected_output);
+    if (trimmed_miden_code != expected_output) {
+        print_title("Expected Output");
+        println!("{}", expected_output);
+        print_title("Actual Output");
+        println!("{}", trimmed_miden_code);
+        panic!("Incorrect output");
+    }
+    // let execution_value = executor::execute(miden_code, vec![]).unwrap();
+    // let stack = execution_value.last_stack_state();
+    // let last_stack_value = stack.first().unwrap();
+    //
+    // print_title("Miden Output");
+    // match expected_output {
+    //     MidenResult::U256(expected) => {
+    //         let stack_value = miden_to_u256(execution_value);
+    //         println!("{}", stack_value);
+    //         if expected != stack_value {
+    //             print_title("Miden Stack");
+    //             println!("{:?}", stack);
+    //             panic!("Failed, stack result not right");
+    //         }
+    //     }
+    //     MidenResult::U32(expected) => {
+    //         println!("{}", last_stack_value);
+    //         if expected != last_stack_value.as_int() as u32 {
+    //             print_title("Miden Stack");
+    //             println!("{:?}", stack);
+    //             panic!("Failed, stack result not right");
+    //         }
+    //     }
+    // }
+}
+
 // pub fn run_yul() {}
 
 pub fn write_yul_to_masm(yul_file: YulFile) {
@@ -81,7 +159,7 @@ pub fn write_yul_to_masm(yul_file: YulFile) {
     let ast = optimize_ast(parsed);
     let ast = infer_types(&ast);
 
-    let miden_code = miden_generator::transpile_program(ast);
+    let miden_code = miden_generator::transpile_program(ast, Default::default());
 
     fs::write(
         format!(
