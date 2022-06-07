@@ -39,5 +39,5 @@ fn debug_execution() {
     println!("Miden Output");
     let stack = execution_value.last_stack_state();
     dbg!(&stack);
-    let last_stack_value = stack.first().unwrap();
+    let _last_stack_value = stack.first().unwrap();
 }

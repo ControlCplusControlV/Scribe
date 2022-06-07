@@ -1,22 +1,13 @@
 use colored::*;
-use scribe::test_utilities::run_example;
 use scribe::test_utilities::write_yul_to_masm;
-use scribe::type_inference::infer_types;
-use std::path::Path;
 
-use scribe::executor;
-use scribe::miden_generator;
-use scribe::parser;
 use scribe::repl::start_repl;
 
-use scribe::types::expressions_to_tree;
 use scribe::types::YulFile;
 use std::fs;
 use std::io::{stdin, stdout, Read, Write};
-#[macro_use(quickcheck)]
 extern crate quickcheck_macros;
 
-#[macro_use]
 extern crate insta;
 use clap::Parser;
 
