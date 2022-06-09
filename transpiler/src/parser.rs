@@ -1,3 +1,4 @@
+use crate::type_inference::infer_types;
 use crate::types::*;
 use pest::iterators::Pair;
 use pest::Parser;
