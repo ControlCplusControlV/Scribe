@@ -81,20 +81,12 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
         println!("{}", s1);
         println!(" ");
     }
-    // println!();
-    // println!();
-    // print_title("Input Yul");
-    // println!("{}", yul_code);
-    // println!();
 
     let parsed = parser::parse_yul_syntax(yul_code);
 
     let ast = optimize_ast(parsed);
 
     let ast = infer_types(&ast);
-    // print_title("AST");
-    // println!("{}", expressions_to_tree(&ast));
-    // println!();
 
     let miden_code = miden_generator::transpile_program(
         ast,
@@ -126,30 +118,6 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
         println!("{}", trimmed_miden_code);
         panic!("Incorrect output");
     }
-    // let execution_value = executor::execute(miden_code, vec![]).unwrap();
-    // let stack = execution_value.last_stack_state();
-    // let last_stack_value = stack.first().unwrap();
-    //
-    // print_title("Miden Output");
-    // match expected_output {
-    //     MidenResult::U256(expected) => {
-    //         let stack_value = miden_to_u256(execution_value);
-    //         println!("{}", stack_value);
-    //         if expected != stack_value {
-    //             print_title("Miden Stack");
-    //             println!("{:?}", stack);
-    //             panic!("Failed, stack result not right");
-    //         }
-    //     }
-    //     MidenResult::U32(expected) => {
-    //         println!("{}", last_stack_value);
-    //         if expected != last_stack_value.as_int() as u32 {
-    //             print_title("Miden Stack");
-    //             println!("{:?}", stack);
-    //             panic!("Failed, stack result not right");
-    //         }
-    //     }
-    // }
 }
 
 // pub fn run_yul() {}
