@@ -46,7 +46,7 @@ impl TypeInferrer {
                     .iter()
                     .enumerate()
                     .map(|(i, expr)| {
-                        if (i == 0 && function_name == "mstore" || function_name == "mload") {
+                        if i == 0 && function_name == "mstore" || function_name == "mload" {
                             self.expected_types = vec![Some(YulType::U32)];
                         }
                         // self.expected_types = vec![expected_param_type.clone()];

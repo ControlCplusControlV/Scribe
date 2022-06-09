@@ -1,6 +1,6 @@
-use std::{fmt, path::PathBuf};
-
+use debug_tree::TreeBuilder;
 use primitive_types::U256;
+use std::{fmt, path::PathBuf};
 
 #[derive(Debug)]
 //Struct to represent a YulFile
@@ -237,8 +237,6 @@ pub struct TypedIdentifier {
 }
 
 pub type Identifier = String;
-
-use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
 
 //Implementations for the Expr enum
 impl Expr {
