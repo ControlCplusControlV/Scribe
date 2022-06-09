@@ -47,9 +47,7 @@ pub fn join_u32s_to_u256(x: Vec<u32>) -> U256 {
     let u256_bytes = x
         .iter()
         .take(8)
-        .flat_map(|x| {
-            return x.to_be_bytes();
-        })
+        .flat_map(|x| x.to_be_bytes())
         .collect::<Vec<_>>();
 
     U256::from_big_endian(&u256_bytes)
