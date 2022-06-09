@@ -51,7 +51,6 @@ pub enum YulType {
 impl YulType {
     //Converts a string representation of u32 or u256 to a YulType
     pub fn from_annotation(annotation: &str) -> Self {
-        dbg!(annotation);
         match annotation {
             "u32" => Self::U32,
             "u256" => Self::U256,
