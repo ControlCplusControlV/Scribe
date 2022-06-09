@@ -1,6 +1,6 @@
 use indoc::indoc;
-use primitive_types::U256;
-use scribe::test_utilities::{compile_example, run_example, MidenResult};
+
+use scribe::test_utilities::{compile_example};
 
 #[test]
 fn optimization_basic_constant_replacement() {

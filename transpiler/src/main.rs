@@ -38,9 +38,9 @@ fn print_title(s: &str) {
 //Wait for the user to press enter to continue when running Scribe examples in the terminal
 fn pause() {
     let mut stdout = stdout();
-    stdout.write(b"Press Enter to continue...").unwrap();
+    stdout.write_all(b"Press Enter to continue...").unwrap();
     stdout.flush().unwrap();
-    stdin().read(&mut [0]).unwrap();
+    stdin().read_exact(&mut [0]).unwrap();
 }
 
 //Clear the terminal when running Scribe examples
