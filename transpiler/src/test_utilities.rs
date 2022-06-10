@@ -111,7 +111,7 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
     println!("");
     // println!();
     // assert_eq!(trimmed_miden_code, expected_output);
-    if (trimmed_miden_code != expected_output) {
+    if trimmed_miden_code != expected_output {
         print_title("Expected Output");
         println!("{}", expected_output);
         print_title("Actual Output");

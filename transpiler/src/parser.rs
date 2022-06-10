@@ -1,7 +1,5 @@
-// use std::fs;
 use crate::type_inference::infer_types;
 use crate::types::*;
-use hex::*;
 use pest::iterators::Pair;
 use pest::Parser;
 use pest_derive::Parser;

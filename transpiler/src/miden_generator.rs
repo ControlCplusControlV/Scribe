@@ -102,7 +102,7 @@ impl Transpiler {
     // if.true
     //     push.0
     fn indent(&mut self) {
-        if (self.options.auto_indent || self.indentation == 0) {
+        if self.options.auto_indent || self.indentation == 0 {
             self.indentation += 4;
         }
     }
@@ -113,7 +113,7 @@ impl Transpiler {
     //     push.0
     // drop
     fn outdent(&mut self) {
-        if (self.options.auto_indent) {
+        if self.options.auto_indent {
             self.indentation -= 4;
         }
     }
@@ -322,7 +322,7 @@ impl Transpiler {
                     self.add_line(&format!("dupw.3"));
                 }
                 o => {
-                    for _ in (0..8) {
+                    for _ in 0..8 {
                         self.add_line(&format!("dup.{}", o));
                     }
                 }
@@ -417,7 +417,7 @@ impl Transpiler {
                         self.add_line(&format!("movupw.3"));
                     }
                     o => {
-                        for _ in (0..8) {
+                        for _ in 0..8 {
                             self.add_line(&format!("movup.{}", o + 7));
                         }
                     }
@@ -1086,7 +1086,7 @@ impl Transpiler {
 
     //Add a comment in to the Miden assembly. Comments are generated throughout transpilation.
     fn add_comment(&mut self, comment: &str) {
-        if (self.options.comments) {
+        if self.options.comments {
             self.program = format!(
                 "{}\n{}# {} #",
                 self.program,

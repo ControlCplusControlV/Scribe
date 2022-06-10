@@ -1,6 +1,6 @@
-use std::{fmt, path::PathBuf};
-
+use debug_tree::TreeBuilder;
 use primitive_types::U256;
+use std::{fmt, path::PathBuf};
 
 #[derive(Debug)]
 //Struct to represent a YulFile
@@ -32,10 +32,10 @@ pub enum Expr {
 impl Expr {
     pub fn get_inferred_type(&self) -> Option<YulType> {
         match self {
-            Expr::Literal(ExprLiteral::Number(x)) => x.inferred_type.clone(),
+            Expr::Literal(ExprLiteral::Number(x)) => x.inferred_type,
             Expr::Literal(_) => todo!(),
-            Expr::FunctionCall(x) => x.inferred_return_types.first().unwrap().clone(),
-            Expr::Variable(x) => x.inferred_type.clone(),
+            Expr::FunctionCall(x) => *x.inferred_return_types.first().unwrap(),
+            Expr::Variable(x) => x.inferred_type,
             _ => unreachable!(),
         }
     }
@@ -238,8 +238,6 @@ pub struct TypedIdentifier {
 
 pub type Identifier = String;
 
-use debug_tree::{add_branch_to, add_leaf_to, TreeBuilder, TreeSymbols};
-
 //Implementations for the Expr enum
 impl Expr {
     //Add the Expr to the abstract syntax tree. Each Expr is added as a tree "leaf".
@@ -255,11 +253,10 @@ impl Expr {
                     "{}:{}",
                     value,
                     inferred_type
-                        .clone()
                         .map(|yt| yt.to_string())
-                        .unwrap_or("unknown".to_string())
+                        .unwrap_or_else(|| "unknown".to_string())
                 )),
-                ExprLiteral::String(x) => tree.add_leaf(&x),
+                ExprLiteral::String(x) => tree.add_leaf(x),
                 ExprLiteral::Bool(x) => tree.add_leaf(&x.to_string()),
             },
             //--------------------------------------------------------
@@ -274,10 +271,10 @@ impl Expr {
                 default_case,
                 expr,
             }) => {
-                let _branch = tree.add_branch(&format!("switch"));
+                let _branch = tree.add_branch(&"switch".to_string());
                 expr.add_to_tree(tree);
                 for case in cases {
-                    let _branch = tree.add_branch(&format!("case"));
+                    let _branch = tree.add_branch(&"case".to_string());
                     Expr::Block(case.block.clone()).add_to_tree(tree);
                 }
             }
@@ -293,8 +290,8 @@ impl Expr {
                 let _branch = tree.add_branch(&format!(
                     "{}({}): {}",
                     &function_name.to_string(),
-                    format_inferred_types(&inferred_param_types),
-                    format_inferred_types(&inferred_return_types)
+                    format_inferred_types(inferred_param_types),
+                    format_inferred_types(inferred_return_types)
                 ));
                 for expression in exprs.clone().into_iter() {
                     expression.add_to_tree(tree);
@@ -439,7 +436,7 @@ impl Expr {
                         tree.add_leaf(&param.to_string());
                     }
                 }
-                let _branch = tree.add_branch(&format!("body"));
+                let _branch = tree.add_branch(&"body".to_string());
                 Expr::Block(block.clone()).add_to_tree(tree);
             }
 
@@ -496,10 +493,10 @@ fn inferred_type_to_string(inferred_type: &Option<YulType>) -> String {
 }
 
 //Convert a Vec of YulType to a string
-fn format_inferred_types(inferred_types: &Vec<Option<YulType>>) -> String {
+fn format_inferred_types(inferred_types: &[Option<YulType>]) -> String {
     inferred_types
         .iter()
-        .map(|it| inferred_type_to_string(it))
+        .map(inferred_type_to_string)
         .collect::<Vec<_>>()
         .join(", ")
 }

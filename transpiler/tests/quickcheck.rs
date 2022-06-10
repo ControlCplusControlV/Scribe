@@ -41,7 +41,7 @@ fn run_miden_function(
         load_all_procs(),
         stack
             .iter()
-            .map(|sv| convert_u256_to_pushes(sv))
+            .map(convert_u256_to_pushes)
             .collect::<Vec<_>>()
             .join("\n"),
         proc
