@@ -1,7 +1,6 @@
 use indoc::indoc;
 use scribe::test_utilities::compile_example;
 
-
 #[test]
 fn optimization_basic_constant_replacement() {
     compile_example(
@@ -62,9 +61,9 @@ fn optimization_last_use() {
         indoc! {"
             begin
                 push.1
-                dup 0
+                dup.0
                 push.2
-                add
+                u32add
                 movup.1
                 push.3
                 add
@@ -125,6 +124,26 @@ fn optimization_let_old_vars_die() {
 }
 
 #[test]
+fn optimization_let_old_vars_die_v2() {
+    // Will probably have to disable some optimizations for this
+    //
+    // When a var would have been pushed to memory, it should instead be allowed to fall out of the
+    // addressable part of the stack, if it's no longer used
+    compile_example(
+        "                                                                                  
+        let x1;u256 := 1
+        let x2:u256 := 2
+        let x3:u256 := 3
+        x3 
+        ",
+        indoc! {"
+            begin
+            // Assert similarly to the test above to make sure old variables die
+            end
+        "},
+    );
+}
+#[test]
 fn variable_life() {
     // Will probably have to disable some optimizations for this
     //
@@ -136,7 +155,7 @@ fn variable_life() {
     mstore(0x20, 67677686778768)
     let b:u256 := mload(0x20)
     let c:u256 := add(b, 1000)
-    mstore(0x20, 100)
+    mstore(0x20, c)
     let d:u256 = mload(0x20)
     // assert the value of d
     d
@@ -149,11 +168,11 @@ fn variable_life() {
 fn test_folding() {
     compile_example(
         "
-    let a:u256 := add(100, 5)
-    let b:u256 := mul(a, 10)
-    let c:u256 := div(b, 5)
-    let d:u256 := sub(c, 1)
-    // Assert this folds into a single PUSH statement
+        let a:u256 := add(100, 5)
+        let b:u256 := mul(a, 10)
+        let c:u256 := div(b, 5)
+        let d:u256 := sub(c, 1)
+        // Assert this folds into a single PUSH statement
         ",
         todo!(),
     );
@@ -167,6 +186,29 @@ fn test_lifetime() {
     let b:u256 := 43589348589349845838993489493
     let c:u256 = add(a, b)
     let d:u256 = add(a, c)
+        ",
+        todo!(),
+    );
+}
+
+#[test]
+fn memory_test() {
+    compile_example(
+        "
+        // populate memory
+        mstore(0x20, 1)
+        mstore(0x21, 2)
+        mstore(0x22, 3)
+
+        // declare variables - we read from memory to make sure constant folding doesn't kick in
+        let a:u256 := mload(0x20)
+        let b:u256 := mload(0x21)
+        let c:u256 := mload(0x22)
+
+        // perform some operations with the variables
+        b := add(b, 100)
+        c := add(c, a)
+        c := add(c, b)
         ",
         todo!(),
     );
