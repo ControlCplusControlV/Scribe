@@ -6,11 +6,11 @@ pub use miden_processor::{ExecutionError, Felt as BaseElement, FieldElement, Pro
 pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, MidenError> {
     let program = miden_assembly::Assembler::new()
         .compile_script(&program)
-        .map_err(|e| MidenError::AssemblyError(e))?;
+        .map_err(MidenError::AssemblyError)?;
 
     let pub_inputs = vec![];
     let inputs = ProgramInputs::new(&pub_inputs, &[], vec![]).unwrap();
-    miden_processor::execute(&program, &inputs).map_err(|e| MidenError::ExecutionError(e))
+    miden_processor::execute(&program, &inputs).map_err(MidenError::ExecutionError)
 }
 
 //Errors that are returned from the Miden processor during execution.

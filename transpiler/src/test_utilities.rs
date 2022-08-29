@@ -41,7 +41,7 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
 
     let miden_code = miden_generator::transpile_program(ast, Default::default());
     let mut trimmed_miden_code = miden_code
-        .split("\n")
+        .split('\n')
         // .skip_while(|line| *line != "# end std lib #")
         .collect::<Vec<_>>()
         .join("\n");
@@ -93,16 +93,15 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
         CompileOptions {
             comments: false,
             auto_indent: false,
-            ..Default::default()
         },
     );
     let mut trimmed_miden_code = miden_code
-        .split("\n")
+        .split('\n')
         .filter(|line| !line.contains("use std") && !line.trim().is_empty())
         .collect::<Vec<_>>()
         .join("\n");
     let mut trimmed_yul_code = yul_code
-        .split("\n")
+        .split('\n')
         .filter(|line| !line.trim().is_empty())
         .collect::<Vec<_>>()
         .join("\n");
@@ -149,7 +148,7 @@ pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
         .flat_map(|x| {
             let svint = x.as_int() as u32;
 
-            return svint.to_be_bytes();
+            svint.to_be_bytes()
         })
         .collect::<Vec<_>>();
 

@@ -182,10 +182,10 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
             if let Some(rhs) = rhs {
                 rhs_expr = Some(parse_expression(rhs));
             }
-            return Expr::DeclareVariable(ExprDeclareVariable {
+            Expr::DeclareVariable(ExprDeclareVariable {
                 typed_identifiers: typed_identifiers,
                 rhs: rhs_expr.map(Box::new),
-            });
+            })
         }
 
         //if rule is not defined
@@ -296,15 +296,15 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
             let function_name = inners.next().unwrap().as_str();
             let mut exprs: Vec<Expr> = Vec::new();
             // for each argument in the function, parse the expression and add it to exprs
-            for arg in inners.into_iter() {
+            for arg in inners {
                 exprs.push(parse_expression(arg));
             }
-            return Expr::FunctionCall(ExprFunctionCall {
+            Expr::FunctionCall(ExprFunctionCall {
                 function_name: function_name.to_string(),
                 exprs: Box::new(exprs),
                 inferred_return_types: vec![],
                 inferred_param_types: vec![],
-            });
+            })
         }
 
         //if the rule has not been defined yet

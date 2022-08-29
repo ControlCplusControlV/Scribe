@@ -271,10 +271,10 @@ impl Expr {
                 default_case,
                 expr,
             }) => {
-                let _branch = tree.add_branch(&"switch".to_string());
+                let _branch = tree.add_branch("switch");
                 expr.add_to_tree(tree);
                 for case in cases {
-                    let _branch = tree.add_branch(&"case".to_string());
+                    let _branch = tree.add_branch("case");
                     Expr::Block(case.block.clone()).add_to_tree(tree);
                 }
             }
@@ -424,19 +424,19 @@ impl Expr {
             }) => {
                 let _branch = tree.add_branch(&format!("function definition - {}", function_name));
                 {
-                    let _params_branch = tree.add_branch(&format!("params"));
+                    let _params_branch = tree.add_branch("params");
                     for param in typed_identifier_list {
                         tree.add_leaf(&param.to_string());
                     }
                 }
                 {
-                    let _params_branch = tree.add_branch(&format!("returns"));
+                    let _params_branch = tree.add_branch("returns");
                     for param in return_typed_identifier_list {
                         dbg!(&return_typed_identifier_list);
                         tree.add_leaf(&param.to_string());
                     }
                 }
-                let _branch = tree.add_branch(&"body".to_string());
+                let _branch = tree.add_branch("body");
                 Expr::Block(block.clone()).add_to_tree(tree);
             }
 

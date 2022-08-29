@@ -80,7 +80,7 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
     if let Some(stack_string) = stack_string {
         program_lines.push(
             stack_string
-                .split(",")
+                .split(',')
                 .map(|s| format!("push.{}", s))
                 .collect::<Vec<_>>()
                 .into_iter()
@@ -108,7 +108,7 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
         let result = execute(program_with_procs, vec![]);
 
         let mut result_string = "".to_string();
-        if program_lines.len() > 0 {
+        if !program_lines.is_empty() {
             match result {
                 Ok(execution_value) => {
                     let stack = execution_value.last_stack_state();
@@ -116,7 +116,7 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
                         "\n{}",
                         stack
                             .iter()
-                            .map(|f| format!("{}", f.to_string()))
+                            .map(|f| format!("{}", f))
                             .collect::<Vec<_>>()
                             .join(" "),
                     );

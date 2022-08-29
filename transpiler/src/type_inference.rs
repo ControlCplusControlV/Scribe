@@ -86,9 +86,8 @@ impl TypeInferrer {
             }) => {
                 let inferred_types = identifiers
                     .iter()
-                    .map(|ident| Some(self.scoped_variables.get(ident).unwrap().clone()))
-                    .collect::<Vec<_>>()
-                    .clone();
+                    .map(|ident| Some(*self.scoped_variables.get(ident).unwrap()))
+                    .collect::<Vec<_>>();
                 self.expected_types = inferred_types.clone();
                 Expr::Assignment(ExprAssignment {
                     identifiers,
@@ -106,12 +105,12 @@ impl TypeInferrer {
                 for typed_identifier in &typed_identifiers {
                     self.scoped_variables.insert(
                         typed_identifier.identifier.clone(),
-                        typed_identifier.yul_type.clone(),
+                        typed_identifier.yul_type,
                     );
                 }
                 self.expected_types = typed_identifiers
                     .iter()
-                    .map(|ti| Some(ti.yul_type.clone()))
+                    .map(|ti| Some(ti.yul_type))
                     .collect();
                 let rhs = rhs.map(|rhs| Box::new(self.walk_expr(*rhs)));
                 Expr::DeclareVariable(ExprDeclareVariable {
@@ -130,7 +129,7 @@ impl TypeInferrer {
                 for typed_identifier in params.iter().chain(returns.iter()) {
                     self.scoped_variables.insert(
                         typed_identifier.identifier.clone(),
-                        typed_identifier.yul_type.clone(),
+                        typed_identifier.yul_type,
                     );
                 }
                 let block = ExprBlock {
@@ -201,7 +200,7 @@ impl TypeInferrer {
                 inferred_type: _,
             }) => {
                 let inferred_type = self.scoped_variables.get(&identifier).cloned();
-                self.evaluated_types = vec![inferred_type.clone()];
+                self.evaluated_types = vec![inferred_type];
                 Expr::Variable(ExprVariableReference {
                     inferred_type,
                     identifier,
@@ -213,12 +212,8 @@ impl TypeInferrer {
                 expr,
                 cases,
             }) => {
-                let new_expr = self.walk_expr(*expr.clone());
-                let inferred_type = self
-                    .evaluated_types
-                    .first()
-                    .unwrap_or(&Some(YulType::U256))
-                    .clone();
+                let new_expr = self.walk_expr(*expr);
+                let inferred_type = *self.evaluated_types.first().unwrap_or(&Some(YulType::U256));
                 let expected_types = self.evaluated_types.clone();
                 let cases = cases
                     .into_iter()
@@ -249,12 +244,8 @@ impl TypeInferrer {
                 value,
                 inferred_type: _,
             }) => {
-                let inferred_type = self
-                    .expected_types
-                    .first()
-                    .unwrap_or(&Some(YulType::U256))
-                    .clone();
-                self.evaluated_types = vec![inferred_type.clone()];
+                let inferred_type = *self.expected_types.first().unwrap_or(&Some(YulType::U256));
+                self.evaluated_types = vec![inferred_type];
                 ExprLiteral::Number(ExprLiteralNumber {
                     value,
                     inferred_type: inferred_type,
