@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::{collections::HashMap, vec};
 
 use crate::types::*;
@@ -72,7 +73,7 @@ impl VariableAssignmentVisitor {
 // add(i, 1) to i := add(1, i) will break this optimization. In the future we should support gt,
 // subtracting, etc.
 impl ExpressionVisitor for ForLoopToRepeatVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
+    fn visit_expr(&mut self, _expr: Expr) -> Option<Expr> {
         todo!();
         //         match &expr {
         //             Expr::ForLoop(ExprForLoop {
@@ -142,12 +143,12 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
         //             }
         //             _ => {}
         //         }
-        Some(expr)
+        // Some(expr)
     }
 }
 
 impl ExpressionVisitor for VariableAssignmentVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
+    fn visit_expr(&mut self, _expr: Expr) -> Option<Expr> {
         todo!();
         // match &expr {
         //     Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) => {
@@ -172,12 +173,12 @@ impl ExpressionVisitor for VariableAssignmentVisitor {
         //     }
         //     _ => {}
         // }
-        Some(expr)
+        // Some(expr)
     }
 }
 
 impl ExpressionVisitor for ConstVariableVisitor {
-    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
+    fn visit_expr(&mut self, _expr: Expr) -> Option<Expr> {
         todo!();
         // match &expr {
         //     Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs: _ }) => {
@@ -192,7 +193,7 @@ impl ExpressionVisitor for ConstVariableVisitor {
         //     }
         //     _ => {}
         // }
-        Some(expr)
+        // Some(expr)
     }
 }
 
@@ -253,10 +254,10 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
 
             //TODO: Expr is function definition
             Expr::FunctionDefinition(ExprFunctionDefinition {
-                function_name,
-                params,
-                returns,
-                block,
+                function_name: _,
+                params: _,
+                returns: _,
+                block: _,
             }) => todo!(),
 
             //TODO: Expr is break
@@ -303,8 +304,8 @@ fn walk_expr<V: ExpressionVisitor>(expr: Expr, visitor: &mut V) -> Option<Expr> 
 
             //Expr is variable
             Expr::Variable(ExprVariableReference {
-                ref identifier,
-                ref inferred_type,
+                identifier: _,
+                inferred_type: _,
             }) => expr,
             Expr::Case(_) => todo!(),
             Expr::Switch(_) => todo!(),

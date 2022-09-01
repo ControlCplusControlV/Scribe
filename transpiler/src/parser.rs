@@ -1,4 +1,3 @@
-use crate::type_inference::infer_types;
 use crate::types::*;
 use pest::iterators::Pair;
 use pest::Parser;
@@ -183,7 +182,7 @@ fn parse_statement(expression: Pair<Rule>) -> Expr {
                 rhs_expr = Some(parse_expression(rhs));
             }
             Expr::DeclareVariable(ExprDeclareVariable {
-                typed_identifiers: typed_identifiers,
+                typed_identifiers,
                 rhs: rhs_expr.map(Box::new),
             })
         }
@@ -255,7 +254,7 @@ fn parse_expression(expression: Pair<Rule>) -> Expr {
         Rule::number_literal => parse_expression(expression),
         Rule::hex_number => {
             // TODO: parse hex numbers
-            let mut initial = expression.as_str();
+            let initial = expression.as_str();
             Expr::Literal(ExprLiteral::Number(ExprLiteralNumber {
                 inferred_type: None,
                 value: U256::from_str_radix(initial, 16).unwrap(),
@@ -336,20 +335,11 @@ fn parse_block(expression: Pair<Rule>) -> ExprBlock {
     ExprBlock { exprs }
 }
 
-fn get_identifier(pair: Pair<Rule>) -> String {
-    match pair.as_rule() {
-        Rule::identifier => {
-            return pair.as_str().to_string();
-        }
-        r => {
-            panic!("This was supposed to be an identifier! {:?}", r);
-        }
-    }
-}
-
 // TESTS
 #[cfg(test)]
 mod tests {
+    use crate::type_inference::infer_types;
+
     use super::*;
 
     fn parse_to_tree(yul: &str) -> String {

@@ -266,9 +266,9 @@ impl Expr {
             //--------------------------------------------------------
             //is switch
             Expr::Switch(ExprSwitch {
-                inferred_type,
+                inferred_type: _,
                 cases,
-                default_case,
+                default_case: _,
                 expr,
             }) => {
                 let _branch = tree.add_branch("switch");

@@ -33,8 +33,8 @@ impl TypeInferrer {
             //Expr is function call
             Expr::FunctionCall(ExprFunctionCall {
                 function_name,
-                inferred_return_types,
-                inferred_param_types,
+                inferred_return_types: _,
+                inferred_param_types: _,
                 exprs,
             }) => {
                 // TODO: this is dumb, but inferring that the params to the function should be the
@@ -80,7 +80,7 @@ impl TypeInferrer {
 
             //Expr is assignment
             Expr::Assignment(ExprAssignment {
-                inferred_types,
+                inferred_types: _,
                 identifiers,
                 rhs,
             }) => {
@@ -248,7 +248,7 @@ impl TypeInferrer {
                 self.evaluated_types = vec![inferred_type];
                 ExprLiteral::Number(ExprLiteralNumber {
                     value,
-                    inferred_type: inferred_type,
+                    inferred_type,
                 })
             }
             x => x,

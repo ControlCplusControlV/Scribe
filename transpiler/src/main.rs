@@ -1,11 +1,9 @@
-use colored::*;
 use scribe::test_utilities::write_yul_to_masm;
 
 use scribe::repl::start_repl;
 
 use scribe::types::YulFile;
 use std::fs;
-use std::io::{stdin, stdout, Read, Write};
 extern crate quickcheck_macros;
 
 extern crate insta;
@@ -26,26 +24,6 @@ enum SubCommand {
         #[clap(short, long)]
         stack: Option<String>,
     },
-}
-
-//Display a "title" in bold when running Scribe examples in the terminal
-fn print_title(s: &str) {
-    let s1 = format!("=== {} ===", s).blue().bold();
-    println!("{}", s1);
-    println!(" ");
-}
-
-//Wait for the user to press enter to continue when running Scribe examples in the terminal
-fn pause() {
-    let mut stdout = stdout();
-    stdout.write_all(b"Press Enter to continue...").unwrap();
-    stdout.flush().unwrap();
-    stdin().read_exact(&mut [0]).unwrap();
-}
-
-//Clear the terminal when running Scribe examples
-fn clear_screen() {
-    print!("{esc}c", esc = 27 as char);
 }
 
 fn main() {

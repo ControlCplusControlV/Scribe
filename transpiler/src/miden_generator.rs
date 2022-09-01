@@ -73,11 +73,11 @@ struct Stack(Vec<StackValue>);
 // Implementation to print the stack in the terminal
 impl std::fmt::Debug for Stack {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\n").unwrap();
+        writeln!(f).unwrap();
         for value in self.0.iter() {
-            write!(
+            writeln!(
                 f,
-                "{}:{}\n",
+                "{}:{}",
                 value
                     .typed_identifier
                     .clone()
@@ -499,24 +499,6 @@ impl Transpiler {
         }
     }
 
-    //Drop the top value from the stack. Similar to other functions, if the YulType is u32, drop is called.
-    //If the YulType is u256, dropw is called twice
-    fn drop_top_stack_value(&mut self) {
-        self.add_comment("dropping top stack value");
-        let stack_value = self.stack.0.get(0).unwrap().clone();
-        self.stack.0.remove(0);
-        match stack_value.yul_type {
-            YulType::U32 => {
-                self.add_line("drop");
-            }
-            YulType::U256 => {
-                self.add_line("dropw");
-                self.add_line("dropw");
-            }
-        }
-        self.newline();
-    }
-
     //Drops the stack after the nth element.
     //For example if the stack is [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     // drop_after(10) will result [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0]
@@ -743,7 +725,7 @@ impl Transpiler {
         self.top_is_var(transpiler_target_switch_expression.clone());
 
         //For each case in the ExprSwitch.cases in the ExprSwitch passed into transpile_switch()
-        for (i, case) in op.cases.iter().enumerate() {
+        for (_, case) in op.cases.iter().enumerate() {
             //Dup the transpiler_target_switch_expression, which results in this value at the top of the stack
             self.dup_identifier(transpiler_target_switch_expression.clone());
 
@@ -1092,7 +1074,7 @@ impl Transpiler {
             Expr::FunctionCall(op) => self.transpile_miden_function(op),
             Expr::Repeat(op) => self.transpile_repeat(op),
             // We've already compiled the functions
-            Expr::FunctionDefinition(op) => (),
+            Expr::FunctionDefinition(_op) => (),
             Expr::Break => self.transpile_break(),
             Expr::Continue => self.transpile_continue(),
             Expr::Leave => self.transpile_leave(),

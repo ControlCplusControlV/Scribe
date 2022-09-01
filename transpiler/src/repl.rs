@@ -128,7 +128,7 @@ pub fn start_repl(functions_file: Option<String>, stack_string: Option<String>) 
                 }
             }
         }
-        println!("");
+        println!();
         let readline = rl.readline(&">> ".blue());
         match readline {
             Ok(line) => {
