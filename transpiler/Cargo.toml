@@ -12,9 +12,9 @@ path = "src/main.rs"
 [dependencies]
 pest = "2.0"
 pest_derive = "2.0"
-miden-assembly = {path = "./miden/assembly"}
-miden-processor = {path = "./miden/processor"}
-miden-core = {path = "./miden/core"}
+miden-assembly = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-processor = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-core = { git = "http://github.com/maticnetwork/miden", branch = "next" }
 hex = "0.4"
 colored = "2"
 debug_tree = "0.4.0"

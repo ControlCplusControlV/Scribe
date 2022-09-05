@@ -1,4 +1,4 @@
-use miden_processor::StarkField;
+use miden_core::StarkField;
 use quickcheck::{Arbitrary, Gen, TestResult};
 use quickcheck_macros::quickcheck;
 use scribe::{

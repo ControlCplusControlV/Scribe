@@ -1,11 +1,11 @@
 use miden_processor::ExecutionTrace;
-pub use miden_processor::{ExecutionError, Felt as BaseElement, FieldElement, ProgramInputs};
+pub use miden_processor::{ExecutionError, ProgramInputs};
 
 //Compiles and executes a compiled Miden program, returning the stack and any Miden errors.
 //The program is passed in as a String, passed to the Miden Assembler, and then passed into the Miden Processor to be executed
 pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, MidenError> {
-    let program = miden_assembly::Assembler::new()
-        .compile_script(&program)
+    let program = miden_assembly::Assembler::new(false)
+        .compile(&program)
         .map_err(MidenError::AssemblyError)?;
 
     let pub_inputs = vec![];

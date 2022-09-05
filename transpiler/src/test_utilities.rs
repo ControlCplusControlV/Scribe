@@ -8,7 +8,7 @@ use crate::type_inference::infer_types;
 use crate::types::expressions_to_tree;
 use crate::types::YulFile;
 use colored::*;
-use miden_processor::StarkField;
+use miden_core::StarkField;
 use primitive_types::U256;
 use std::fs;
 pub enum MidenResult {
