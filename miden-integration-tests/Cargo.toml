@@ -1,0 +1,31 @@
+[package]
+name = "miden-integration-tests"
+version = "0.1.0"
+edition = "2021"
+# Disable automatic test target discovery. This allows us to run all the integ tests as a single binary target (lib.rs)
+# instead of each integ test file being its own compiled & linked binary which is the default behavior. Linking with
+# RocksDB is expensive so we want to minimize the amount of work on ld. This is also how other projects like diesel-rs
+# structure their integ tests.
+autotests = false
+autobenches = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[test]]
+name = "integration_tests"
+path = "tests/lib.rs"
+harness = true
+
+
+[dependencies]
+scribe = {path = "../transpiler/"}
+miden-assembly = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-processor = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-core = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+primitive-types = "0.11.1"
+quickcheck = "1.0.3"
+quickcheck_macros = "1"
+tokio = { version = "1.21", features = ["macros", "rt-multi-thread"] }
+colored = "2"
+indoc = "1.0.6"
+insta = "1.12.0"
+rstest = "*"

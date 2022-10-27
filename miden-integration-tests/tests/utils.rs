@@ -1,15 +1,14 @@
-// Kind of hacky, maybe move this to a shared crate eventually
-use crate::ast_optimization::optimize_ast;
-use crate::executor;
-use crate::miden_generator;
-use crate::miden_generator::CompileOptions;
-use crate::parser;
-use crate::type_inference::infer_types;
-use crate::types::expressions_to_tree;
-use crate::types::YulFile;
 use colored::*;
 use miden_core::StarkField;
 use primitive_types::U256;
+use scribe::ast_optimization::optimize_ast;
+use scribe::executor;
+use scribe::miden_generator;
+use scribe::miden_generator::CompileOptions;
+use scribe::parser;
+use scribe::type_inference::infer_types;
+use scribe::types::expressions_to_tree;
+use scribe::types::YulFile;
 use std::fs;
 pub enum MidenResult {
     U256(primitive_types::U256),
@@ -39,15 +38,21 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     println!("{}", expressions_to_tree(&ast));
     println!();
 
-    let miden_code = miden_generator::transpile_program(ast, Default::default());
+    let (transpiler, miden_code) = miden_generator::transpile_program(ast, Default::default());
     let mut trimmed_miden_code = miden_code
         .split('\n')
         // .skip_while(|line| *line != "# end std lib #")
+        // .filter(|line| !line.trim().starts_with("#"))
+        // .filter(|line| !line.trim().is_empty())
         .collect::<Vec<_>>()
         .join("\n");
     print_title("Generated Miden Assembly");
     println!("{}", trimmed_miden_code);
     println!();
+    println!("Estimated cost: {}", transpiler.cost);
+    println!();
+    fs::write(format!("./test_output.masm",), trimmed_miden_code)
+        .expect("Unable to write Miden to file.");
 
     let execution_value = executor::execute(miden_code, vec![]).unwrap();
     let stack = execution_value.last_stack_state();
@@ -88,7 +93,7 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
 
     let ast = infer_types(&ast);
 
-    let miden_code = miden_generator::transpile_program(
+    let (_, miden_code) = miden_generator::transpile_program(
         ast,
         CompileOptions {
             comments: false,
@@ -126,7 +131,7 @@ pub fn write_yul_to_masm(yul_file: YulFile) {
     let ast = optimize_ast(parsed);
     let ast = infer_types(&ast);
 
-    let miden_code = miden_generator::transpile_program(ast, Default::default());
+    let (_, miden_code) = miden_generator::transpile_program(ast, Default::default());
 
     fs::write(
         format!(

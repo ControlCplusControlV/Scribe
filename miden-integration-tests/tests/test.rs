@@ -1,5 +1,5 @@
 use primitive_types::U256;
-use scribe::test_utilities::{run_example, MidenResult};
+use crate::utils::{run_example, MidenResult};
 
 #[test]
 fn integration_math() {
@@ -85,12 +85,11 @@ fn integration_for() {
 fn integration_fib() {
     run_example(
         "
-            let n := 10
-            let a := 0
-            let b := 1
-            let c := 0
+            let a:u32 := 0
+            let b:u32 := 1
+            let c:u32 := 0
 
-            for { let i := 0 } lt(i, n) { i := add(i, 1)}
+            for { let i:u32 := 0 } lt(i, n) { i := add(i, 1)}
             {
                 c := add(a,b)
                 a := b
@@ -106,8 +105,8 @@ fn integration_fib() {
 fn integration_case() {
     run_example(
         "
-            let x := 5
             let y := 8
+            let x := 5
             switch x
                 case 3 {
                     y := 5

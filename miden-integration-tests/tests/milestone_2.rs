@@ -1,5 +1,5 @@
+use crate::utils::compile_example;
 use indoc::indoc;
-use scribe::test_utilities::compile_example;
 
 #[test]
 fn optimization_basic_constant_replacement() {

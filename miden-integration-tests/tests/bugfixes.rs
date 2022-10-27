@@ -1,4 +1,5 @@
-use scribe::test_utilities::{run_example, MidenResult};
+use crate::utils::{run_example, MidenResult};
+
 #[test]
 fn test_is_zero() {
     run_example(

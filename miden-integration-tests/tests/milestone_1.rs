@@ -1,5 +1,5 @@
+use crate::utils::{run_example, MidenResult};
 use primitive_types::U256;
-use scribe::test_utilities::{run_example, MidenResult};
 
 #[test]
 fn u256_hex_literal() {

@@ -1,9 +1,9 @@
+use crate::utils::{miden_to_u256, MidenResult};
 use miden_core::StarkField;
 use quickcheck::{Arbitrary, Gen, TestResult};
 use quickcheck_macros::quickcheck;
 use scribe::{
     executor::execute,
-    test_utilities::{miden_to_u256, MidenResult},
     utils::{convert_u256_to_pushes, join_u32s_to_u256, load_all_procs, split_u256_to_u32s},
 };
 
@@ -235,4 +235,17 @@ fn multiplication_all_limbs() {
     );
     dbg!(&test_result);
     assert!(!test_result.is_failure());
+}
+
+fn reverse<T: Clone>(xs: &[T]) -> Vec<T> {
+    let mut rev = vec![];
+    for x in xs {
+        rev.insert(0, x.clone())
+    }
+    rev
+}
+
+#[quickcheck]
+fn double_reversal_is_identity(xs: Vec<isize>) -> bool {
+    xs == reverse(&reverse(&xs))
 }

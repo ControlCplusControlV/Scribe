@@ -25,6 +25,7 @@ rustyline = "9.1.2"
 clap = {version = "3.0.14", features = ["derive"]}
 anyhow = "1.0.54"
 thiserror = "1.0.30"
+# TODO: can maybe delete
 quickcheck = "1.0.3"
 quickcheck_macros = "1"
 include_dir = "0.7.2"
