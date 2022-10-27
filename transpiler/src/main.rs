@@ -1,6 +1,8 @@
-use scribe::test_utilities::write_yul_to_masm;
-
+use scribe::ast_optimization::optimize_ast;
+use scribe::miden_generator;
+use scribe::parser;
 use scribe::repl::start_repl;
+use scribe::type_inference::infer_types;
 
 use scribe::types::YulFile;
 use std::fs;
@@ -24,6 +26,23 @@ enum SubCommand {
         #[clap(short, long)]
         stack: Option<String>,
     },
+}
+
+pub fn write_yul_to_masm(yul_file: YulFile) {
+    let parsed = parser::parse_yul_syntax(&yul_file.file_contents);
+    let ast = optimize_ast(parsed);
+    let ast = infer_types(&ast);
+
+    let miden_code = miden_generator::transpile_program(ast, Default::default());
+
+    fs::write(
+        format!(
+            "../masm/{}.masm",
+            &yul_file.file_path.file_stem().unwrap().to_str().unwrap()
+        ),
+        miden_code,
+    )
+    .expect("Unable to write Miden to file.");
 }
 
 fn main() {

@@ -126,23 +126,6 @@ pub fn compile_example(yul_code: &str, expected_output: &str) {
 
 // pub fn run_yul() {}
 
-pub fn write_yul_to_masm(yul_file: YulFile) {
-    let parsed = parser::parse_yul_syntax(&yul_file.file_contents);
-    let ast = optimize_ast(parsed);
-    let ast = infer_types(&ast);
-
-    let (_, miden_code) = miden_generator::transpile_program(ast, Default::default());
-
-    fs::write(
-        format!(
-            "../masm/{}.masm",
-            &yul_file.file_path.file_stem().unwrap().to_str().unwrap()
-        ),
-        miden_code,
-    )
-    .expect("Unable to write Miden to file.");
-}
-
 //Converts the top 8 elements on the top of the stack to a U256 struct
 //This is used during testing to assert that the Miden output is the correct U256 value
 pub fn miden_to_u256(execuiton_trace: miden_processor::ExecutionTrace) -> U256 {
