@@ -1,5 +1,5 @@
-use crate::executor::execute;
-use crate::utils::load_all_procs;
+use papyrus::executor::execute;
+use papyrus::utils::load_all_procs;
 use colored::*;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;

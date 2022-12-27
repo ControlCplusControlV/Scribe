@@ -1,10 +1,9 @@
-use scribe::ast_optimization::optimize_ast;
-use scribe::miden_generator;
-use scribe::parser;
-use scribe::repl::start_repl;
-use scribe::type_inference::infer_types;
+use papyrus::ast_optimization::optimize_ast;
+use papyrus::miden_generator;
+use papyrus::parser;
+use papyrus::type_inference::infer_types;
 
-use scribe::types::YulFile;
+use papyrus::types::YulFile;
 use std::fs;
 extern crate quickcheck_macros;
 
@@ -56,7 +55,7 @@ fn main() {
             functions_file,
             stack,
         }) => {
-            start_repl(functions_file, stack);
+            ()
         }
         //If there are no command line arguments, run scribe on the yul contracts in the contracts directory and print the ouput in the terminal
         None => {

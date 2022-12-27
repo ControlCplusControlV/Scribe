@@ -1,0 +1,7 @@
+[workspace]
+edition = "2021"
+members = [
+    "crates/papyrus",
+    "bin/scribe",
+    "bin/repl",
+]
