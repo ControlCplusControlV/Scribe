@@ -1,0 +1,9 @@
+---
+source: src/parser.rs
+assertion_line: 253
+expression: "parse_to_tree(\"\n            i := 1\n            \")"
+
+---
+AST
+└╼ assign - i
+  └╼ 1

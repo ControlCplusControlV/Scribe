@@ -1,0 +1,25 @@
+---
+source: src/parser.rs
+assertion_line: 508
+expression: "parse_to_tree(\"\n            let x := 5\n            let y := 8\n            switch x\n                case 3 {\n                    y := 5\n                }\n                case 5 {\n                    y := 12\n                    let z := 15\n                }\n                case 8 {\n                    y := 15\n                }\n            y\")"
+
+---
+AST
+├╼ declare - x:u256
+│ └╼ 5:u256
+├╼ declare - y:u256
+│ └╼ 8:u256
+├╼ switch
+│ ├╼ var - x:u256
+│ ├╼ case
+│ │ └╼ assign - y:u256
+│ │   └╼ 5:u256
+│ ├╼ case
+│ │ ├╼ assign - y:u256
+│ │ │ └╼ 12:u256
+│ │ └╼ declare - z:u256
+│ │   └╼ 15:u256
+│ └╼ case
+│   └╼ assign - y:u256
+│     └╼ 15:u256
+└╼ var - y:u256

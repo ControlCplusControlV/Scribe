@@ -1,0 +1,8 @@
+---
+source: crates/papyrus/src/parser.rs
+expression: "parse_to_tree(\"add(1,2)\")"
+---
+AST
+└╼ add(u256, u256): 
+  ├╼ 1:u256
+  └╼ 2:u256

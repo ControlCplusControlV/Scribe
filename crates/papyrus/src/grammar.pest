@@ -1,0 +1,47 @@
+file = { SOI ~ NEWLINE* ~ (object | statement*) ~ NEWLINE* ~ EOI }
+
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+underscore = { "_" }
+WHITESPACE = _{ " " }
+
+
+block = { "{" ~ NEWLINE* ~ statement* ~ NEWLINE* ~ "}" }
+statement = { NEWLINE* ~ (for_loop | switch | if_statement | variable_declaration | assignment |  block | function_definition |   break_ | continue_ | leave | expr | comment)  ~ NEWLINE*  } 
+function_definition = { "function" ~ identifier ~ "(" ~ typed_identifier_list ~ ")" ~ function_returns ~ block }
+function_returns = { ( "->" ~ typed_identifier_list)? } 
+variable_declaration = { "let" ~ typed_identifier_list ~ (":=" ~ expr)? }
+assignment = { (identifier_list) ~ ":=" ~ NEWLINE * ~ expr }
+expr = { function_call | identifier | literal }
+if_statement = { "if" ~ expr ~ block}
+switch = { "switch" ~ expr ~ NEWLINE* ~ ((case+ ~ default?) | default) }
+case = { "case" ~ literal ~ block ~ NEWLINE* }
+default = { "default" ~ block }
+for_loop = { "for" ~ block ~ expr ~ block ~ (NEWLINE*) ~ block}
+break_ = @{ "break" }
+continue_ = @{ "continue" }
+leave = @{"leave"}
+function_call = { identifier ~ "(" ~ (expr ~ ( "," ~ expr)* )? ~ ")" }
+identifier = @{ ("_" | ASCII_ALPHA) ~ (ASCII_ALPHANUMERIC | "_" | "$")*}
+identifier_list = { identifier ~ ("," ~ identifier)*  }
+type_name = { identifier }
+typed_identifier_list = { typed_identifier? ~ ("," ~ typed_identifier )* }
+typed_identifier = { (identifier ~ (":" ~ type_name)?) }
+literal = { (number_literal | string_literal | true_literal | false_literal | hex_literal) ~ (":" ~ type_name)? }
+number_literal = { hex_number | decimal_number }
+comment = _{"//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE}
+string_literal = ${ "\"" ~ string_inner ~ "\"" }
+string_inner = @{ string_char* }
+string_char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+true_literal = @{ "true" }
+false_literal = @{ "false"}
+hex_number = @{ "0x" ~ ('0'..'9'| 'a'..'f'|'A'..'F')+ }
+decimal_number = @{ digit+ }
+object = { "object" ~ string_literal ~ "{" ~ NEWLINE* ~ code ~ (object | data)* ~ NEWLINE* ~ "}" }
+code = { "code" ~ block }
+data = {"data" ~ string_literal ~ (hex_literal | string_literal) }
+hex_literal = @{ "hex" ~ ( ("\""  ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\"") | "\'" ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\'") }

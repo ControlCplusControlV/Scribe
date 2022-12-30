@@ -1,0 +1,13 @@
+---
+source: crates/papyrus/src/parser.rs
+expression: "parse_to_tree(\"\n            if lt(i, 2) {\n               mstore(i, 1)\n            }\n            \")"
+---
+AST
+└╼ if statement
+  └╼ conditional
+    ├╼ lt(unknown, u256): 
+    │ ├╼ var - i:unknown
+    │ └╼ 2:u256
+    └╼ mstore(unknown, u256): 
+      ├╼ var - i:unknown
+      └╼ 1:u256

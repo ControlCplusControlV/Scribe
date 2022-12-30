@@ -1,0 +1,7 @@
+---
+source: src/parser.rs
+assertion_line: 276
+expression: parse_to_tree(yul)
+
+---
+AST
