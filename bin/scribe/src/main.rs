@@ -54,9 +54,7 @@ fn main() {
         Some(SubCommand::Repl {
             functions_file,
             stack,
-        }) => {
-            ()
-        }
+        }) => (),
         //If there are no command line arguments, run scribe on the yul contracts in the contracts directory and print the ouput in the terminal
         None => {
             let yul_contracts = read_yul_contracts();

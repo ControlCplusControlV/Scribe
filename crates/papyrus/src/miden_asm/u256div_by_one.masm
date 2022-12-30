@@ -1,0 +1,26 @@
+proc.u256div_by_one
+  push.2
+  u32div
+  swap.1
+  push.2
+  u32div 
+  swap.2
+  push.2
+  u32div
+  swap.3
+  push.2
+  u32div
+  swap.4
+  push.2
+  u32div
+  swap.5
+  push.2
+  u32div
+  swap.6
+  push.2
+  u32div
+  swap.7
+  push.2
+  u32div
+  movdn.7
+end

@@ -35,6 +35,6 @@ fn main() {
         }) => {
             start_repl(functions_file, stack);
         }
-        None => ()
+        None => (),
     }
 }
