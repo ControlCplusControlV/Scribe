@@ -8,24 +8,6 @@ use std::fs;
 extern crate quickcheck_macros;
 
 extern crate insta;
-use clap::Parser;
-
-#[derive(Parser)]
-#[clap(version = "1.0", author = "Me")]
-struct Opts {
-    #[clap(subcommand)]
-    subcmd: Option<SubCommand>,
-}
-
-#[derive(Parser)]
-enum SubCommand {
-    Repl {
-        #[clap(short, long)]
-        functions_file: Option<String>,
-        #[clap(short, long)]
-        stack: Option<String>,
-    },
-}
 
 pub fn write_yul_to_masm(yul_file: YulFile) {
     let parsed = parser::parse_yul_syntax(&yul_file.file_contents);
@@ -45,25 +27,11 @@ pub fn write_yul_to_masm(yul_file: YulFile) {
 }
 
 fn main() {
-    let opts: Opts = Opts::parse();
-    // opts.skip_setup = true;
+    let yul_contracts = read_yul_contracts();
 
-    //Match any command line arguments
-    match opts.subcmd {
-        //If the program is run with "repl" as an argument, start the Miden repl in the terminal
-        Some(SubCommand::Repl {
-            functions_file,
-            stack,
-        }) => (),
-        //If there are no command line arguments, run scribe on the yul contracts in the contracts directory and print the ouput in the terminal
-        None => {
-            let yul_contracts = read_yul_contracts();
-
-            //For each contract in Vec of YulFile
-            for yul_code in yul_contracts {
-                write_yul_to_masm(yul_code)
-            }
-        }
+    //For each contract in Vec of YulFile
+    for yul_code in yul_contracts {
+        write_yul_to_masm(yul_code)
     }
 }
 
