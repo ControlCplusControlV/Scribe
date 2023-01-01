@@ -13,16 +13,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./transpiler
-
+    
     steps:
     - uses: actions/checkout@v2
-    - name: Submodule init
-      run: git submodule init
-    - name: Submodule update
-      run: git submodule update
     - name: Build
       run: cargo build --verbose
     - name: Check formatting
@@ -31,4 +24,3 @@ jobs:
       run: cargo clippy --all-targets --all-features
     - name: Run tests
       run: cargo test --verbose
-      working-directory: ./transpiler/miden-integration-tests

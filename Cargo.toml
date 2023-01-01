@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/papyrus",
+    "bin/scribe",
+    "bin/repl",
+]

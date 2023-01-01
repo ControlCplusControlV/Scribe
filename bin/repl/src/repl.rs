@@ -1,6 +1,6 @@
-use crate::executor::execute;
-use crate::utils::load_all_procs;
 use colored::*;
+use papyrus::executor::execute;
+use papyrus::utils::load_all_procs;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use std::fs;

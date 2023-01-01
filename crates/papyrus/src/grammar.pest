@@ -45,6 +45,3 @@ object = { "object" ~ string_literal ~ "{" ~ NEWLINE* ~ code ~ (object | data)* 
 code = { "code" ~ block }
 data = {"data" ~ string_literal ~ (hex_literal | string_literal) }
 hex_literal = @{ "hex" ~ ( ("\""  ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\"") | "\'" ~ ('0'..'9'| 'a'..'f'|'A'..'F'){2}* ~ "\'") }
-
-
-

@@ -1,0 +1,33 @@
+[package]
+name = "scribe"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "scribe"
+path = "src/main.rs"
+
+[dependencies]
+papyrus = { path  = "../../crates/papyrus" }
+pest = "2.0"
+pest_derive = "2.0"
+miden-assembly = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-processor = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+miden-core = { git = "http://github.com/maticnetwork/miden", branch = "next" }
+hex = "0.4"
+colored = "2"
+debug_tree = "0.4.0"
+insta = "1.12.0"
+primitive-types = "0.11.1"
+itertools = "0.10.3"
+rustyline = "9.1.2"
+clap = {version = "3.0.14", features = ["derive"]}
+anyhow = "1.0.54"
+thiserror = "1.0.30"
+# TODO: can maybe delete
+quickcheck = "1.0.3"
+quickcheck_macros = "1"
+include_dir = "0.7.2"
+indoc = "1.0.6"
