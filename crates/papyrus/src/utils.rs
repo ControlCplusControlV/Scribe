@@ -15,7 +15,7 @@ pub fn convert_u256_to_pushes(x: &U256) -> String {
         .map(|bytes| {
             let mut stack_value: u32 = 0;
             for (i, bytes) in bytes.enumerate() {
-                stack_value |= ((*bytes as u32) << ((i) * 8)) as u32
+                stack_value |= (*bytes as u32) << ((i) * 8)
             }
             format!("push.{:<10}", stack_value)
         })
@@ -36,7 +36,7 @@ pub fn split_u256_to_u32s(x: &U256) -> Vec<u32> {
         .map(|bytes| {
             let mut stack_value: u32 = 0;
             for (i, bytes) in bytes.enumerate() {
-                stack_value |= ((*bytes as u32) << ((i) * 8)) as u32
+                stack_value |= (*bytes as u32) << ((i) * 8)
             }
             stack_value
         })

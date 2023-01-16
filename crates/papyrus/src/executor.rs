@@ -1,16 +1,15 @@
 use miden_processor::ExecutionTrace;
-pub use miden_processor::{ExecutionError, ProgramInputs};
+pub use miden_processor::{ExecutionError, MemAdviceProvider, StackInputs};
 
 //Compiles and executes a compiled Miden program, returning the stack and any Miden errors.
 //The program is passed in as a String, passed to the Miden Assembler, and then passed into the Miden Processor to be executed
 pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace, MidenError> {
     let program = miden_assembly::Assembler::default()
-        .compile(&program)
+        .compile(program)
         .map_err(MidenError::AssemblyError)?;
 
-    let pub_inputs = vec![];
-    let inputs = ProgramInputs::new(&pub_inputs, &[], vec![]).unwrap();
-    miden_processor::execute(&program, &inputs).map_err(MidenError::ExecutionError)
+    miden_processor::execute(&program, StackInputs::empty(), MemAdviceProvider::empty())
+        .map_err(MidenError::ExecutionError)
 }
 
 //Errors that are returned from the Miden processor during execution.

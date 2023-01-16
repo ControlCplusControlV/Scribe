@@ -1,19 +1,19 @@
 proc.u256shr_unsafe
   dup
-  u32shr.1
+  u32unchecked_shr.1
   movdn.8
-  u32shl.31
+  u32unchecked_shl.31
 
   repeat.6
     dup.1
-    u32shr.1
+    u32unchecked_shr.1
     add
     movdn.8
-    u32shl.31
+    u32unchecked_shl.31
   end
 
   swap
-  u32shr.1
+  u32unchecked_shr.1
   add
   movdn.7
 end

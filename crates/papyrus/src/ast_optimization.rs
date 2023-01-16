@@ -50,7 +50,7 @@ struct VariableAssignmentVisitor {
 }
 
 impl VariableAssignmentVisitor {
-    //Checks for variables that are only assigned once and returns a hashmap of the variables to convert into constants.
+    // Checks for variables that are only assigned once and returns a hashmap of the variables to convert into constants.
     fn get_const_variables(&self) -> HashMap<String, ExprLiteral> {
         self.assignment_counter
             .iter()
