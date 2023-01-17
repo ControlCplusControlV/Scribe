@@ -8,8 +8,13 @@ use crate::types::*;
 pub fn optimize_ast(ast: Vec<Expr>) -> Vec<Expr> {
     // let mut assignment_visitor = VariableAssignmentVisitor::default();
     // let ast = walk_ast(ast, &mut assignment_visitor);
+
+
     // let const_variables = assignment_visitor.get_const_variables();
     // let ast = walk_ast(ast, &mut ConstVariableVisitor { const_variables });
+
+
+    
 
     // walk_ast(ast, &mut ForLoopToRepeatVisitor {})
     // TODO: fix optimizations
@@ -73,77 +78,111 @@ impl VariableAssignmentVisitor {
 // add(i, 1) to i := add(1, i) will break this optimization. In the future we should support gt,
 // subtracting, etc.
 impl ExpressionVisitor for ForLoopToRepeatVisitor {
-    fn visit_expr(&mut self, _expr: Expr) -> Option<Expr> {
-        todo!();
-        //         match &expr {
-        //             Expr::ForLoop(ExprForLoop {
-        //                 init_block,
-        //                 conditional,
-        //                 after_block,
-        //                 interior_block,
-        //             }) => {
-        //                 let start: Option<u128>;
-        //                 let iterator_identifier: Option<String>;
-        //                 if let Some(first_expr) = (*init_block.exprs).first() {
-        //                     if let Expr::DeclareVariable(ExprDeclareVariable { identifier, rhs }) =
-        //                         first_expr
-        //                     {
-        //                         if let Some(Expr::Literal(value)) = rhs.clone().map(|e| *e) {
-        //                             start = Some(todo!("Need to get literal value here"));
-        //                             iterator_identifier = Some(identifier.to_string());
-        //                         } else {
-        //                             return Some(expr);
-        //                         }
-        //                     } else {
-        //                         return Some(expr);
-        //                     }
-        //                 } else {
-        //                     return Some(expr);
-        //                 }
-        //
-        //                 if let Some(Expr::Assignment(assignment)) = (*after_block.exprs).first() {
-        //                     if *assignment
-        //                         == (ExprAssignment {
-        //                             typed_identifier: iterator_identifier.clone().unwrap(),
-        //                             rhs: Box::new(Expr::FunctionCall(ExprFunctionCall {
-        //                                 function_name: "add".to_string(),
-        //                                 exprs: Box::new(vec![
-        //                                     Expr::Variable(ExprVariableReference {
-        //                                         identifier: iterator_identifier.clone().unwrap(),
-        //                                     }),
-        //                                     Expr::Literal(todo!("Need to get literal value here")),
-        //                                 ]),
-        //                             })),
-        //                         })
-        //                     {}
-        //                 } else {
-        //                     return Some(expr);
-        //                 }
-        //                 if let Expr::FunctionCall(ExprFunctionCall {
-        //                     function_name,
-        //                     exprs,
-        //                 }) = &**conditional
-        //                 {
-        //                     if function_name == "lt"
-        //                         && exprs[0]
-        //                             == Expr::Variable(ExprVariableReference {
-        //                                 identifier: iterator_identifier.unwrap(),
-        //                             })
-        //                     {
-        //                         if let Expr::Literal(value) = exprs[1] {
-        //                             return Some(Expr::Repeat(ExprRepeat {
-        //                                 interior_block: interior_block.clone(),
-        //                                 iterations: todo!("Get end value from literal"),
-        //                             }));
-        //                         }
-        //                     }
-        //                 } else {
-        //                     return Some(expr);
-        //                 }
-        //             }
-        //             _ => {}
-        //         }
-        // Some(expr)
+    fn visit_expr(&mut self, expr: Expr) -> Option<Expr> {
+        let preserve_value = Some(expr.clone());
+
+       if let Expr::ForLoop(ExprForLoop {
+                init_block,
+                conditional,
+                after_block,
+                interior_block,
+            }) = expr.clone() {
+                let mut i = 0; // Variable to keep track of where repeat begins
+                let init_value_name: String;
+
+
+                // Start out with the init block, and determine where iteration will start
+                /// This optimization will only be applied when the init block uses a number literal for the rhs
+                if init_block.exprs.len() != 1 {
+                    return preserve_value;
+                }
+
+
+
+                for expr in init_block.exprs {
+                    if let Expr::Assignment(value) = expr.clone() {
+                        if let Expr::Literal(value) = *value.rhs {
+                            match value {
+                                ExprLiteral::Number(n)=> {
+                                    i = n.value.0[3]; // TODO: make sure this is within u32 constraints
+                                }
+                                _ => {
+                                    return preserve_value;
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                let mut end_val = primitive_types::U256::zero();
+                // With `i` now indicating where our iteration will start, we can check the conditional
+                if let Expr::FunctionCall(ExprFunctionCall{function_name, exprs, inferred_return_types, inferred_param_types }) = *conditional {
+
+                        if function_name == "lt"{
+                            if let Expr::Literal(ExprLiteral::Number(expr_literal_num)) = exprs.last().unwrap() {
+                               end_val =  expr_literal_num.value;
+                            };
+                            
+                        } else if function_name == "gt"{
+                            if let Expr::Literal(ExprLiteral::Number(expr_literal_num)) = exprs.last().unwrap() {
+                                end_val =  expr_literal_num.value;
+                             };
+                        }else{
+                            return preserve_value;
+                        }
+                    
+                }
+
+                // Determine iterator size
+                if after_block.exprs.len() != 1 {
+                    return preserve_value;
+                }
+                let mut step = 0;
+
+                for expr in after_block.exprs {
+                    match expr {
+                        Expr::Assignment(value) => {
+                            if let Expr::FunctionCall(ExprFunctionCall { function_name, exprs, .. }) = *value.rhs {
+                                    if function_name == "add" {
+
+
+
+
+                                        for args in *exprs {
+                                            match args {
+                                                Expr::Literal(ExprLiteral::Number(expr_literal_num)) => {
+                                                    step = expr_literal_num.value.0[3]; // TODO: make sure this is within u32 constraints
+                                                }
+                                                Expr::Variable(ExprVariableReference { identifier , ..}) => {
+                                                    if identifier != "i" { // Should check identifier is the same as the one which appaered earlier
+                                                        return preserve_value;
+                                                    }
+                                                }
+                                                _ => return preserve_value
+                                            }
+                                    }
+                                }
+                            }
+                        }
+                        _ => return Some(expr)
+                    }
+                }
+
+                //TODO: 
+
+                // for { let i := 29 } lt(i, exponent) { i := add(i, 1) }
+                // {
+                //     result := mul(result, base)
+                // }
+                
+                return Some(Expr::Repeat(ExprRepeat {
+                    iterations: 53,
+                    interior_block,
+                }));
+            };
+
+        Some(expr)
     }
 }
 

@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/papyrus",
+    "crates/miden-integration-tests",
     "bin/scribe",
     "bin/repl",
 ]
