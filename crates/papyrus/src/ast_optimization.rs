@@ -88,8 +88,13 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                 interior_block,
             }) = expr.clone() {
                 let mut i = 0; // Variable to keep track of where repeat begins
-                let init_value_name: String;
+                let mut init_value_variable_name: String = "".to_string();
 
+                //get the init value name, 
+
+                //Get the end value
+
+                // Get the step and see if it is mul, add etc, and get the repeat amount
 
                 // Start out with the init block, and determine where iteration will start
                 /// This optimization will only be applied when the init block uses a number literal for the rhs
@@ -97,7 +102,13 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                     return preserve_value;
                 }
 
-
+               if let Some(Expr::DeclareVariable(ExprDeclareVariable{typed_identifiers, rhs: _}))= init_block.exprs.first(){
+                    if let Some(TypedIdentifier{identifier, yul_type}) = typed_identifiers.first(){
+                        init_value_variable_name = identifier.to_owned();
+                    }
+               }else{
+                return preserve_value;
+               };
 
                 for expr in init_block.exprs {
                     if let Expr::Assignment(value) = expr.clone() {
@@ -138,30 +149,71 @@ impl ExpressionVisitor for ForLoopToRepeatVisitor {
                 if after_block.exprs.len() != 1 {
                     return preserve_value;
                 }
-                let mut step = 0;
+                let mut iterations = 0; // Final value for repeat statement
 
                 for expr in after_block.exprs {
                     match expr {
                         Expr::Assignment(value) => {
                             if let Expr::FunctionCall(ExprFunctionCall { function_name, exprs, .. }) = *value.rhs {
-                                    if function_name == "add" {
-
-
-
-
+                                match function_name.to_string().as_str() {
+                                    "add" => {
+                                        let mut step = 1;
                                         for args in *exprs {
                                             match args {
                                                 Expr::Literal(ExprLiteral::Number(expr_literal_num)) => {
                                                     step = expr_literal_num.value.0[3]; // TODO: make sure this is within u32 constraints
                                                 }
                                                 Expr::Variable(ExprVariableReference { identifier , ..}) => {
-                                                    if identifier != "i" { // Should check identifier is the same as the one which appaered earlier
+                                                    if identifier != init_value_variable_name { // Should check identifier is the same as the one which appaered earlier
                                                         return preserve_value;
                                                     }
                                                 }
                                                 _ => return preserve_value
                                             }
+                                        iterations = ((end_val - i) / step).0[3]; // TODO: make sure this is within u32 constraints
                                     }
+                                    }
+                                    "sub" => {
+                                        let mut step = 1;
+                                        let args = *exprs;
+                                        if let Some(Expr::Variable( ExprVariableReference { identifier , ..})) = args.first() {
+                                            if *identifier != init_value_variable_name {
+                                                return preserve_value;
+                                            }
+                                        }
+
+                                        if let Some(Expr::Literal( ExprLiteral::Number())) = args.first() {
+                                            if *identifier != init_value_variable_name {
+                                                return preserve_value;
+                                            }
+                                        }
+                                        
+
+                                        
+
+                                    }
+                                    "mul" => {
+                                        let step = 1;
+                                        let args = *exprs;            
+                                        for args in *exprs {
+                                            match args {
+                                                Expr::Literal(ExprLiteral::Number(expr_literal_num)) => {
+                                                    step = expr_literal_num.value.0[3]; // TODO: make sure this is within u32 constraints
+                                                }
+                                                Expr::Variable(ExprVariableReference { identifier , ..}) => {
+                                                    if identifier != init_value_variable_name { // Should check identifier is the same as the one which appaered earlier
+                                                        return preserve_value;
+                                                    }
+                                                }
+                                                _ => return preserve_value
+                                            }
+                                        }
+                                    }
+                                    "div" => {
+                                        let step = 1;
+                                        let args = *exprs;                                        
+                                    }
+                                    _ => return preserve_value,
                                 }
                             }
                         }
