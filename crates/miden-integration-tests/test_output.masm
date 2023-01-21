@@ -2,12 +2,12 @@ use.std::math::u256
  
  
 begin
-    # and() #
-    # u256 literal: 0 #
-    push.0          push.0          push.0          push.0          push.0          push.0          push.0          push.0         
+    # eq() #
+    # u256 literal: 2 #
+    push.2          push.0          push.0          push.0          push.0          push.0          push.0          push.0         
 
-    # u256 literal: 0 #
-    push.0          push.0          push.0          push.0          push.0          push.0          push.0          push.0         
+    # u256 literal: 2 #
+    push.2          push.0          push.0          push.0          push.0          push.0          push.0          push.0         
 
-    exec.u256::and
+    exec.u256::eq_unsafe
 end
