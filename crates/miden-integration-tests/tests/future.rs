@@ -1,5 +1,5 @@
-use primitive_types::U256;
 use crate::utils::{run_example, MidenResult};
+use primitive_types::U256;
 
 #[ignore]
 #[test]

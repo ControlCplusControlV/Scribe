@@ -1,6 +1,5 @@
 use colored::*;
 use miden_core::StarkField;
-use primitive_types::U256;
 use papyrus::ast_optimization::optimize_ast;
 use papyrus::executor;
 use papyrus::miden_generator;
@@ -9,12 +8,12 @@ use papyrus::parser;
 use papyrus::type_inference::infer_types;
 use papyrus::types::expressions_to_tree;
 use papyrus::types::YulFile;
+use primitive_types::U256;
 use std::fs;
 pub enum MidenResult {
     U256(primitive_types::U256),
     U32(u32),
 }
-
 
 fn print_title(s: &str) {
     let s1 = format!("=== {} ===", s).blue().bold();
@@ -25,7 +24,6 @@ fn print_title(s: &str) {
 //Function to display transpile Yul code and display each step of the transpilation process in the terminal.
 //This function is only used to demonstrate what Scribe does in a easy to read format.
 pub fn run_example(yul_code: &str, expected_output: MidenResult) {
-  
     println!();
     println!();
     print_title("Input Yul");
@@ -41,7 +39,7 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
     println!("{}", expressions_to_tree(&ast));
     println!();
 
-    let  miden_code = miden_generator::transpile_program(ast, Default::default());
+    let miden_code = miden_generator::transpile_program(ast, Default::default());
     let mut trimmed_miden_code = miden_code
         .split('\n')
         // .skip_while(|line| *line != "# end std lib #")
@@ -84,7 +82,6 @@ pub fn run_example(yul_code: &str, expected_output: MidenResult) {
 }
 
 pub fn compile_example(yul_code: &str, expected_output: &str) {
-
     let parsed = parser::parse_yul_syntax(yul_code);
 
     let ast = optimize_ast(parsed);
