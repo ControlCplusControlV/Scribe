@@ -4,6 +4,7 @@ use crate::types::{
 };
 
 pub mod const_variable;
+pub mod cost_estimator;
 pub mod for_loop_to_repeat;
 pub mod variable_assignment;
 
