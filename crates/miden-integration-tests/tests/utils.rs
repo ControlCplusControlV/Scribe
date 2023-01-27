@@ -1,9 +1,9 @@
 use colored::*;
 use miden_core::StarkField;
-use papyrus::ast_optimization::optimize_ast;
 use papyrus::executor;
 use papyrus::miden_generator;
 use papyrus::miden_generator::CompileOptions;
+use papyrus::optimizer::optimize_ast;
 use papyrus::parser;
 use papyrus::type_inference::infer_types;
 use papyrus::types::expressions_to_tree;

@@ -1,6 +1,6 @@
 use crate::utils::compile_example;
 use indoc::indoc;
-use papyrus::ast_optimization::optimize_ast;
+use papyrus::optimizer::optimize_ast;
 
 #[test]
 fn optimization_basic_constant_replacement() {

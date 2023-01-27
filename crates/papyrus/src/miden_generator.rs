@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use include_dir::{include_dir, Dir};
 use primitive_types::U256;
 
-use crate::{ast_optimization::optimize_ast, types::*, utils::convert_u256_to_pushes};
+use crate::{optimizer::optimize_ast, types::*, utils::convert_u256_to_pushes};
 
 //Struct that enables transpilation management. Through implementations, this struct keeps track of the variables,
 //open memory addresses, the stack, indentation of Miden assembly and user defined functions.
@@ -1147,7 +1147,7 @@ pub fn transpile_program(expressions: Vec<Expr>, options: CompileOptions) -> Str
     //transpiling the body of the miden program
     for expr in &ast {
         if let Expr::FunctionDefinition(op) = expr {
-            transpiler.transpile_function_declaration(op)
+            transpiler.transpile_function_declaration(&op)
         }
     }
 
