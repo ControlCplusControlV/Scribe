@@ -8,8 +8,12 @@ pub fn execute(program: String, _pub_inputs: Vec<u128>) -> Result<ExecutionTrace
         .compile(program)
         .map_err(MidenError::AssemblyError)?;
 
-    miden_processor::execute(&program, StackInputs::empty(), MemAdviceProvider::empty())
-        .map_err(MidenError::ExecutionError)
+    miden_processor::execute(
+        &program,
+        StackInputs::default(),
+        MemAdviceProvider::default(),
+    )
+    .map_err(MidenError::ExecutionError)
 }
 
 //Errors that are returned from the Miden processor during execution.

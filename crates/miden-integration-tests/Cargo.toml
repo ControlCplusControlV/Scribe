@@ -17,7 +17,7 @@ harness = true
 
 
 [dependencies]
-scribe = {path = "../transpiler/"}
+papyrus = { path = "../papyrus" }
 miden-assembly = { git = "http://github.com/maticnetwork/miden", branch = "next" }
 miden-processor = { git = "http://github.com/maticnetwork/miden", branch = "next" }
 miden-core = { git = "http://github.com/maticnetwork/miden", branch = "next" }

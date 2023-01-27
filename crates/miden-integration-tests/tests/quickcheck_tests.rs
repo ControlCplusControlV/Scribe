@@ -1,11 +1,11 @@
 use crate::utils::{miden_to_u256, MidenResult};
 use miden_core::StarkField;
-use quickcheck::{Arbitrary, Gen, TestResult};
-use quickcheck_macros::quickcheck;
-use scribe::{
+use papyrus::{
     executor::execute,
     utils::{convert_u256_to_pushes, join_u32s_to_u256, load_all_procs, split_u256_to_u32s},
 };
+use quickcheck::{Arbitrary, Gen, TestResult};
+use quickcheck_macros::quickcheck;
 
 #[derive(Clone, Debug)]
 struct U256(primitive_types::U256);

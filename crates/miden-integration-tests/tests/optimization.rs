@@ -1,5 +1,6 @@
 use crate::utils::compile_example;
 use indoc::indoc;
+use papyrus::optimizer::optimize_ast;
 
 #[test]
 fn optimization_basic_constant_replacement() {
@@ -142,4 +143,80 @@ fn optimization_let_old_vars_die_v2() {
             end
         "},
     );
+}
+
+#[test]
+fn test_for_loop_to_repeat_statement_optimization() {
+    //Conditional is lt
+    let source_code = " 
+    let result := 0
+
+    for { let i := 0 } lt(i, 100) { i := add(i, 1) }
+        {
+            result := mul(result, 2)
+        }
+    ";
+
+    let parsed = papyrus::parser::parse_yul_syntax(source_code);
+    let ast = optimize_ast(parsed);
+
+    println!("{:#?}", ast);
+
+    // insta::assert_debug_snapshot!(ast);
+
+    // //Conditional is lt, mul
+    // let source_code = "
+    // let result := 0
+
+    // for { let i := 0 } lt(i, 100) { i := mul(i, 2) }
+    //     {
+    //         result := mul(result, 2)
+    //     }
+    // "
+
+    // let parsed = parser::parse_yul_syntax(source_code);
+    // let ast = optimize_ast(parsed);
+    // insta::assert_debug_snapshot!(ast);
+
+    // //Conditional is gt, div
+    // let source_code = "
+    // let result := 0
+
+    // for { let i := 100 } gt(i, 0) { i := div(i, 2) }
+    //     {
+    //         result := mul(result, 2)
+    //     }
+    // "
+
+    // let parsed = parser::parse_yul_syntax(source_code);
+    // let ast = optimize_ast(parsed);
+    // insta::assert_debug_snapshot!(ast);
+
+    // //Conditional is slt
+    // let source_code = "
+    // let result := 0
+
+    // for { let i := 100 } gt(i, 0) { i := sub(i, 1) }
+    //     {
+    //         result := mul(result, 2)
+    //     }
+    // "
+
+    // let parsed = parser::parse_yul_syntax(source_code);
+    // let ast = optimize_ast(parsed);
+    // insta::assert_debug_snapshot!(ast);
+
+    // //Conditional is sgt
+    // let source_code = "
+    // let result := 0
+
+    // for { let i := 100 } gt(i, 0) { i := sub(i, 1) }
+    //     {
+    //         result := mul(result, 2)
+    //     }
+    // "
+
+    // let parsed = parser::parse_yul_syntax(source_code);
+    // let ast = optimize_ast(parsed);
+    // insta::assert_debug_snapshot!(ast);
 }
