@@ -7,6 +7,10 @@ impl CostEstimator {
         CostEstimator { total_cost: 0 }
     }
 
+    //TODO: not sure what the program passed in might look like, but we can this function return the cost of the sequence
+    pub fn evaluate() {}
+
+    //TODO: we might not need this, might only need the evaluate function
     pub fn increment(&mut self, operation: MidenOperation) {
         self.total_cost += operation.cost() as u128;
     }
